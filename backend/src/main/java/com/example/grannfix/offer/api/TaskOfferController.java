@@ -7,16 +7,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/offers")
 @RequiredArgsConstructor
-public class OfferController {
+public class TaskOfferController {
 
     private final OfferService offerService;
 
-    @PostMapping("/task/{taskId}")
+    @PostMapping("/tasks/{taskId}/offers")
     public OfferResponse createOffer(
             @PathVariable UUID taskId,
             @AuthenticationPrincipal UUID userId,
@@ -24,4 +25,13 @@ public class OfferController {
     ) {
         return offerService.createOffer(taskId, userId, request);
     }
+
+    @GetMapping("/tasks/{taskId}/offers")
+    public List<OfferResponse> getOffers(
+            @PathVariable UUID taskId,
+            @AuthenticationPrincipal UUID userId
+    ){
+        return offerService.getTaskOffers(taskId, userId);
+    }
+
 }

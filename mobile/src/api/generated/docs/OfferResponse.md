@@ -7,14 +7,11 @@
 Name | Type
 ------------ | -------------
 `id` | string
-`taskId` | string
 `helperId` | string
 `proposedPrice` | number
 `message` | string
 `status` | string
 `createdAt` | Date
-`updatedAt` | Date
-`completedAt` | Date
 
 ## Example
 
@@ -24,14 +21,11 @@ import type { OfferResponse } from ''
 // TODO: Update the object below with actual values
 const example = {
   "id": null,
-  "taskId": null,
   "helperId": null,
   "proposedPrice": null,
   "message": null,
   "status": null,
   "createdAt": null,
-  "updatedAt": null,
-  "completedAt": null,
 } satisfies OfferResponse
 
 console.log(example)

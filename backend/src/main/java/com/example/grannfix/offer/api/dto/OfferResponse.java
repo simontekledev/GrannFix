@@ -7,12 +7,9 @@ import java.util.UUID;
 
 public record OfferResponse(
         UUID id,
-        UUID taskId,
         UUID helperId,
         BigDecimal proposedPrice,
         String message,
         OfferStatus status,
-        Instant createdAt,
-        Instant updatedAt,
-        Instant completedAt
+        Instant createdAt
 ) {}

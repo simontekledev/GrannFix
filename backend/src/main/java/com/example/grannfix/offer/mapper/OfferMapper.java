@@ -11,14 +11,11 @@ public class OfferMapper {
 
         return new OfferResponse(
                 o.getId(),
-                o.getTaskId(),
                 o.getHelperId(),
                 o.getProposedPrice(),
                 o.getMessage(),
                 o.getStatus(),
-                o.getCreatedAt(),
-                o.getUpdatedAt(),
-                o.getCompletedAt()
+                o.getCreatedAt()
         );
     }
 }

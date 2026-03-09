@@ -1,27 +1,80 @@
+import React, { useMemo, useState } from "react";
 import { Image } from "expo-image";
-import { Platform, StyleSheet, Button, Alert } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  StyleSheet,
+  TextInput,
+  Pressable,
+} from "react-native";
+import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
-import { HelloWave } from "@/components/hello-wave";
 import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
+import { authApi } from "@/src/api/client";
 
-import Constants from "expo-constants";
-
-// Get your PC IP from Expo (same trick as client.ts)
 const host = Constants.expoConfig?.hostUri?.split(":")[0];
 const BASE_URL = `http://${host}:8080`;
 
 export default function HomeScreen() {
-  async function handlePing() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
+
+  const canSubmit = useMemo(() => {
+    // very light validation; keep it simple
+    return email.trim().length > 0 && password.length > 0 && !submitting;
+  }, [email, password, submitting]);
+
+  async function handleLogin() {
+    if (!canSubmit) return;
+
+    setSubmitting(true);
     try {
-      const res = await fetch(`${BASE_URL}/ping`);
-      const text = await res.text();
-      Alert.alert("✅ Ping response", `${res.status}: ${text}\n\n${BASE_URL}/ping`);
+      const res = await authApi.login({
+        loginRequest: {
+          email: email.trim(),
+          password,
+        },
+      });
+
+      if (res.accessToken) {
+        await AsyncStorage.setItem("access_token", res.accessToken);
+      }
+      if (res.refreshToken) {
+        await AsyncStorage.setItem("refresh_token", res.refreshToken);
+      }
+
+      Alert.alert(
+        "✅ Logged in",
+        `User: ${res.user?.id ?? "(no id)"}\nToken saved: ${
+          res.accessToken ? "yes" : "no"
+        }`
+      );
+
+      // OPTIONAL: navigate somewhere after login
+      // Change "/(tabs)/explore" to wherever your authenticated landing page is.
+      router.replace("/(tabs)/explore");
     } catch (e: any) {
-      console.log("Ping error:", e);
-      Alert.alert("❌ Ping failed", String(e?.message ?? e));
+      console.log("Login error:", e);
+
+      const msg =
+        e?.response?.status
+          ? `HTTP ${e.response.status}`
+          : e?.status
+          ? `HTTP ${e.status}`
+          : String(e?.message ?? e);
+
+      Alert.alert("❌ Login failed", msg);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -35,79 +88,127 @@ export default function HomeScreen() {
         />
       }
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+      <ThemedView style={styles.container}>
+        <ThemedText type="title">Sign in</ThemedText>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">API Test</ThemedText>
-        <ThemedText>
-          Base URL: <ThemedText type="defaultSemiBold">{BASE_URL}</ThemedText>
+        <ThemedText style={{ marginTop: 8 }}>
+          API Base URL:{" "}
+          <ThemedText type="defaultSemiBold">{BASE_URL}</ThemedText>
         </ThemedText>
 
-        <Button title="Ping backend (/ping)" onPress={handlePing} />
-      </ThemedView>
+        <ThemedView style={styles.form}>
+          <ThemedText type="subtitle">Email</ThemedText>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            textContentType="username"
+            placeholder="you@example.com"
+            placeholderTextColor="#999"
+            style={styles.input}
+            editable={!submitting}
+            returnKeyType="next"
+          />
 
-      {/* keep the rest of your starter UI */}
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
+          <ThemedText type="subtitle">Password</ThemedText>
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            textContentType="password"
+            placeholder="••••••••"
+            placeholderTextColor="#999"
+            style={styles.input}
+            editable={!submitting}
+            returnKeyType="done"
+            onSubmitEditing={handleLogin}
+          />
 
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert("Action pressed")} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+          <Pressable
+              onPress={handleLogin}
+              disabled={!canSubmit}
+              style={({ pressed }) => [
+                styles.button,
+                !canSubmit && styles.buttonDisabled,
+                pressed && canSubmit && styles.buttonPressed,
+              ]}
+            >
+              {submitting ? (
+                <ActivityIndicator />
+              ) : (
+                <ThemedText style={styles.buttonText}>Log in</ThemedText>
+              )}
+            </Pressable>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
+            <Pressable
+              onPress={() => router.push("/register")}
+              style={styles.linkButton}
+            >
+              <ThemedText style={styles.linkText}>
+                Don’t have an account? Register
+              </ThemedText>
+            </Pressable>
+
+          <ThemedText style={styles.hint}>
+            Tip: On{" "}
+            <ThemedText type="defaultSemiBold">
+              {Platform.select({
+                ios: "iOS",
+                android: "Android",
+                web: "web",
+              })}
+            </ThemedText>
+            , make sure your phone/emulator can reach{" "}
+            <ThemedText type="defaultSemiBold">{BASE_URL}</ThemedText>.
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  container: {
+    gap: 12,
+    marginBottom: 24,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 12,
+  form: {
+    gap: 10,
+    marginTop: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#bbb",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: "#fff",
+  },
+  button: {
+    marginTop: 8,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  buttonDisabled: {
+    opacity: 0.45,
+  },
+  buttonPressed: {
+    opacity: 0.8,
+  },
+  buttonText: {
+    fontSize: 16,
+  },
+  hint: {
+    marginTop: 6,
+    opacity: 0.8,
+    lineHeight: 18,
   },
   reactLogo: {
     height: 178,
@@ -116,4 +217,6 @@ const styles = StyleSheet.create({
     left: 0,
     position: "absolute",
   },
+  linkButton: { marginTop: 12, alignItems: "center" },
+  linkText: { textDecorationLine: "underline", opacity: 0.9 },
 });

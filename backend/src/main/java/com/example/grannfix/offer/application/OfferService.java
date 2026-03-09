@@ -11,12 +11,12 @@ import com.example.grannfix.common.contracts.TaskOfferView;
 import com.example.grannfix.offer.domain.Offer;
 import com.example.grannfix.offer.mapper.OfferMapper;
 import com.example.grannfix.offer.persistence.OfferRepository;
-import com.example.grannfix.task.domain.TaskStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -51,5 +51,19 @@ public class OfferService {
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("You already have an offer for this task.");
         }
+    }
+
+    @Transactional
+    public List<OfferResponse> getTaskOffers(UUID taskId, UUID userId) {
+        TaskOfferView task = taskOfferPort.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
+
+        if (!task.createdById().equals(userId)) {
+            throw new ForbiddenException("Not your task");
+        }
+        return offerRepository.findByTaskIdOrderByCreatedAtDesc(taskId)
+                .stream()
+                .map(OfferMapper::toResponse)
+                .toList();
     }
 }

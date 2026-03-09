@@ -30,12 +30,6 @@ export interface OfferResponse {
      * @type {string}
      * @memberof OfferResponse
      */
-    taskId?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OfferResponse
-     */
     helperId?: string;
     /**
      * 
@@ -61,18 +55,6 @@ export interface OfferResponse {
      * @memberof OfferResponse
      */
     createdAt?: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof OfferResponse
-     */
-    updatedAt?: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof OfferResponse
-     */
-    completedAt?: Date;
 }
 
 
@@ -108,14 +90,11 @@ export function OfferResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'] == null ? undefined : json['id'],
-        'taskId': json['taskId'] == null ? undefined : json['taskId'],
         'helperId': json['helperId'] == null ? undefined : json['helperId'],
         'proposedPrice': json['proposedPrice'] == null ? undefined : json['proposedPrice'],
         'message': json['message'] == null ? undefined : json['message'],
         'status': json['status'] == null ? undefined : json['status'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
-        'updatedAt': json['updatedAt'] == null ? undefined : (new Date(json['updatedAt'])),
-        'completedAt': json['completedAt'] == null ? undefined : (new Date(json['completedAt'])),
     };
 }
 
@@ -131,14 +110,11 @@ export function OfferResponseToJSONTyped(value?: OfferResponse | null, ignoreDis
     return {
         
         'id': value['id'],
-        'taskId': value['taskId'],
         'helperId': value['helperId'],
         'proposedPrice': value['proposedPrice'],
         'message': value['message'],
         'status': value['status'],
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),
-        'updatedAt': value['updatedAt'] == null ? value['updatedAt'] : value['updatedAt'].toISOString(),
-        'completedAt': value['completedAt'] == null ? value['completedAt'] : value['completedAt'].toISOString(),
     };
 }
 

@@ -6,16 +6,16 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.offer.api.dto.CreateOfferRequest;
 import com.example.grannfix.offer.api.dto.OfferResponse;
-import com.example.grannfix.common.contracts.TaskOfferPort;
-import com.example.grannfix.common.contracts.TaskOfferView;
+import com.example.grannfix.offer.application.port.out.TaskOfferPort;
+import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.offer.domain.Offer;
+import com.example.grannfix.offer.domain.OfferStatus;
 import com.example.grannfix.offer.mapper.OfferMapper;
 import com.example.grannfix.offer.persistence.OfferRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -65,5 +65,32 @@ public class OfferService {
                 .stream()
                 .map(OfferMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public OfferResponse acceptOffer(UUID offerId, UUID userId){
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
+
+        TaskOfferView task = taskOfferPort.findById(offer.getTaskId())
+                .orElseThrow(() -> new NotFoundException("Task not found: " + offer.getTaskId()));
+
+        if (!task.createdById().equals(userId)) {
+            throw new ForbiddenException("Not your task");
+        }
+        if (!task.offerable()) {
+            throw new BadRequestException("Task is not open for offers.");
+        }
+        if (offer.getStatus()==OfferStatus.ACCEPTED) {
+            throw new ConflictException("Offer is already accepted.");
+        }
+        if (offerRepository.existsByTaskIdAndStatus(offer.getTaskId(), OfferStatus.ACCEPTED)) {
+            throw new ConflictException("Another offer has already been accepted for this task.");
+        }
+        offer.setStatus(OfferStatus.ACCEPTED);
+        Offer saved = offerRepository.save(offer);
+        offerRepository.rejectOtherPendingOffers(saved.getTaskId(), saved.getId());
+        taskOfferPort.assignTask(saved.getTaskId(), saved.getHelperId());
+        return OfferMapper.toResponse(saved);
     }
 }

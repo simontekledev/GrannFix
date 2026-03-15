@@ -1,7 +1,7 @@
 package com.example.grannfix.task.infrastructure;
 
-import com.example.grannfix.common.contracts.TaskOfferPort;
-import com.example.grannfix.common.contracts.TaskOfferView;
+import com.example.grannfix.offer.application.port.out.TaskOfferPort;
+import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.task.domain.Task;
 import com.example.grannfix.task.domain.TaskStatus;
 import com.example.grannfix.task.persistence.TaskRepository;
@@ -39,5 +39,17 @@ public class TaskAdminAdapter implements TaskManagementPort, TaskOfferPort {
                         p.getCreatedById(),
                         p.getStatus() == TaskStatus.OPEN
                 ));
+    }
+    @Override
+    @Transactional
+    public void assignTask(UUID taskId, UUID helperId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
+
+        if (task.getStatus() != TaskStatus.OPEN) {
+            throw new IllegalStateException("Task is not open.");
+        }
+        task.setAssignedToId(helperId);
+        task.setStatus(TaskStatus.ASSIGNED);
     }
 }

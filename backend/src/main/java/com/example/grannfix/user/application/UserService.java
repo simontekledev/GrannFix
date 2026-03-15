@@ -1,5 +1,8 @@
 package com.example.grannfix.user.application;
 
+import com.example.grannfix.common.errors.ConflictException;
+import com.example.grannfix.common.errors.ForbiddenException;
+import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.user.application.port.out.TaskManagementPort;
 import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
@@ -8,6 +11,7 @@ import com.example.grannfix.user.api.dto.PublicUserDto;
 import com.example.grannfix.user.api.dto.UpdateMeRequest;
 import com.example.grannfix.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.config.ConfigDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +44,8 @@ public class UserService {
 
             if (u.getEmail() == null || !newEmail.equalsIgnoreCase(u.getEmail())) {
                 if (userRepository.existsByEmail(newEmail)) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+                    throw new ConflictException("Email already in use") {
+                    };
                 }
                 u.setEmail(newEmail);
             }
@@ -63,9 +68,9 @@ public class UserService {
     private User getActiveUserOrThrow(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                        new NotFoundException("User not found"));
         if (!user.isActive()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is disabled");
+            throw new ForbiddenException("User is disabled");
         }
         return user;
     }
@@ -90,8 +95,7 @@ public class UserService {
                     .plus(Duration.ofDays(7));
 
             if (Instant.now().isBefore(nextAllowed)) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
+                throw new ConflictException(
                         "LOCATION_CHANGE_COOLDOWN"
                 );
             }

@@ -1,5 +1,7 @@
 package com.example.grannfix.user.application;
 
+import com.example.grannfix.common.errors.BadRequestException;
+import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.user.api.dto.AdminUserDto;
 import com.example.grannfix.user.application.port.out.TaskManagementPort;
 import com.example.grannfix.user.domain.User;
@@ -31,7 +33,7 @@ public class AdminUserService {
     public void reactivateUser(UUID userId) {
         User u = getUserOrThrow(userId);
         if (u.isActive()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already active");
+            throw new BadRequestException("User already active");
         }
         u.setActive(true);
     }
@@ -41,7 +43,7 @@ public class AdminUserService {
         User u = getUserOrThrow(userId);
 
         if (!u.isActive()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already inactive");
+            throw new BadRequestException("User already inactive");
         }
         u.setActive(false);
         taskAdminPort.cancelOpenOrAssignedTasksCreatedBy(u.getId());
@@ -49,6 +51,6 @@ public class AdminUserService {
 
     private User getUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 }

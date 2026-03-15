@@ -9,11 +9,14 @@ import com.example.grannfix.auth.infrastructure.messaging.email.EmailSender;
 import com.example.grannfix.auth.infrastructure.messaging.sms.SmsSender;
 import com.example.grannfix.auth.infrastructure.security.JwtService;
 import com.example.grannfix.auth.persistence.PasswordResetTokenRepository;
+import com.example.grannfix.common.errors.BadRequestException;
+import com.example.grannfix.common.errors.ConflictException;
+import com.example.grannfix.common.errors.ForbiddenException;
+import com.example.grannfix.common.errors.NotFoundException;
+import com.example.grannfix.common.errors.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,7 +24,7 @@ import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
-public class AuthApplicationService {
+public class AuthService {
 
     private final UserAuthPort userAuthPort;
     private final JwtService jwtService;
@@ -36,10 +39,10 @@ public class AuthApplicationService {
         validatePhone(phoneNumber);
         userAuthPort.findByPhone(phoneNumber).ifPresent(user -> {
             if (!user.active()) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is disabled");
+                throw new ForbiddenException("User is disabled");
             }
             if (user.verified()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already verified");
+                throw new ConflictException("User is already verified");
             }
         });
         String code = otpService.generateAndStore(phoneNumber);
@@ -53,14 +56,14 @@ public class AuthApplicationService {
 
         boolean ok = otpService.verify(normalizedPhone, code);
         if (!ok) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired OTP");
+            throw new UnauthorizedException("Invalid or expired OTP");
         }
 
         UserAuthView user = userAuthPort.findByPhone(normalizedPhone)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!user.active()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is disabled");
+            throw new ForbiddenException("User is disabled");
         }
         if (!user.verified()) {
             userAuthPort.markVerified(user.id());
@@ -74,7 +77,7 @@ public class AuthApplicationService {
         validatePhone(phone);
 
         if (userAuthPort.existsByEmail(email)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+            throw new ConflictException("Email already in use");
         }
 
         CreateUserCommand cmd = new CreateUserCommand(
@@ -94,18 +97,18 @@ public class AuthApplicationService {
         String email = req.email().trim().toLowerCase();
 
         UserAuthView user = userAuthPort.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
         if (user.passwordHash() == null || !passwordEncoder.matches(req.password(), user.passwordHash())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
         if (!user.active()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is disabled");
+            throw new ForbiddenException("User is disabled");
         }
         if (!user.verified()) {
             userAuthPort.markVerified(user.id());
             user = userAuthPort.findById(user.id())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                    .orElseThrow(() -> new NotFoundException("User not found"));
         }
         return buildAuthResponse(user);
     }
@@ -145,19 +148,19 @@ public class AuthApplicationService {
         String token = tokenRaw.trim();
 
         PasswordResetToken prt = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid token"));
 
         if (prt.isUsed()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token already used");
+            throw new UnauthorizedException("Token already used");
         }
         if (Instant.now().isAfter(prt.getExpiresAt())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expired");
+            throw new UnauthorizedException("Token expired");
         }
         UserAuthView user = userAuthPort.findById(prt.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!user.active()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is disabled");
+            throw new ForbiddenException("User is disabled");
         }
 
         userAuthPort.updatePassword(user.id(), passwordEncoder.encode(newPassword));
@@ -202,7 +205,7 @@ public class AuthApplicationService {
 
     private void validatePhone(String phoneNumber) {
         if (phoneNumber == null || !phoneNumber.matches("^\\+[1-9]\\d{7,14}$")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number");
+            throw new BadRequestException("Invalid phone number");
         }
     }
 }

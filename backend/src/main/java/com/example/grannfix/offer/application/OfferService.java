@@ -93,4 +93,26 @@ public class OfferService {
         taskOfferPort.assignTask(saved.getTaskId(), saved.getHelperId());
         return OfferMapper.toResponse(saved);
     }
+
+    @Transactional
+    public OfferResponse markDoneOffer(UUID offerId, UUID userId) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
+
+        TaskOfferView task = taskOfferPort.findById(offer.getTaskId())
+                .orElseThrow(() -> new NotFoundException("Task not found: " + offer.getTaskId()));
+
+        if (!offer.getHelperId().equals(userId)) {
+            throw new ForbiddenException("Not your offer");
+        }
+        if (offer.getStatus() != OfferStatus.ACCEPTED) {
+            throw new BadRequestException("Only accepted offers can be marked as done.");
+        }
+        if (!task.assignedToId().equals(userId)) {
+            throw new ConflictException("Task is not assigned to this helper.");
+        }
+        offer.setStatus(OfferStatus.MARKED_DONE);
+        Offer saved = offerRepository.save(offer);
+        return OfferMapper.toResponse(saved);
+    }
 }

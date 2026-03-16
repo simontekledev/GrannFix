@@ -7,5 +7,7 @@ import java.util.UUID;
 public interface TaskOfferProjection {
     UUID getId();
     UUID getCreatedById();
+    UUID getAssignedToId();
+
     TaskStatus getStatus();
 }

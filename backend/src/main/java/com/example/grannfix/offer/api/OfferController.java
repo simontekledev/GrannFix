@@ -25,4 +25,11 @@ public class OfferController {
     ) {
         return offerService.acceptOffer(offerId, userId);
     }
+    @PostMapping("/{offerId}/mark-done")
+    public OfferResponse markDoneOffer(
+            @PathVariable UUID offerId,
+            @AuthenticationPrincipal UUID userId
+    ) {
+        return offerService.markDoneOffer(offerId, userId);
+    }
 }

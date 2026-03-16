@@ -37,6 +37,7 @@ public class TaskAdminAdapter implements TaskManagementPort, TaskOfferPort {
                 .map(p -> new TaskOfferView(
                         p.getId(),
                         p.getCreatedById(),
+                        p.getAssignedToId(),
                         p.getStatus() == TaskStatus.OPEN
                 ));
     }

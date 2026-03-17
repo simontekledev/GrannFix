@@ -15,6 +15,7 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.common.errors.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
@@ -50,6 +51,7 @@ public class AuthService {
         // smsSender.send(phoneNumber, "Your GrannFix verification code is: " + code);
     }
 
+    @Transactional
     public AuthResponse verifyOtp(String phoneNumber, String code) {
         String normalizedPhone = normalizePhone(phoneNumber);
         validatePhone(normalizedPhone);
@@ -71,6 +73,7 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    @Transactional
     public AuthResponse register(RegisterRequest req) {
         String email = req.email().trim().toLowerCase();
         String phone = normalizePhone(req.phoneNumber());
@@ -93,6 +96,7 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest req) {
         String email = req.email().trim().toLowerCase();
 
@@ -113,6 +117,7 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    @Transactional
     public void forgotPassword(String emailRaw) {
         String email = emailRaw.trim().toLowerCase();
 
@@ -144,6 +149,7 @@ public class AuthService {
         });
     }
 
+    @Transactional
     public void resetPassword(String tokenRaw, String newPassword) {
         String token = tokenRaw.trim();
 

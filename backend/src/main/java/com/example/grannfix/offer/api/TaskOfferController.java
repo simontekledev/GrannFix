@@ -12,12 +12,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/tasks")
 @RequiredArgsConstructor
 public class TaskOfferController {
 
     private final OfferService offerService;
 
-    @PostMapping("/tasks/{taskId}/offers")
+    @PostMapping("/{taskId}/offers")
     public OfferResponse createOffer(
             @PathVariable UUID taskId,
             @AuthenticationPrincipal UUID userId,
@@ -26,7 +27,7 @@ public class TaskOfferController {
         return offerService.createOffer(taskId, userId, request);
     }
 
-    @GetMapping("/tasks/{taskId}/offers")
+    @GetMapping("/{taskId}/offers")
     public List<OfferResponse> getOffers(
             @PathVariable UUID taskId,
             @AuthenticationPrincipal UUID userId

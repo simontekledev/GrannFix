@@ -12,7 +12,7 @@ import com.example.grannfix.offer.domain.Offer;
 import com.example.grannfix.offer.domain.OfferStatus;
 import com.example.grannfix.offer.mapper.OfferMapper;
 import com.example.grannfix.offer.persistence.OfferRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class OfferService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OfferResponse> getTaskOffers(UUID taskId, UUID userId) {
         TaskOfferView task = taskOfferPort.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
@@ -81,8 +81,8 @@ public class OfferService {
         if (!task.offerable()) {
             throw new BadRequestException("Task is not open for offers.");
         }
-        if (offer.getStatus()==OfferStatus.ACCEPTED) {
-            throw new ConflictException("Offer is already accepted.");
+        if (offer.getStatus() != OfferStatus.PENDING) {
+            throw new ConflictException("Only pending offers can be accepted.");
         }
         if (offerRepository.existsByTaskIdAndStatus(offer.getTaskId(), OfferStatus.ACCEPTED)) {
             throw new ConflictException("Another offer has already been accepted for this task.");
@@ -108,7 +108,7 @@ public class OfferService {
         if (offer.getStatus() != OfferStatus.ACCEPTED) {
             throw new BadRequestException("Only accepted offers can be marked as done.");
         }
-        if (!task.assignedToId().equals(userId)) {
+        if (task.assignedToId() == null || !task.assignedToId().equals(userId)) {
             throw new ConflictException("Task is not assigned to this helper.");
         }
         offer.setStatus(OfferStatus.MARKED_DONE);

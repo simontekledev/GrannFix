@@ -51,8 +51,7 @@ public class TaskService {
                 .street(req.street() != null ? req.street().trim() : null)
                 .offeredPrice(price)
                 .build();
-        Task saved = taskRepository.save(task);
-        return TaskMapper.toResponse(saved);
+        return TaskMapper.toResponse(taskRepository.save(task));
     }
 
     @Transactional(readOnly = true)

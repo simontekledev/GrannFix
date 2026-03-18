@@ -22,14 +22,23 @@ public class OfferController {
     public OfferResponse acceptOffer(
             @PathVariable UUID offerId,
             @AuthenticationPrincipal UUID userId
-    ) {
+    ){
         return offerService.acceptOffer(offerId, userId);
     }
+
     @PostMapping("/{offerId}/mark-done")
     public OfferResponse markDoneOffer(
             @PathVariable UUID offerId,
             @AuthenticationPrincipal UUID userId
-    ) {
+    ){
         return offerService.markDoneOffer(offerId, userId);
+    }
+
+    @PostMapping("/{offerId}/confirm-done")
+    public OfferResponse confirmDoneOffer(
+            @PathVariable UUID offerId,
+            @AuthenticationPrincipal UUID userId
+    ){
+        return offerService.confirmDoneOffer(offerId, userId);
     }
 }

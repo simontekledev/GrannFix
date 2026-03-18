@@ -9,6 +9,8 @@ import com.example.grannfix.user.application.port.out.TaskManagementPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,5 +54,21 @@ public class TaskAdminAdapter implements TaskManagementPort, TaskOfferPort {
         }
         task.setAssignedToId(helperId);
         task.setStatus(TaskStatus.ASSIGNED);
+    }
+
+    @Override
+    @Transactional
+    public void completeTask(UUID taskId, Instant now) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
+
+        if (task.getStatus() != TaskStatus.ASSIGNED) {
+            throw new IllegalStateException("Task is not assigned.");
+        }
+        if (task.getCompletedAt() != null) {
+            throw new IllegalStateException("Task is already completed.");
+        }
+        task.setStatus(TaskStatus.COMPLETED);
+        task.setCompletedAt(now);
     }
 }

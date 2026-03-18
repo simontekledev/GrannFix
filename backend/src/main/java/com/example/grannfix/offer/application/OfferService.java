@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -113,6 +115,31 @@ public class OfferService {
         }
         offer.setStatus(OfferStatus.MARKED_DONE);
         Offer saved = offerRepository.save(offer);
+        return OfferMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public OfferResponse confirmDoneOffer(UUID offerId, UUID userId) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
+
+        TaskOfferView task = taskOfferPort.findById(offer.getTaskId())
+                .orElseThrow(() -> new NotFoundException("Task not found: " + offer.getTaskId()));
+
+        if (!task.createdById().equals(userId)) {
+            throw new ForbiddenException("Not your task");
+        }
+        if (offer.getStatus() != OfferStatus.MARKED_DONE) {
+            throw new BadRequestException("Only marked done offers can be confirmed.");
+        }
+        if (task.assignedToId() == null || !task.assignedToId().equals(offer.getHelperId())) {
+            throw new ConflictException("Task is not assigned to this helper.");
+        }
+        Instant now = Instant.now();
+        offer.setStatus(OfferStatus.COMPLETED);
+        offer.setCompletedAt(now);
+        Offer saved = offerRepository.save(offer);
+        taskOfferPort.completeTask(saved.getTaskId(), now);
         return OfferMapper.toResponse(saved);
     }
 }

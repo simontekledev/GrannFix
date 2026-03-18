@@ -1,5 +1,6 @@
 package com.example.grannfix.task.infrastructure;
 
+import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.offer.application.port.out.TaskOfferPort;
 import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.task.domain.Task;
@@ -47,11 +48,8 @@ public class TaskAdminAdapter implements TaskManagementPort, TaskOfferPort {
     @Transactional
     public void assignTask(UUID taskId, UUID helperId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
+                .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
 
-        if (task.getStatus() != TaskStatus.OPEN) {
-            throw new IllegalStateException("Task is not open.");
-        }
         task.setAssignedToId(helperId);
         task.setStatus(TaskStatus.ASSIGNED);
     }
@@ -60,15 +58,9 @@ public class TaskAdminAdapter implements TaskManagementPort, TaskOfferPort {
     @Transactional
     public void completeTask(UUID taskId, Instant now) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
+                .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
 
-        if (task.getStatus() != TaskStatus.ASSIGNED) {
-            throw new IllegalStateException("Task is not assigned.");
-        }
-        if (task.getCompletedAt() != null) {
-            throw new IllegalStateException("Task is already completed.");
-        }
-        task.setStatus(TaskStatus.COMPLETED);
         task.setCompletedAt(now);
+        task.setStatus(TaskStatus.COMPLETED);
     }
 }

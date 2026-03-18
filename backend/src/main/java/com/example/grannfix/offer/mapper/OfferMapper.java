@@ -15,7 +15,8 @@ public class OfferMapper {
                 o.getProposedPrice(),
                 o.getMessage(),
                 o.getStatus(),
-                o.getCreatedAt()
+                o.getCreatedAt(),
+                o.getCompletedAt()
         );
     }
 }

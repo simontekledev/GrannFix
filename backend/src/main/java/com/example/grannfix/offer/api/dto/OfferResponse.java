@@ -11,5 +11,6 @@ public record OfferResponse(
         BigDecimal proposedPrice,
         String message,
         OfferStatus status,
-        Instant createdAt
+        Instant createdAt,
+        Instant completedAt
 ) {}

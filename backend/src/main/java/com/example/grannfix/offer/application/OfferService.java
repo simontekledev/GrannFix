@@ -12,6 +12,7 @@ import com.example.grannfix.offer.domain.Offer;
 import com.example.grannfix.offer.domain.OfferStatus;
 import com.example.grannfix.offer.mapper.OfferMapper;
 import com.example.grannfix.offer.persistence.OfferRepository;
+import com.example.grannfix.task.domain.TaskStatus;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

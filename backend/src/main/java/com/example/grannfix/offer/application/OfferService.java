@@ -6,13 +6,12 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.offer.api.dto.CreateOfferRequest;
 import com.example.grannfix.offer.api.dto.OfferResponse;
-import com.example.grannfix.offer.application.port.out.TaskOfferPort;
+import com.example.grannfix.offer.application.port.out.TaskAssignmentPort;
 import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.offer.domain.Offer;
 import com.example.grannfix.offer.domain.OfferStatus;
 import com.example.grannfix.offer.mapper.OfferMapper;
 import com.example.grannfix.offer.persistence.OfferRepository;
-import com.example.grannfix.task.domain.TaskStatus;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +26,7 @@ import java.util.UUID;
 public class OfferService {
 
     private final OfferRepository offerRepository;
-    private final TaskOfferPort taskOfferPort;
+    private final TaskAssignmentPort taskOfferPort;
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
         TaskOfferView task = taskOfferPort.findById(taskId)
@@ -71,7 +70,24 @@ public class OfferService {
     }
 
     @Transactional
-    public OfferResponse acceptOffer(UUID offerId, UUID userId){
+    public OfferResponse cancelOffer(UUID offerId, UUID userId) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
+
+        if (!offer.getHelperId().equals(userId)) {
+            throw new ForbiddenException("Not your offer");
+        }
+
+        if (offer.getStatus() != OfferStatus.PENDING) {
+            throw new ConflictException("Only pending offers can be cancelled.");
+        }
+        offer.setStatus(OfferStatus.CANCELLED);
+        Offer saved = offerRepository.save(offer);
+        return OfferMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public OfferResponse acceptOffer(UUID offerId, UUID userId) {
         Offer offer = offerRepository.findById(offerId)
                 .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
 
@@ -90,11 +106,16 @@ public class OfferService {
         if (offerRepository.existsByTaskIdAndStatus(offer.getTaskId(), OfferStatus.ACCEPTED)) {
             throw new ConflictException("Another offer has already been accepted for this task.");
         }
-        offer.setStatus(OfferStatus.ACCEPTED);
-        Offer saved = offerRepository.save(offer);
-        offerRepository.rejectOtherPendingOffers(saved.getTaskId(), saved.getId());
-        taskOfferPort.assignTask(saved.getTaskId(), saved.getHelperId());
-        return OfferMapper.toResponse(saved);
+        try {
+            offer.setStatus(OfferStatus.ACCEPTED);
+            Offer saved = offerRepository.saveAndFlush(offer);
+            offerRepository.rejectOtherPendingOffers(saved.getTaskId(), saved.getId());
+            taskOfferPort.assignTask(saved.getTaskId(), saved.getHelperId());
+
+            return OfferMapper.toResponse(saved);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("Another offer has already been accepted for this task.");
+        }
     }
 
     @Transactional

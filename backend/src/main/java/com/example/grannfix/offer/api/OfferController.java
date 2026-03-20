@@ -25,6 +25,13 @@ public class OfferController {
     ){
         return offerService.acceptOffer(offerId, userId);
     }
+    @PostMapping("/{offerId}/cancel")
+    public OfferResponse cancelOffer(
+            @PathVariable UUID offerId,
+            @AuthenticationPrincipal UUID userId
+    ){
+        return offerService.cancelOffer(offerId, userId);
+    }
 
     @PostMapping("/{offerId}/mark-done")
     public OfferResponse markDoneOffer(

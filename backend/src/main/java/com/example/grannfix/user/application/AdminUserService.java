@@ -3,7 +3,7 @@ package com.example.grannfix.user.application;
 import com.example.grannfix.common.errors.BadRequestException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.user.api.dto.AdminUserDto;
-import com.example.grannfix.user.application.port.out.TaskManagementPort;
+import com.example.grannfix.user.application.port.out.TaskAdminPort;
 import com.example.grannfix.user.domain.User;
 import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class AdminUserService {
 
     private final UserRepository userRepository;
-    private final TaskManagementPort taskAdminPort;
+    private final TaskAdminPort taskAdminPort;
 
     @Transactional(readOnly = true)
     public Page<AdminUserDto> getAllUsers(Pageable pageable) {

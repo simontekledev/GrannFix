@@ -3,7 +3,7 @@ package com.example.grannfix.user.application;
 import com.example.grannfix.common.errors.ConflictException;
 import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
-import com.example.grannfix.user.application.port.out.TaskManagementPort;
+import com.example.grannfix.user.application.port.out.TaskAdminPort;
 import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
 import com.example.grannfix.user.api.dto.MeUserDto;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final TaskManagementPort taskUserPort;
+    private final TaskAdminPort taskAdminPort;
     @Transactional(readOnly = true)
     public MeUserDto getMe(UUID userId) {
         return UserMapper.toMeDto(getActiveUserOrThrow(userId));
@@ -54,7 +54,7 @@ public class UserService {
     public void removeMe(UUID userId){
         User u = getActiveUserOrThrow(userId);
         u.setActive(false);
-        taskUserPort.cancelOpenOrAssignedTasksCreatedBy(u.getId());
+        taskAdminPort.cancelOpenOrAssignedTasksCreatedBy(u.getId());
     }
 
     @Transactional(readOnly = true)

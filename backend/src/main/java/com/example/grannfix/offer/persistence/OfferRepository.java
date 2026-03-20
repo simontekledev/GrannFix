@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 public interface OfferRepository extends JpaRepository<Offer, UUID> {
@@ -24,4 +23,13 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
     """)
     int rejectOtherPendingOffers(@Param("taskId") UUID taskId,
                                  @Param("acceptedOfferId") UUID acceptedOfferId);
+
+    @Modifying
+    @Query("""
+    update Offer o
+    set o.status = com.example.grannfix.offer.domain.OfferStatus.DECLINED
+    where o.taskId = :taskId
+      and o.status = com.example.grannfix.offer.domain.OfferStatus.PENDING
+""")
+    int declinePendingOffersByTaskId(@Param("taskId") UUID taskId);
 }

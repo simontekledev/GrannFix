@@ -8,6 +8,7 @@ import com.example.grannfix.task.api.dto.CreateTaskRequest;
 import com.example.grannfix.task.api.dto.TaskDetailResponse;
 import com.example.grannfix.task.api.dto.TaskResponse;
 import com.example.grannfix.task.api.dto.UpdateTaskRequest;
+import com.example.grannfix.task.application.port.out.OfferTaskPort;
 import com.example.grannfix.task.domain.Task;
 import com.example.grannfix.task.domain.TaskStatus;
 import com.example.grannfix.task.mapper.TaskMapper;
@@ -26,6 +27,7 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserLookupPort userLookupPort;
+    private final OfferTaskPort offerTaskPort;
 
     @Transactional
     public TaskResponse addTask(UUID createdById, CreateTaskRequest req) {
@@ -134,10 +136,11 @@ public class TaskService {
         if (!task.isActive()) {
             throw new BadRequestException("Task is already inactive.");
         }
-        if (task.getStatus() == TaskStatus.COMPLETED || task.getStatus() == TaskStatus.CANCELLED) {
+        if (task.getStatus() != TaskStatus.OPEN) {
             throw new BadRequestException("Task cannot be cancelled.");
         }
         task.setStatus(TaskStatus.CANCELLED);
+        offerTaskPort.declinePendingOffers(taskId);
     }
 
     @Transactional
@@ -151,6 +154,7 @@ public class TaskService {
             throw new BadRequestException("Assigned or completed tasks cannot be deleted.");
         }
         task.setActive(false);
+        offerTaskPort.declinePendingOffers(taskId);
     }
 
     private Task getTaskOrThrow(UUID taskId) {

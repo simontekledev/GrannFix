@@ -6,11 +6,9 @@
 
 Name | Type
 ------------ | -------------
-`direction` | string
-`nullHandling` | string
-`ascending` | boolean
-`property` | string
-`ignoreCase` | boolean
+`empty` | boolean
+`sorted` | boolean
+`unsorted` | boolean
 
 ## Example
 
@@ -19,11 +17,9 @@ import type { SortObject } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "direction": null,
-  "nullHandling": null,
-  "ascending": null,
-  "property": null,
-  "ignoreCase": null,
+  "empty": null,
+  "sorted": null,
+  "unsorted": null,
 } satisfies SortObject
 
 console.log(example)

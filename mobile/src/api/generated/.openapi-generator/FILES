@@ -1,5 +1,6 @@
 apis/AdminUserControllerApi.ts
 apis/AuthControllerApi.ts
+apis/OfferControllerApi.ts
 apis/PingControllerApi.ts
 apis/TaskControllerApi.ts
 apis/TaskOfferControllerApi.ts
@@ -17,6 +18,7 @@ docs/CursorPageResponseTaskResponse.md
 docs/ForgotPasswordRequest.md
 docs/LoginRequest.md
 docs/MeUserDto.md
+docs/OfferControllerApi.md
 docs/OfferResponse.md
 docs/PageAdminUserDto.md
 docs/Pageable.md

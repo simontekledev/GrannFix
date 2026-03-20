@@ -7,10 +7,10 @@
 Name | Type
 ------------ | -------------
 `offset` | number
-`sort` | [Array&lt;SortObject&gt;](SortObject.md)
+`sort` | [SortObject](SortObject.md)
 `paged` | boolean
-`pageNumber` | number
 `pageSize` | number
+`pageNumber` | number
 `unpaged` | boolean
 
 ## Example
@@ -23,8 +23,8 @@ const example = {
   "offset": null,
   "sort": null,
   "paged": null,
-  "pageNumber": null,
   "pageSize": null,
+  "pageNumber": null,
   "unpaged": null,
 } satisfies PageableObject
 

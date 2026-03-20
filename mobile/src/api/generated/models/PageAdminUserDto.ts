@@ -73,10 +73,10 @@ export interface PageAdminUserDto {
     number?: number;
     /**
      * 
-     * @type {Array<SortObject>}
+     * @type {SortObject}
      * @memberof PageAdminUserDto
      */
-    sort?: Array<SortObject>;
+    sort?: SortObject;
     /**
      * 
      * @type {boolean}
@@ -131,7 +131,7 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'size': json['size'] == null ? undefined : json['size'],
         'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminUserDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
-        'sort': json['sort'] == null ? undefined : ((json['sort'] as Array<any>).map(SortObjectFromJSON)),
+        'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
         'first': json['first'] == null ? undefined : json['first'],
         'last': json['last'] == null ? undefined : json['last'],
         'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
@@ -156,7 +156,7 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
         'size': value['size'],
         'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminUserDtoToJSON)),
         'number': value['number'],
-        'sort': value['sort'] == null ? undefined : ((value['sort'] as Array<any>).map(SortObjectToJSON)),
+        'sort': SortObjectToJSON(value['sort']),
         'first': value['first'],
         'last': value['last'],
         'numberOfElements': value['numberOfElements'],

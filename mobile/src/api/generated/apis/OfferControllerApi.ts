@@ -15,19 +15,27 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateOfferRequest,
   OfferResponse,
 } from '../models/index';
 import {
-    CreateOfferRequestFromJSON,
-    CreateOfferRequestToJSON,
     OfferResponseFromJSON,
     OfferResponseToJSON,
 } from '../models/index';
 
-export interface CreateOfferOperationRequest {
-    taskId: string;
-    createOfferRequest: CreateOfferRequest;
+export interface AcceptOfferRequest {
+    offerId: string;
+}
+
+export interface CancelOfferRequest {
+    offerId: string;
+}
+
+export interface ConfirmDoneOfferRequest {
+    offerId: string;
+}
+
+export interface MarkDoneOfferRequest {
+    offerId: string;
 }
 
 /**
@@ -36,28 +44,19 @@ export interface CreateOfferOperationRequest {
 export class OfferControllerApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for createOffer without sending the request
+     * Creates request options for acceptOffer without sending the request
      */
-    async createOfferRequestOpts(requestParameters: CreateOfferOperationRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['taskId'] == null) {
+    async acceptOfferRequestOpts(requestParameters: AcceptOfferRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['offerId'] == null) {
             throw new runtime.RequiredError(
-                'taskId',
-                'Required parameter "taskId" was null or undefined when calling createOffer().'
-            );
-        }
-
-        if (requestParameters['createOfferRequest'] == null) {
-            throw new runtime.RequiredError(
-                'createOfferRequest',
-                'Required parameter "createOfferRequest" was null or undefined when calling createOffer().'
+                'offerId',
+                'Required parameter "offerId" was null or undefined when calling acceptOffer().'
             );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -68,22 +67,21 @@ export class OfferControllerApi extends runtime.BaseAPI {
             }
         }
 
-        let urlPath = `/offers/task/{taskId}`;
-        urlPath = urlPath.replace(`{${"taskId"}}`, encodeURIComponent(String(requestParameters['taskId'])));
+        let urlPath = `/offers/{offerId}/accept`;
+        urlPath = urlPath.replace(`{${"offerId"}}`, encodeURIComponent(String(requestParameters['offerId'])));
 
         return {
             path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateOfferRequestToJSON(requestParameters['createOfferRequest']),
         };
     }
 
     /**
      */
-    async createOfferRaw(requestParameters: CreateOfferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
-        const requestOptions = await this.createOfferRequestOpts(requestParameters);
+    async acceptOfferRaw(requestParameters: AcceptOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
+        const requestOptions = await this.acceptOfferRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => OfferResponseFromJSON(jsonValue));
@@ -91,8 +89,161 @@ export class OfferControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async createOffer(requestParameters: CreateOfferOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
-        const response = await this.createOfferRaw(requestParameters, initOverrides);
+    async acceptOffer(requestParameters: AcceptOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
+        const response = await this.acceptOfferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for cancelOffer without sending the request
+     */
+    async cancelOfferRequestOpts(requestParameters: CancelOfferRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['offerId'] == null) {
+            throw new runtime.RequiredError(
+                'offerId',
+                'Required parameter "offerId" was null or undefined when calling cancelOffer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/offers/{offerId}/cancel`;
+        urlPath = urlPath.replace(`{${"offerId"}}`, encodeURIComponent(String(requestParameters['offerId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async cancelOfferRaw(requestParameters: CancelOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
+        const requestOptions = await this.cancelOfferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OfferResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async cancelOffer(requestParameters: CancelOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
+        const response = await this.cancelOfferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for confirmDoneOffer without sending the request
+     */
+    async confirmDoneOfferRequestOpts(requestParameters: ConfirmDoneOfferRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['offerId'] == null) {
+            throw new runtime.RequiredError(
+                'offerId',
+                'Required parameter "offerId" was null or undefined when calling confirmDoneOffer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/offers/{offerId}/confirm-done`;
+        urlPath = urlPath.replace(`{${"offerId"}}`, encodeURIComponent(String(requestParameters['offerId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async confirmDoneOfferRaw(requestParameters: ConfirmDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
+        const requestOptions = await this.confirmDoneOfferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OfferResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async confirmDoneOffer(requestParameters: ConfirmDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
+        const response = await this.confirmDoneOfferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for markDoneOffer without sending the request
+     */
+    async markDoneOfferRequestOpts(requestParameters: MarkDoneOfferRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['offerId'] == null) {
+            throw new runtime.RequiredError(
+                'offerId',
+                'Required parameter "offerId" was null or undefined when calling markDoneOffer().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/offers/{offerId}/mark-done`;
+        urlPath = urlPath.replace(`{${"offerId"}}`, encodeURIComponent(String(requestParameters['offerId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async markDoneOfferRaw(requestParameters: MarkDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
+        const requestOptions = await this.markDoneOfferRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OfferResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async markDoneOffer(requestParameters: MarkDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
+        const response = await this.markDoneOfferRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

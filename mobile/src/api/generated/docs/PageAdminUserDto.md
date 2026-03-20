@@ -11,7 +11,7 @@ Name | Type
 `size` | number
 `content` | [Array&lt;AdminUserDto&gt;](AdminUserDto.md)
 `number` | number
-`sort` | [Array&lt;SortObject&gt;](SortObject.md)
+`sort` | [SortObject](SortObject.md)
 `first` | boolean
 `last` | boolean
 `numberOfElements` | number

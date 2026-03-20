@@ -43,7 +43,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/tasks/*").permitAll()
                         .requestMatchers("/tasks/**").authenticated()
 
-                        .requestMatchers(HttpMethod.POST, "/offers/task/*").authenticated()
                         .requestMatchers("/offers/**").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")

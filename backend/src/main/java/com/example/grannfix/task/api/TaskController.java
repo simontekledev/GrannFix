@@ -39,23 +39,21 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDetailResponse> getTask(
+    public TaskDetailResponse getTask(
             @AuthenticationPrincipal UUID userId,
             @PathVariable UUID id
     ) {
-        return ResponseEntity.ok(
-                taskService.getTaskById(userId, id)
-        );
+        return taskService.getTaskById(userId, id);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskResponse> updateMyTask(
+    public TaskResponse updateMyTask(
             @AuthenticationPrincipal UUID userId,
             @PathVariable UUID id,
             @RequestBody @Valid UpdateTaskRequest req
     ) {
-        return ResponseEntity.ok(taskService.updateMyTask(
-                userId, id, req));
+        return taskService.updateMyTask(
+                userId, id, req);
     }
 
     @PostMapping("/{id}/cancel")

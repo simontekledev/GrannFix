@@ -12,6 +12,7 @@ Name | Type
 `message` | string
 `status` | string
 `createdAt` | Date
+`completedAt` | Date
 
 ## Example
 
@@ -26,6 +27,7 @@ const example = {
   "message": null,
   "status": null,
   "createdAt": null,
+  "completedAt": null,
 } satisfies OfferResponse
 
 console.log(example)

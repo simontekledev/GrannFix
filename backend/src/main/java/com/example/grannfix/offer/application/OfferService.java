@@ -1,5 +1,6 @@
 package com.example.grannfix.offer.application;
 
+import com.example.grannfix.common.contracts.UserLookupPort;
 import com.example.grannfix.common.errors.BadRequestException;
 import com.example.grannfix.common.errors.ConflictException;
 import com.example.grannfix.common.errors.ForbiddenException;
@@ -27,8 +28,12 @@ public class OfferService {
 
     private final OfferRepository offerRepository;
     private final TaskAssignmentPort taskOfferPort;
+    private final UserLookupPort userLookupPort;
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
+        if (!userLookupPort.isVerified(helperId)) {
+            throw new ForbiddenException("Phone number must be verified (OTP) before creating offers.");
+        }
         TaskOfferView task = taskOfferPort.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
 

@@ -1,5 +1,6 @@
 import { Configuration } from "./generated/runtime";
 import { AuthControllerApi } from "./generated/apis/AuthControllerApi";
+import { TaskQueryControllerApi } from "./generated/apis/TaskQueryControllerApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = "http://192.168.1.164:8080"; 
@@ -16,3 +17,4 @@ const config = new Configuration({
 console.log("API BASE URL:", BASE_URL);
 
 export const authApi = new AuthControllerApi(config);
+export const taskQueryApi = new TaskQueryControllerApi(config);

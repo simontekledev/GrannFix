@@ -1,222 +1,232 @@
-import React, { useMemo, useState } from "react";
-import { Image } from "expo-image";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
-  StyleSheet,
-  TextInput,
+  FlatList,
   Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import Constants from "expo-constants";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { taskQueryApi } from "@/src/api/client";
+import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { authApi } from "@/src/api/client";
-
-const host = Constants.expoConfig?.hostUri?.split(":")[0];
-const BASE_URL = `http://${host}:8080`;
-
-export default function HomeScreen() {
+export default function UpptackScreen() {
   const router = useRouter();
+  const [tasks, setTasks] = useState<TaskResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [submitting, setSubmitting] = useState(false);
-
-  const canSubmit = useMemo(() => {
-    // very light validation; keep it simple
-    return email.trim().length > 0 && password.length > 0 && !submitting;
-  }, [email, password, submitting]);
-
-  async function handleLogin() {
-    if (!canSubmit) return;
-
-    setSubmitting(true);
+  const fetchTasks = useCallback(async () => {
     try {
-      const res = await authApi.login({
-        loginRequest: {
-          email: email.trim(),
-          password,
-        },
-      });
-
-      if (res.accessToken) {
-        await AsyncStorage.setItem("access_token", res.accessToken);
-      }
-      if (res.refreshToken) {
-        await AsyncStorage.setItem("refresh_token", res.refreshToken);
-      }
-
-      Alert.alert(
-        "✅ Logged in",
-        `User: ${res.user?.id ?? "(no id)"}\nToken saved: ${
-          res.accessToken ? "yes" : "no"
-        }`
-      );
-
-      // OPTIONAL: navigate somewhere after login
-      // Change "/(tabs)/explore" to wherever your authenticated landing page is.
-      router.replace("/(tabs)/explore");
-    } catch (e: any) {
-      console.log("Login error:", e);
-
-      const msg =
-        e?.response?.status
-          ? `HTTP ${e.response.status}`
-          : e?.status
-          ? `HTTP ${e.status}`
-          : String(e?.message ?? e);
-
-      Alert.alert("❌ Login failed", msg);
-    } finally {
-      setSubmitting(false);
+      const res = await taskQueryApi.listTasks({ status: "OPEN" as any });
+      setTasks(res.items ?? []);
+    } catch (e) {
+      console.log("Failed to load tasks:", e);
     }
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setLoggedIn(!!token);
+  }, []);
+
+  useEffect(() => {
+    Promise.all([fetchTasks(), checkAuth()]).finally(() => setLoading(false));
+  }, [fetchTasks, checkAuth]);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await Promise.all([fetchTasks(), checkAuth()]);
+    setRefreshing(false);
+  }
+
+  function renderTask({ item }: { item: TaskResponse }) {
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {item.title ?? "Uppdrag"}
+          </Text>
+          {item.offeredPrice != null && (
+            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
+          )}
+        </View>
+
+        {item.area && (
+          <View style={styles.areaBadge}>
+            <Text style={styles.areaBadgeText}>{item.area}</Text>
+          </View>
+        )}
+
+        {item.description ? (
+          <Text style={styles.cardDescription} numberOfLines={2}>
+            {item.description}
+          </Text>
+        ) : null}
+
+        {!loggedIn && (
+          <Pressable
+            onPress={() => router.push("/(tabs)/profil")}
+            style={({ pressed }) => [
+              styles.cardButton,
+              pressed && styles.cardButtonPressed,
+            ]}
+          >
+            <Text style={styles.cardButtonText}>Logga in for att hjalpa</Text>
+          </Pressable>
+        )}
+      </View>
+    );
+  }
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#111" />
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Upptack</Text>
+        <Text style={styles.subtitle}>Tillgangliga uppdrag</Text>
+      </View>
+
+      {tasks.length === 0 ? (
+        <View style={styles.centered}>
+          <Text style={styles.emptyIcon}>📋</Text>
+          <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
+          <Text style={styles.emptySubtitle}>
+            Dra nedat for att uppdatera
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) => item.id ?? Math.random().toString()}
+          renderItem={renderTask}
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#111" />
+          }
         />
-      }
-    >
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">Sign in</ThemedText>
-
-        <ThemedText style={{ marginTop: 8 }}>
-          API Base URL:{" "}
-          <ThemedText type="defaultSemiBold">{BASE_URL}</ThemedText>
-        </ThemedText>
-
-        <ThemedView style={styles.form}>
-          <ThemedText type="subtitle">Email</ThemedText>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            textContentType="username"
-            placeholder="you@example.com"
-            placeholderTextColor="#999"
-            style={styles.input}
-            editable={!submitting}
-            returnKeyType="next"
-          />
-
-          <ThemedText type="subtitle">Password</ThemedText>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            textContentType="password"
-            placeholder="••••••••"
-            placeholderTextColor="#999"
-            style={styles.input}
-            editable={!submitting}
-            returnKeyType="done"
-            onSubmitEditing={handleLogin}
-          />
-
-          <Pressable
-              onPress={handleLogin}
-              disabled={!canSubmit}
-              style={({ pressed }) => [
-                styles.button,
-                !canSubmit && styles.buttonDisabled,
-                pressed && canSubmit && styles.buttonPressed,
-              ]}
-            >
-              {submitting ? (
-                <ActivityIndicator />
-              ) : (
-                <ThemedText style={styles.buttonText}>Log in</ThemedText>
-              )}
-            </Pressable>
-
-            <Pressable
-              onPress={() => router.push("/register")}
-              style={styles.linkButton}
-            >
-              <ThemedText style={styles.linkText}>
-                Don’t have an account? Register
-              </ThemedText>
-            </Pressable>
-
-          <ThemedText style={styles.hint}>
-            Tip: On{" "}
-            <ThemedText type="defaultSemiBold">
-              {Platform.select({
-                ios: "iOS",
-                android: "Android",
-                web: "web",
-              })}
-            </ThemedText>
-            , make sure your phone/emulator can reach{" "}
-            <ThemedText type="defaultSemiBold">{BASE_URL}</ThemedText>.
-          </ThemedText>
-        </ThemedView>
-      </ThemedView>
-    </ParallaxScrollView>
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 12,
-    marginBottom: 24,
+  safe: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  form: {
-    gap: 10,
-    marginTop: 12,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#bbb",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: "#fff",
-  },
-  button: {
-    marginTop: 8,
-    borderRadius: 12,
-    paddingVertical: 12,
+  centered: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 32,
+  },
+  headerRow: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#111",
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#666",
+    marginTop: 2,
+  },
+  list: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  card: {
+    backgroundColor: "#f9f9f9",
+    borderRadius: 14,
+    padding: 18,
+    marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: "#eee",
   },
-  buttonDisabled: {
-    opacity: 0.45,
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
   },
-  buttonPressed: {
-    opacity: 0.8,
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#111",
+    flex: 1,
+    marginRight: 12,
   },
-  buttonText: {
+  cardPrice: {
     fontSize: 16,
+    fontWeight: "700",
+    color: "#16A34A",
   },
-  hint: {
-    marginTop: 6,
+  areaBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#f0fdf4",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  areaBadgeText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#16A34A",
+  },
+  cardDescription: {
+    fontSize: 14,
+    color: "#555",
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  cardButton: {
+    marginTop: 12,
+    backgroundColor: "#16A34A",
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  cardButtonPressed: {
     opacity: 0.8,
-    lineHeight: 18,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  cardButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
   },
-  linkButton: { marginTop: 12, alignItems: "center" },
-  linkText: { textDecorationLine: "underline", opacity: 0.9 },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111",
+    marginBottom: 4,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+  },
 });

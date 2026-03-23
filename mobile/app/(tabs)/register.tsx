@@ -1,10 +1,21 @@
 import React, { useMemo, useState } from "react";
-import { Alert, StyleSheet, TextInput, Pressable, ActivityIndicator, View, Modal, FlatList } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  ActivityIndicator,
+  View,
+  Text,
+  Modal,
+  FlatList,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { authApi } from "@/src/api/client";
 
 const STOCKHOLM_AREAS = [
@@ -34,7 +45,7 @@ const STOCKHOLM_AREAS = [
   "Skarpnäck",
   "Skärholmen",
 
-  "Annat"
+  "Annat",
 ];
 
 export default function RegisterScreen() {
@@ -61,7 +72,6 @@ export default function RegisterScreen() {
   const formattedPhone = phoneDigits.length > 0 ? `+46${phoneDigits}` : "";
 
   function formatPhoneDisplay(digits: string): string {
-    // Format as 7X XXX XX XX
     let result = "";
     for (let i = 0; i < digits.length; i++) {
       if (i === 2 || i === 5 || i === 7) result += " ";
@@ -73,7 +83,6 @@ export default function RegisterScreen() {
   const phoneDisplay = formatPhoneDisplay(phoneDigits);
 
   function handlePhoneChange(text: string) {
-    // Strip leading zero (common mistake: typing 07... instead of 7...)
     const digits = text.replace(/\D/g, "").replace(/^0+/, "");
     setPhoneLocal(digits);
   }
@@ -115,7 +124,7 @@ export default function RegisterScreen() {
         await AsyncStorage.setItem("refresh_token", res.refreshToken);
       }
 
-      Alert.alert("✅ Account created", "You’re registered and ready to go.");
+      Alert.alert("Konto skapat", "Du är registrerad och redo att börja.");
       router.replace("/(tabs)/explore");
     } catch (e: any) {
       console.log("Register error:", e);
@@ -127,104 +136,108 @@ export default function RegisterScreen() {
           ? `HTTP ${e.status}`
           : String(e?.message ?? e);
 
-      Alert.alert("❌ Registration failed", msg);
+      Alert.alert("Registrering misslyckades", msg);
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}>
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">Create account</ThemedText>
+    <SafeAreaView style={styles.safe}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>Skapa konto</Text>
+          <Text style={styles.subtitle}>Fyll i dina uppgifter för att komma igång</Text>
 
-        <ThemedView style={styles.form}>
-          <ThemedText type="subtitle">Name</ThemedText>
+          <Text style={styles.label}>Namn</Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Full name"
-            placeholderTextColor="#999"
+            placeholder="Förnamn och efternamn"
+            placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
           />
 
-          <ThemedText type="subtitle">Email</ThemedText>
+          <Text style={styles.label}>E-post</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
-            placeholder="you@example.com"
-            placeholderTextColor="#999"
+            placeholder="din@email.com"
+            placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
           />
 
-          <ThemedText type="subtitle">Password</ThemedText>
+          <Text style={styles.label}>Lösenord</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            placeholder="••••••••"
-            placeholderTextColor="#999"
+            placeholder="Minst 6 tecken"
+            placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
           />
 
-          <ThemedText type="subtitle">Confirm password</ThemedText>
+          <Text style={styles.label}>Bekräfta lösenord</Text>
           <TextInput
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
-            placeholder="••••••••"
-            placeholderTextColor="#999"
+            placeholder="Skriv lösenordet igen"
+            placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
           />
 
           {confirmPassword.length > 0 ? (
             passwordsMatch ? (
-              <ThemedText style={styles.successText}>✓ Passwords match</ThemedText>
+              <Text style={styles.successText}>Lösenorden matchar</Text>
             ) : (
-              <ThemedText style={styles.errorText}>Passwords do not match</ThemedText>
+              <Text style={styles.errorText}>Lösenorden matchar inte</Text>
             )
           ) : null}
 
-          <ThemedText type="subtitle">Phone number</ThemedText>
+          <Text style={styles.label}>Telefonnummer</Text>
           <View style={styles.phoneRow}>
             <View style={styles.phonePrefix}>
-              <ThemedText style={styles.phonePrefixText}>+46</ThemedText>
+              <Text style={styles.phonePrefixText}>+46</Text>
             </View>
             <TextInput
               value={phoneDisplay}
               onChangeText={handlePhoneChange}
               keyboardType="number-pad"
               placeholder="7X XXX XX XX"
-              placeholderTextColor="#999"
+              placeholderTextColor="#a0a0a0"
               style={[styles.input, styles.phoneInput]}
               editable={!submitting}
               maxLength={12}
             />
           </View>
 
-          <ThemedText type="subtitle">City</ThemedText>
-          <TextInput
-            value="Stockholm"
-            editable={false}
-            style={[styles.input, styles.disabledInput]}
-            placeholderTextColor="#999"
-          />
+          <Text style={styles.label}>Stad</Text>
+          <View style={[styles.input, styles.disabledInput]}>
+            <Text style={styles.disabledText}>Stockholm</Text>
+          </View>
 
-          <ThemedText type="subtitle">Area</ThemedText>
+          <Text style={styles.label}>Område</Text>
           <Pressable
             onPress={() => !submitting && setAreaModalVisible(true)}
             style={styles.input}
           >
-            <ThemedText style={area ? styles.areaSelectedText : styles.areaPlaceholderText}>
-              {area || "Select area / district"}
-            </ThemedText>
+            <Text style={area ? styles.areaSelectedText : styles.areaPlaceholderText}>
+              {area || "Välj område"}
+            </Text>
           </Pressable>
 
           <Modal
@@ -237,15 +250,17 @@ export default function RegisterScreen() {
               style={styles.modalOverlay}
               onPress={() => { setAreaModalVisible(false); setAreaSearch(""); }}
             >
-              <View style={styles.modalContent}>
-                <ThemedText type="subtitle" style={styles.modalTitle}>
-                  Select area
-                </ThemedText>
+              <View
+                style={styles.modalContent}
+                onStartShouldSetResponder={() => true}
+              >
+                <Text style={styles.modalTitle}>Välj område</Text>
+                <View style={styles.modalHandle} />
                 <TextInput
                   value={areaSearch}
                   onChangeText={setAreaSearch}
-                  placeholder="Search..."
-                  placeholderTextColor="#999"
+                  placeholder="Sök..."
+                  placeholderTextColor="#a0a0a0"
                   autoCorrect={false}
                   style={styles.searchInput}
                 />
@@ -266,7 +281,8 @@ export default function RegisterScreen() {
                         pressed && styles.modalItemPressed,
                       ]}
                     >
-                      <ThemedText style={styles.modalItemText}>{item}</ThemedText>
+                      <Text style={styles.modalItemText}>{item}</Text>
+                      {item === area && <Text style={styles.modalCheck}>✓</Text>}
                     </Pressable>
                   )}
                 />
@@ -284,132 +300,197 @@ export default function RegisterScreen() {
             ]}
           >
             {submitting ? (
-              <ActivityIndicator />
+              <ActivityIndicator color="#fff" />
             ) : (
-              <ThemedText style={styles.buttonText}>Register</ThemedText>
+              <Text style={styles.buttonText}>Registrera</Text>
             )}
           </Pressable>
 
           <Pressable onPress={() => router.back()} style={styles.linkButton}>
-            <ThemedText style={styles.linkText}>Already have an account? Back to login</ThemedText>
+            <Text style={styles.linkText}>
+              Har du redan ett konto? <Text style={styles.linkTextBold}>Logga in</Text>
+            </Text>
           </Pressable>
-        </ThemedView>
-      </ThemedView>
-    </ParallaxScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 12, marginBottom: 24 },
-  form: { gap: 10, marginTop: 12 },
+  safe: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 48,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#111",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#666",
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+    marginTop: 16,
+  },
   input: {
-    borderWidth: 1,
-    borderColor: "#bbb",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
-    color: "#fff",
+    color: "#111",
+    borderWidth: 1,
+    borderColor: "#e8e8e8",
   },
   disabledInput: {
-    opacity: 0.7,
+    backgroundColor: "#efefef",
+  },
+  disabledText: {
+    fontSize: 16,
+    color: "#999",
   },
   phoneRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
   },
   phonePrefix: {
+    backgroundColor: "#f5f5f5",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: "#bbb",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    justifyContent: "center",
+    borderColor: "#e8e8e8",
   },
   phonePrefixText: {
     fontSize: 16,
     fontWeight: "600",
+    color: "#333",
   },
   phoneInput: {
     flex: 1,
   },
   button: {
-    marginTop: 8,
+    marginTop: 28,
+    backgroundColor: "#16A34A",
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#333",
   },
-  buttonDisabled: { opacity: 0.45 },
+  buttonDisabled: { opacity: 0.35 },
   buttonPressed: { opacity: 0.8 },
-  buttonText: { fontSize: 16 },
-  linkButton: { marginTop: 12, alignItems: "center" },
-  linkText: { textDecorationLine: "underline", opacity: 0.9 },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  linkButton: {
+    marginTop: 16,
+    alignItems: "center",
+  },
+  linkText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  linkTextBold: {
+    fontWeight: "600",
+    color: "#16A34A",
+  },
   errorText: {
-    color: "#ff6b6b",
-    marginTop: -4,
-    marginBottom: 4,
+    color: "#e53e3e",
+    fontSize: 13,
+    marginTop: 4,
   },
   successText: {
-    color: "#4ade80",
-    marginTop: -4,
-    marginBottom: 4,
+    color: "#16A34A",
+    fontSize: 13,
+    marginTop: 4,
   },
   areaSelectedText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#111",
   },
   areaPlaceholderText: {
     fontSize: 16,
-    color: "#999",
+    color: "#a0a0a0",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#1c1c1e",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     maxHeight: "60%",
     paddingBottom: 32,
   },
+  modalHandle: {
+    width: 36,
+    height: 4,
+    backgroundColor: "#ddd",
+    borderRadius: 2,
+    alignSelf: "center",
+    position: "absolute",
+    top: 8,
+  },
   modalTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#111",
     textAlign: "center",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#333",
+    paddingTop: 20,
+    paddingBottom: 12,
   },
   searchInput: {
-    borderWidth: 1,
-    borderColor: "#444",
+    backgroundColor: "#f5f5f5",
     borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     fontSize: 16,
-    color: "#fff",
+    color: "#111",
     marginHorizontal: 16,
-    marginTop: 10,
-    marginBottom: 4,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e8e8e8",
   },
   modalItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#333",
+    borderBottomColor: "#eee",
   },
   modalItemSelected: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "#f0fdf4",
   },
   modalItemPressed: {
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: "#f5f5f5",
   },
   modalItemText: {
     fontSize: 16,
-    color: "#fff",
+    color: "#111",
+  },
+  modalCheck: {
+    fontSize: 16,
+    color: "#16A34A",
+    fontWeight: "600",
   },
 });

@@ -22,8 +22,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     SELECT t FROM Task t
     WHERE t.active = true
       AND (:status IS NULL OR t.status = :status)
-      AND (:city IS NULL OR LOWER(t.city) = LOWER(:city))
-      AND (:area IS NULL OR LOWER(t.area) = LOWER(:area))
+      AND (:city IS NULL OR t.city = :city)
+      AND (:area IS NULL OR t.area = :area)
     ORDER BY t.createdAt DESC, t.id DESC
 """)
     List<Task> findActive(
@@ -37,8 +37,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     SELECT t FROM Task t
     WHERE t.active = true
       AND (:status IS NULL OR t.status = :status)
-      AND (:city IS NULL OR LOWER(t.city) = LOWER(:city))
-      AND (:area IS NULL OR LOWER(t.area) = LOWER(:area))
+      AND (:city IS NULL OR t.city = :city)
+      AND (:area IS NULL OR t.area = :area)
       AND (
             t.createdAt < :cursorCreatedAt
             OR (t.createdAt = :cursorCreatedAt AND t.id < :cursorId)

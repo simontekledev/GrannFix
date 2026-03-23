@@ -1,3 +1,7 @@
+import { taskQueryApi } from "@/src/api/client";
+import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,10 +13,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
-import { taskQueryApi } from "@/src/api/client";
-import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 
 export default function UpptackScreen() {
   const router = useRouter();
@@ -22,13 +22,24 @@ export default function UpptackScreen() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const fetchTasks = useCallback(async () => {
-    try {
-      const res = await taskQueryApi.listTasks({ status: "OPEN" as any });
-      setTasks(res.items ?? []);
-    } catch (e) {
-      console.log("Failed to load tasks:", e);
-    }
-  }, []);
+  try {
+    console.log("Fetching tasks...");
+    const res = await taskQueryApi.listTasks({
+      cursor: undefined,
+      limit: 20,
+      status: "OPEN",
+      city: undefined,
+      area: undefined,
+    });
+
+    console.log("API response:", res);
+    setTasks(res.items ?? []);
+  } catch (e: any) {
+    console.log("Failed to load tasks:", e);
+    console.log("Error message:", e?.message);
+    console.log("Error cause:", e?.cause);
+  }
+}, []);
 
   const checkAuth = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
@@ -77,7 +88,7 @@ export default function UpptackScreen() {
               pressed && styles.cardButtonPressed,
             ]}
           >
-            <Text style={styles.cardButtonText}>Logga in for att hjalpa</Text>
+            <Text style={styles.cardButtonText}>Logga in för att hjälpa till</Text>
           </Pressable>
         )}
       </View>
@@ -184,7 +195,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#f0fdf4",
     borderRadius: 6,
-    paddingHorizontal: 10,
+    paddingHorizontal: 1,
     paddingVertical: 4,
     marginBottom: 8,
   },

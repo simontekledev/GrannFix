@@ -31,13 +31,13 @@ public class Task {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String city;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String area;
 
-    @Column
+    @Column(length = 200)
     private String street;
 
     @DecimalMin(value = "0.00")

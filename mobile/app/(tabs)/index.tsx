@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function UpptackScreen() {
+export default function UpptäckScreen() {
   const router = useRouter();
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,8 +108,8 @@ export default function UpptackScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Upptack</Text>
-        <Text style={styles.subtitle}>Tillgangliga uppdrag</Text>
+        <Text style={styles.title}>Upptäck</Text>
+        <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
 
       {tasks.length === 0 ? (
@@ -117,7 +117,7 @@ export default function UpptackScreen() {
           <Text style={styles.emptyIcon}>📋</Text>
           <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
           <Text style={styles.emptySubtitle}>
-            Dra nedat for att uppdatera
+            Dra nedåt för att uppdatera
           </Text>
         </View>
       ) : (

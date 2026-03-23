@@ -98,7 +98,7 @@ export default function ProfilScreen() {
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.scroll}>
           <Text style={styles.title}>Profil</Text>
-          <Text style={styles.subtitle}>Du ar inloggad</Text>
+          <Text style={styles.subtitle}>Du är inloggad</Text>
 
           <View style={styles.section}>
             <Pressable
@@ -132,7 +132,7 @@ export default function ProfilScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Valkommen</Text>
+          <Text style={styles.title}>Välkommen</Text>
           <Text style={styles.subtitle}>Logga in eller skapa ett konto</Text>
 
           <Text style={styles.label}>E-post</Text>
@@ -150,13 +150,13 @@ export default function ProfilScreen() {
             returnKeyType="next"
           />
 
-          <Text style={styles.label}>Losenord</Text>
+          <Text style={styles.label}>Lösenord</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
             secureTextEntry
             textContentType="password"
-            placeholder="Ange ditt losenord"
+            placeholder="Ange ditt lösenord"
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}

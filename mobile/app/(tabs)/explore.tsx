@@ -40,7 +40,7 @@ export default function AktivitetScreen() {
           <Text style={styles.emptyIcon}>💬</Text>
           <Text style={styles.emptyTitle}>Ingen aktivitet</Text>
           <Text style={styles.emptySubtitle}>
-            Logga in for att se dina uppdrag och chattar
+            Logga in för att se dina uppdrag och chattar
           </Text>
           <Pressable
             onPress={() => router.push("/(tabs)/profil")}

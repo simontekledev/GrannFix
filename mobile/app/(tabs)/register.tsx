@@ -68,6 +68,36 @@ export default function RegisterScreen() {
 
   const passwordsMatch = password === confirmPassword;
 
+  const BLOCKED_PASSWORDS = [
+    "12345678", "123456789", "1234567890", "password", "password1",
+    "qwerty123", "qwertyui", "abcdefgh", "abcd1234", "iloveyou",
+    "letmein1", "welcome1", "monkey123", "dragon12", "master12",
+    "football", "baseball", "trustno1", "sunshine", "princess",
+    "11111111", "00000000", "12341234", "aaaaaaaa", "passw0rd",
+  ];
+
+  function validatePassword(pw: string): string | null {
+    const lower = pw.toLowerCase();
+
+    if (pw.length < 8) return "Lösenordet måste vara minst 8 tecken";
+    if (pw.length > 64) return "Lösenordet får vara max 64 tecken";
+    if (BLOCKED_PASSWORDS.includes(lower) || /^password\d*$/.test(lower)){
+      return "Lösenordet är för svagt";
+    }
+
+    if (/^\d+$/.test(pw)) {
+      return "Lösenordet får inte bara innehålla siffror";
+    }
+
+    if (/(.)\1{5,}/.test(pw)) {
+      return "Lösenordet är för enkelt";
+    }
+
+    return null;
+  }
+
+  const passwordError = password.length > 0 ? validatePassword(password) : null;
+
   const phoneDigits = phoneLocal.replace(/\D/g, "");
   const formattedPhone = phoneDigits.length > 0 ? `+46${phoneDigits}` : "";
 
@@ -91,7 +121,8 @@ export default function RegisterScreen() {
     return (
       !submitting &&
       email.trim().length > 0 &&
-      password.length > 0 &&
+      password.length >= 8 &&
+      passwordError === null &&
       confirmPassword.length > 0 &&
       passwordsMatch &&
       name.trim().length > 0 &&
@@ -99,7 +130,7 @@ export default function RegisterScreen() {
       phoneDigits.length <= 10 &&
       area.trim().length > 0
     );
-  }, [email, password, confirmPassword, passwordsMatch, name, phoneDigits, area, submitting]);
+  }, [email, password, passwordError, confirmPassword, passwordsMatch, name, phoneDigits, area, submitting]);
 
   async function handleRegister() {
     if (!canSubmit) return;
@@ -155,11 +186,11 @@ export default function RegisterScreen() {
           <Text style={styles.title}>Skapa konto</Text>
           <Text style={styles.subtitle}>Fyll i dina uppgifter för att komma igång</Text>
 
-          <Text style={styles.label}>Namn</Text>
+          <Text style={styles.label}>Fullständigt namn</Text>
           <TextInput
             value={name}
             onChangeText={setName}
-            placeholder="Förnamn och efternamn"
+            placeholder="Ange ditt fullständiga namn"
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
@@ -183,11 +214,15 @@ export default function RegisterScreen() {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            placeholder="Minst 6 tecken"
+            placeholder="Minst 8 tecken"
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
+            maxLength={64}
           />
+          {passwordError && (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          )}
 
           <Text style={styles.label}>Bekräfta lösenord</Text>
           <TextInput
@@ -211,7 +246,7 @@ export default function RegisterScreen() {
           <Text style={styles.label}>Telefonnummer</Text>
           <View style={styles.phoneRow}>
             <View style={styles.phonePrefix}>
-              <Text style={styles.phonePrefixText}>+46</Text>
+              <Text style={styles.phonePrefixText}>🇸🇪 +46</Text>
             </View>
             <TextInput
               value={phoneDisplay}

@@ -156,7 +156,7 @@ export default function RegisterScreen() {
       }
 
       Alert.alert("Konto skapat", "Du är registrerad och redo att börja.");
-      router.replace("/(tabs)/explore");
+      router.replace("/(tabs)/activity");
     } catch (e: any) {
       console.log("Register error:", e);
 
@@ -395,7 +395,8 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     fontSize: 16,
-    color: "#999",
+    fontWeight: "600",
+    color: "#333",
   },
   phoneRow: {
     flexDirection: "row",

@@ -341,7 +341,7 @@ export default function RegisterScreen() {
             )}
           </Pressable>
 
-          <Pressable onPress={() => router.back()} style={styles.linkButton}>
+          <Pressable onPress={() => router.replace("/(tabs)/profile")} style={styles.linkButton}>
             <Text style={styles.linkText}>
               Har du redan ett konto? <Text style={styles.linkTextBold}>Logga in</Text>
             </Text>

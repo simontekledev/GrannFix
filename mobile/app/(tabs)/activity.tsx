@@ -3,6 +3,7 @@ import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -90,7 +91,7 @@ export default function AktivitetScreen() {
             Logga in för att se dina uppdrag och chattar
           </Text>
           <Pressable
-            onPress={() => router.push("/(tabs)/profil")}
+            onPress={() => router.push("/(tabs)/profile")}
             style={({ pressed }) => [
               styles.loginButton,
               pressed && styles.loginButtonPressed,
@@ -137,7 +138,13 @@ export default function AktivitetScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Aktivitet</Text>
+        <View style={styles.headerTop}>
+          <Image
+            source={require("@/assets/images/grannfix-icon.png")}
+            style={styles.headerIcon}
+          />
+          <Text style={styles.title}>Aktivitet</Text>
+        </View>
         <Text style={styles.subtitle}>Dina uppdrag</Text>
       </View>
 
@@ -179,6 +186,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 16,
+  },
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  headerIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
   },
   title: {
     fontSize: 28,

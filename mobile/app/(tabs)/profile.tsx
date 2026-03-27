@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,11 +15,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { authApi } from "@/src/api/client";
+import { useFocusEffect } from "expo-router";
+import { authApi, userApi } from "@/src/api/client";
+import type { MeUserDto } from "@/src/api/generated/models/MeUserDto";
 
 export default function ProfilScreen() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [user, setUser] = useState<MeUserDto | null>(null);
 
   // Login form
   const [email, setEmail] = useState("");
@@ -29,14 +33,27 @@ export default function ProfilScreen() {
     return email.trim().length > 0 && password.length > 0 && !submitting;
   }, [email, password, submitting]);
 
-  const checkAuth = useCallback(async () => {
+  const loadProfile = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
-    setLoggedIn(!!token);
+    const isLoggedIn = !!token;
+    setLoggedIn(isLoggedIn);
+    if (isLoggedIn) {
+      try {
+        const me = await userApi.getMe();
+        setUser(me);
+      } catch (e) {
+        console.log("Failed to load profile:", e);
+      }
+    } else {
+      setUser(null);
+    }
   }, []);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [loadProfile])
+  );
 
   async function handleLogin() {
     if (!canSubmit) return;
@@ -60,6 +77,10 @@ export default function ProfilScreen() {
       setEmail("");
       setPassword("");
       setLoggedIn(true);
+      try {
+        const me = await userApi.getMe();
+        setUser(me);
+      } catch (_) {}
     } catch (e: any) {
       console.log("Login error:", e);
 
@@ -80,6 +101,7 @@ export default function ProfilScreen() {
     await AsyncStorage.removeItem("access_token");
     await AsyncStorage.removeItem("refresh_token");
     setLoggedIn(false);
+    setUser(null);
   }
 
   if (loggedIn === null) {
@@ -94,20 +116,64 @@ export default function ProfilScreen() {
 
   // Logged in state
   if (loggedIn) {
+    const initials = (user?.name ?? "?")
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
     return (
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.scroll}>
           <Text style={styles.title}>Profil</Text>
-          <Text style={styles.subtitle}>Du är inloggad</Text>
+
+          <View style={styles.avatarRow}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials}</Text>
+            </View>
+            <View style={styles.avatarInfo}>
+              <Text style={styles.userName}>{user?.name ?? "—"}</Text>
+              {user?.verified && (
+                <Text style={styles.verifiedBadge}>Verifierad</Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.detailCard}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>E-post</Text>
+              <Text style={styles.detailValue}>{user?.email ?? "—"}</Text>
+            </View>
+            <View style={styles.detailDivider} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Telefon</Text>
+              <Text style={styles.detailValue}>{user?.phoneNumber ?? "—"}</Text>
+            </View>
+            <View style={styles.detailDivider} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Stad</Text>
+              <Text style={styles.detailValue}>{user?.city ?? "—"}</Text>
+            </View>
+            <View style={styles.detailDivider} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Område</Text>
+              <Text style={styles.detailValue}>{user?.area ?? "—"}</Text>
+            </View>
+          </View>
 
           <View style={styles.section}>
             <Pressable
-              onPress={() =>
-                Alert.alert("Logga ut", "Vill du logga ut?", [
-                  { text: "Avbryt", style: "cancel" },
-                  { text: "Logga ut", style: "destructive", onPress: handleLogout },
-                ])
-              }
+              onPress={() => {
+                if (Platform.OS === "web") {
+                  if (window.confirm("Vill du logga ut?")) handleLogout();
+                } else {
+                  Alert.alert("Logga ut", "Vill du logga ut?", [
+                    { text: "Avbryt", style: "cancel" },
+                    { text: "Logga ut", style: "destructive", onPress: handleLogout },
+                  ]);
+                }
+              }}
               style={({ pressed }) => [
                 styles.logoutButton,
                 pressed && styles.buttonPressed,
@@ -132,7 +198,13 @@ export default function ProfilScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Välkommen</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("@/assets/images/grannfix-primary-logo.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
           <Text style={styles.subtitle}>Logga in eller skapa ett konto</Text>
 
           <Text style={styles.label}>E-post</Text>
@@ -213,8 +285,17 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 0,
     paddingBottom: 48,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: -16,
+  },
+  logo: {
+    width: 260,
+    height: 260,
   },
   title: {
     fontSize: 28,
@@ -226,6 +307,69 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#666",
     marginBottom: 24,
+    textAlign: "center",
+  },
+  avatarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginBottom: 24,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#16A34A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  avatarInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+  },
+  verifiedBadge: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#16A34A",
+    marginTop: 2,
+  },
+  detailCard: {
+    backgroundColor: "#f9f9f9",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#eee",
+    padding: 16,
+  },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666",
+  },
+  detailValue: {
+    fontSize: 14,
+    color: "#111",
+    textAlign: "right",
+    flex: 1,
+    marginLeft: 16,
+  },
+  detailDivider: {
+    height: 1,
+    backgroundColor: "#eee",
   },
   section: {
     marginTop: 32,

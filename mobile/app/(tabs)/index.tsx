@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -80,17 +81,17 @@ export default function UpptäckScreen() {
           </Text>
         ) : null}
 
-        {!loggedIn && (
-          <Pressable
-            onPress={() => router.push("/(tabs)/profil")}
-            style={({ pressed }) => [
-              styles.cardButton,
-              pressed && styles.cardButtonPressed,
-            ]}
-          >
-            <Text style={styles.cardButtonText}>Logga in för att hjälpa till</Text>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={() => loggedIn ? null : router.push("/(tabs)/profile")}
+          style={({ pressed }) => [
+            styles.cardButton,
+            pressed && !loggedIn && styles.cardButtonPressed,
+          ]}
+        >
+          <Text style={styles.cardButtonText}>
+            {loggedIn ? "Hjälp till" : "Logga in för att hjälpa till"}
+          </Text>
+        </Pressable>
       </View>
     );
   }
@@ -108,7 +109,13 @@ export default function UpptäckScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Upptäck</Text>
+        <View style={styles.headerTop}>
+          <Image
+            source={require("@/assets/images/grannfix-icon.png")}
+            style={styles.headerIcon}
+          />
+          <Text style={styles.title}>Upptäck</Text>
+        </View>
         <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
 
@@ -150,6 +157,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 16,
+  },
+  headerTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  headerIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
   },
   title: {
     fontSize: 28,

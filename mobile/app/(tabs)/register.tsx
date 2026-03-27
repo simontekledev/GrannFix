@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -50,6 +50,11 @@ const STOCKHOLM_AREAS = [
 
 export default function RegisterScreen() {
   const router = useRouter();
+
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -194,10 +199,13 @@ export default function RegisterScreen() {
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current?.focus()}
           />
 
           <Text style={styles.label}>E-post</Text>
           <TextInput
+            ref={emailRef}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -207,10 +215,13 @@ export default function RegisterScreen() {
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
 
           <Text style={styles.label}>Lösenord</Text>
           <TextInput
+            ref={passwordRef}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -219,6 +230,8 @@ export default function RegisterScreen() {
             style={styles.input}
             editable={!submitting}
             maxLength={64}
+            returnKeyType="next"
+            onSubmitEditing={() => confirmPasswordRef.current?.focus()}
           />
           {passwordError && (
             <Text style={styles.errorText}>{passwordError}</Text>
@@ -226,6 +239,7 @@ export default function RegisterScreen() {
 
           <Text style={styles.label}>Bekräfta lösenord</Text>
           <TextInput
+            ref={confirmPasswordRef}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -233,6 +247,8 @@ export default function RegisterScreen() {
             placeholderTextColor="#a0a0a0"
             style={styles.input}
             editable={!submitting}
+            returnKeyType="next"
+            onSubmitEditing={() => phoneRef.current?.focus()}
           />
 
           {confirmPassword.length > 0 ? (
@@ -249,6 +265,7 @@ export default function RegisterScreen() {
               <Text style={styles.phonePrefixText}>🇸🇪 +46</Text>
             </View>
             <TextInput
+              ref={phoneRef}
               value={phoneDisplay}
               onChangeText={handlePhoneChange}
               keyboardType="number-pad"
@@ -257,6 +274,7 @@ export default function RegisterScreen() {
               style={[styles.input, styles.phoneInput]}
               editable={!submitting}
               maxLength={12}
+              returnKeyType="done"
             />
           </View>
 

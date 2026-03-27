@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -25,6 +25,7 @@ export default function ProfilScreen() {
   const [user, setUser] = useState<MeUserDto | null>(null);
 
   // Login form
+  const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -220,10 +221,12 @@ export default function ProfilScreen() {
             style={styles.input}
             editable={!submitting}
             returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
 
           <Text style={styles.label}>Lösenord</Text>
           <TextInput
+            ref={passwordRef}
             value={password}
             onChangeText={setPassword}
             secureTextEntry

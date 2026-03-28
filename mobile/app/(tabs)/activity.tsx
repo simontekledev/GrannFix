@@ -3,7 +3,6 @@ import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -138,13 +137,7 @@ export default function AktivitetScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <View style={styles.headerTop}>
-          <Image
-            source={require("@/assets/images/grannfix-icon.png")}
-            style={styles.headerIcon}
-          />
-          <Text style={styles.title}>Aktivitet</Text>
-        </View>
+        <Text style={styles.title}>Aktivitet</Text>
         <Text style={styles.subtitle}>Dina uppdrag</Text>
       </View>
 
@@ -247,6 +240,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
+    marginLeft: -2,
   },
   statusText: {
     fontSize: 13,

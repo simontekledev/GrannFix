@@ -85,14 +85,23 @@ export default function ProfilScreen() {
     } catch (e: any) {
       console.log("Login error:", e);
 
-      const msg =
-        e?.response?.status
-          ? `HTTP ${e.response.status}`
-          : e?.status
-          ? `HTTP ${e.status}`
-          : String(e?.message ?? e);
+      let msg = "Något gick fel. Försök igen.";
+      const status = e?.response?.status ?? e?.status;
+      if (status === 401 || status === 403) {
+        msg = "Fel e-post eller lösenord. Kontrollera och försök igen.";
+      } else if (status === 404) {
+        msg = "Inget konto hittades med den e-postadressen.";
+      } else if (status === 429) {
+        msg = "För många försök. Vänta en stund och försök igen.";
+      } else if (!status) {
+        msg = "Kunde inte nå servern. Kontrollera din internetanslutning.";
+      }
 
-      Alert.alert("Inloggning misslyckades", msg);
+      if (Platform.OS === "web") {
+        window.alert(msg);
+      } else {
+        Alert.alert("Inloggning misslyckades", msg);
+      }
     } finally {
       setSubmitting(false);
     }

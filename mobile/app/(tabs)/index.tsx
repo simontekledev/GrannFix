@@ -109,13 +109,11 @@ export default function UpptäckScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <View style={styles.headerTop}>
-          <Image
-            source={require("@/assets/images/grannfix-icon.png")}
-            style={styles.headerIcon}
-          />
-          <Text style={styles.title}>Upptäck</Text>
-        </View>
+        <Image
+          source={require("@/assets/images/grannfix-wordmark-cut.png")}
+          style={styles.wordmark}
+          resizeMode="contain"
+        />
         <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
 
@@ -168,6 +166,12 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 8,
   },
+  wordmark: {
+    width: 140,
+    height: 34,
+    alignSelf: "flex-start",
+    marginLeft: -24,
+  },
   title: {
     fontSize: 28,
     fontWeight: "700",
@@ -212,9 +216,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#f0fdf4",
     borderRadius: 6,
-    paddingHorizontal: 1,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     marginBottom: 8,
+    marginLeft: -2,
   },
   areaBadgeText: {
     fontSize: 13,

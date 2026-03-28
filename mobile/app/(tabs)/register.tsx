@@ -165,14 +165,23 @@ export default function RegisterScreen() {
     } catch (e: any) {
       console.log("Register error:", e);
 
-      const msg =
-        e?.response?.status
-          ? `HTTP ${e.response.status}`
-          : e?.status
-          ? `HTTP ${e.status}`
-          : String(e?.message ?? e);
+      let msg = "Något gick fel. Försök igen.";
+      const status = e?.response?.status ?? e?.status;
+      if (status === 409 || status === 400) {
+        msg = "E-postadressen är redan registrerad. Prova att logga in istället.";
+      } else if (status === 422) {
+        msg = "Kontrollera att alla fält är korrekt ifyllda.";
+      } else if (status === 429) {
+        msg = "För många försök. Vänta en stund och försök igen.";
+      } else if (!status) {
+        msg = "Kunde inte nå servern. Kontrollera din internetanslutning.";
+      }
 
-      Alert.alert("Registrering misslyckades", msg);
+      if (Platform.OS === "web") {
+        window.alert(msg);
+      } else {
+        Alert.alert("Registrering misslyckades", msg);
+      }
     } finally {
       setSubmitting(false);
     }

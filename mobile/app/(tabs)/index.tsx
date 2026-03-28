@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     marginBottom: 8,
-    marginLeft: -2,
+    marginLeft: -8,
   },
   areaBadgeText: {
     fontSize: 13,

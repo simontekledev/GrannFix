@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
@@ -51,16 +51,29 @@ export default function AktivitetScreen() {
     }
   }, []);
 
+  // Load data once on mount
+  useEffect(() => {
+    checkAuth().then((isLoggedIn) => {
+      if (isLoggedIn) {
+        fetchTasks().finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
+    });
+  }, [checkAuth, fetchTasks]);
+
+  // Only re-check auth (local) on tab focus
   useFocusEffect(
     useCallback(() => {
-      checkAuth().then((isLoggedIn) => {
-        if (isLoggedIn) {
-          fetchTasks().finally(() => setLoading(false));
-        } else {
-          setLoading(false);
+      AsyncStorage.getItem("access_token").then((token) => {
+        const isLoggedIn = !!token;
+        if (isLoggedIn !== loggedIn) {
+          checkAuth().then((loggedIn) => {
+            if (loggedIn) fetchTasks();
+          });
         }
       });
-    }, [checkAuth, fetchTasks])
+    }, [loggedIn, checkAuth, fetchTasks])
   );
 
   async function onRefresh() {

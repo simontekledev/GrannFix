@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -57,10 +57,21 @@ export default function ProfilScreen() {
     }
   }, []);
 
+  // Load profile data once on mount
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  // Only re-check auth status (local, no API call) on tab focus
   useFocusEffect(
     useCallback(() => {
-      loadProfile();
-    }, [loadProfile])
+      AsyncStorage.getItem("access_token").then((token) => {
+        const isLoggedIn = !!token;
+        if (isLoggedIn !== loggedIn) {
+          loadProfile();
+        }
+      });
+    }, [loggedIn, loadProfile])
   );
 
   async function handleLogin() {

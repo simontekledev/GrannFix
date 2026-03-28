@@ -73,6 +73,18 @@ export interface MeUserDto {
      * @memberof MeUserDto
      */
     verified?: boolean;
+    /**
+     *
+     * @type {number}
+     * @memberof MeUserDto
+     */
+    ratingAverage?: number;
+    /**
+     *
+     * @type {number}
+     * @memberof MeUserDto
+     */
+    ratingCount?: number;
 }
 
 /**
@@ -101,6 +113,8 @@ export function MeUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
         'verified': json['verified'] == null ? undefined : json['verified'],
+        'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
+        'ratingCount': json['ratingCount'] == null ? undefined : json['ratingCount'],
     };
 }
 
@@ -124,6 +138,8 @@ export function MeUserDtoToJSONTyped(value?: MeUserDto | null, ignoreDiscriminat
         'area': value['area'],
         'street': value['street'],
         'verified': value['verified'],
+        'ratingAverage': value['ratingAverage'],
+        'ratingCount': value['ratingCount'],
     };
 }
 

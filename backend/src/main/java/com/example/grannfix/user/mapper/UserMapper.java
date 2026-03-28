@@ -20,7 +20,9 @@ public class UserMapper {
                 user.getCity(),
                 user.getArea(),
                 user.getStreet(),
-                user.isVerified()
+                user.isVerified(),
+                safeDouble(user.getRatingAverage()),
+                safeInt(user.getRatingCount())
         );
     }
 

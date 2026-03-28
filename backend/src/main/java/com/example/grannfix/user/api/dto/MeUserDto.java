@@ -11,5 +11,7 @@ public record MeUserDto(
         String city,
         String area,
         String street,
-        boolean verified
+        boolean verified,
+        Double ratingAverage,
+        Integer ratingCount
 ) {}

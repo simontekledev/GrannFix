@@ -153,6 +153,31 @@ export default function ProfilScreen() {
               style={styles.profileIcon}
             />
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
+
+            <View style={styles.ratingRow}>
+              {[1, 2, 3, 4, 5].map((star) => {
+                const avg = user?.ratingAverage ?? 0;
+                const diff = avg - (star - 1);
+                const fraction = Math.max(0, Math.min(1, diff));
+                // Interpolate color from grey (#D1D5DB) to gold (#F59E0B)
+                const r = Math.round(209 + (245 - 209) * fraction);
+                const g = Math.round(213 + (158 - 213) * fraction);
+                const b = Math.round(219 + (11 - 219) * fraction);
+                return (
+                  <Text key={star} style={[styles.star, { color: `rgb(${r},${g},${b})` }]}>
+                    {"\u2605"}
+                  </Text>
+                );
+              })}
+              <Text style={styles.ratingText}>
+                {(user?.ratingAverage ?? 0).toFixed(1)}
+              </Text>
+            </View>
+
+            {user?.bio ? (
+              <Text style={styles.bioText}>{user.bio}</Text>
+            ) : null}
+
             {user?.verified ? (
               <View style={styles.verifiedPill}>
                 <Text style={styles.verifiedPillText}>Verifierad</Text>
@@ -358,6 +383,28 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111",
     marginBottom: 6,
+  },
+  bioText: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    gap: 2,
+  },
+  star: {
+    fontSize: 20,
+  },
+  ratingText: {
+    fontSize: 14,
+    color: "#888",
+    marginLeft: 6,
   },
   verifiedPill: {
     backgroundColor: "#f0fdf4",

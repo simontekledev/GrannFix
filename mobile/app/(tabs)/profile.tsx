@@ -126,30 +126,27 @@ export default function ProfilScreen() {
 
   // Logged in state
   if (loggedIn) {
-    const initials = (user?.name ?? "?")
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-
     return (
       <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.scroll}>
-          <Text style={styles.title}>Profil</Text>
-
-          <View style={styles.avatarRow}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-            <View style={styles.avatarInfo}>
-              <Text style={styles.userName}>{user?.name ?? "—"}</Text>
-              {user?.verified && (
-                <Text style={styles.verifiedBadge}>Verifierad</Text>
-              )}
-            </View>
+        <ScrollView contentContainerStyle={styles.profileScroll}>
+          <View style={styles.profileHero}>
+            <Image
+              source={require("@/assets/images/user-profile-icon.png")}
+              style={styles.profileIcon}
+            />
+            <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
+            {user?.verified ? (
+              <View style={styles.verifiedPill}>
+                <Text style={styles.verifiedPillText}>Verifierad</Text>
+              </View>
+            ) : (
+              <View style={styles.unverifiedPill}>
+                <Text style={styles.unverifiedPillText}>Ej verifierad</Text>
+              </View>
+            )}
           </View>
 
+          <Text style={styles.sectionTitle}>Kontaktuppgifter</Text>
           <View style={styles.detailCard}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>E-post</Text>
@@ -160,7 +157,10 @@ export default function ProfilScreen() {
               <Text style={styles.detailLabel}>Telefon</Text>
               <Text style={styles.detailValue}>{user?.phoneNumber ?? "—"}</Text>
             </View>
-            <View style={styles.detailDivider} />
+          </View>
+
+          <Text style={styles.sectionTitle}>Plats</Text>
+          <View style={styles.detailCard}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Stad</Text>
               <Text style={styles.detailValue}>{user?.city ?? "—"}</Text>
@@ -172,26 +172,24 @@ export default function ProfilScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Pressable
-              onPress={() => {
-                if (Platform.OS === "web") {
-                  if (window.confirm("Vill du logga ut?")) handleLogout();
-                } else {
-                  Alert.alert("Logga ut", "Vill du logga ut?", [
-                    { text: "Avbryt", style: "cancel" },
-                    { text: "Logga ut", style: "destructive", onPress: handleLogout },
-                  ]);
-                }
-              }}
-              style={({ pressed }) => [
-                styles.logoutButton,
-                pressed && styles.buttonPressed,
-              ]}
-            >
-              <Text style={styles.logoutButtonText}>Logga ut</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={() => {
+              if (Platform.OS === "web") {
+                if (window.confirm("Vill du logga ut?")) handleLogout();
+              } else {
+                Alert.alert("Logga ut", "Vill du logga ut?", [
+                  { text: "Avbryt", style: "cancel" },
+                  { text: "Logga ut", style: "destructive", onPress: handleLogout },
+                ]);
+              }
+            }}
+            style={({ pressed }) => [
+              styles.logoutButton,
+              pressed && styles.buttonPressed,
+            ]}
+          >
+            <Text style={styles.logoutButtonText}>Logga ut</Text>
+          </Pressable>
         </ScrollView>
       </SafeAreaView>
     );
@@ -321,38 +319,60 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
-  avatarRow: {
-    flexDirection: "row",
+  profileScroll: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 48,
+  },
+  profileHero: {
     alignItems: "center",
-    gap: 16,
-    marginBottom: 24,
+    marginBottom: 28,
+    marginTop: 20,
   },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#16A34A",
-    alignItems: "center",
-    justifyContent: "center",
+  profileIcon: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    marginBottom: 14,
   },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  avatarInfo: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 20,
+  profileName: {
+    fontSize: 24,
     fontWeight: "700",
     color: "#111",
+    marginBottom: 6,
   },
-  verifiedBadge: {
+  verifiedPill: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    marginTop: 4,
+  },
+  verifiedPillText: {
     fontSize: 13,
     fontWeight: "600",
     color: "#16A34A",
-    marginTop: 2,
+  },
+  unverifiedPill: {
+    backgroundColor: "#fef2f2",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    marginTop: 4,
+  },
+  unverifiedPillText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#999",
+  },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#888",
+    marginBottom: 8,
+    marginTop: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   detailCard: {
     backgroundColor: "#f9f9f9",
@@ -447,6 +467,7 @@ const styles = StyleSheet.create({
     color: "#16A34A",
   },
   logoutButton: {
+    marginTop: 28,
     borderWidth: 1,
     borderColor: "#e53e3e",
     borderRadius: 12,

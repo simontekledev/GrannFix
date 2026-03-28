@@ -42,8 +42,15 @@ export default function ProfilScreen() {
       try {
         const me = await userApi.getMe();
         setUser(me);
-      } catch (e) {
+      } catch (e: any) {
         console.log("Failed to load profile:", e);
+        const status = e?.response?.status ?? e?.status;
+        if (status === 401 || status === 403) {
+          await AsyncStorage.removeItem("access_token");
+          await AsyncStorage.removeItem("refresh_token");
+          setLoggedIn(false);
+          setUser(null);
+        }
       }
     } else {
       setUser(null);

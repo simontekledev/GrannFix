@@ -5,6 +5,7 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -14,6 +15,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { taskApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
+
+const STATUS_ORDER: Record<string, number> = {
+  OPEN: 0,
+  ASSIGNED: 1,
+  CANCELLED: 2,
+  COMPLETED: 3,
+};
 
 const STATUS_LABELS: Record<string, string> = {
   OPEN: "Öppen",
@@ -52,6 +60,7 @@ export default function AktivitetScreen() {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [filter, setFilter] = useState<string | null>(null);
 
   const checkAuth = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
@@ -62,7 +71,10 @@ export default function AktivitetScreen() {
   const fetchTasks = useCallback(async () => {
     try {
       const res = await taskApi.getMyTasks();
-      setTasks(res);
+      const sorted = [...res].sort((a, b) => {
+        return (STATUS_ORDER[a.status ?? "OPEN"] ?? 99) - (STATUS_ORDER[b.status ?? "OPEN"] ?? 99);
+      });
+      setTasks(sorted);
     } catch (e) {
       console.log("Failed to load my tasks:", e);
     }
@@ -176,6 +188,16 @@ export default function AktivitetScreen() {
     );
   }
 
+  const FILTERS = [
+    { key: null, label: "Alla" },
+    { key: "OPEN", label: "Öppna" },
+    { key: "ASSIGNED", label: "Tilldelade" },
+    { key: "CANCELLED", label: "Avbrutna" },
+    { key: "COMPLETED", label: "Klara" },
+  ];
+
+  const filteredTasks = filter ? tasks.filter((t) => t.status === filter) : tasks;
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
@@ -183,19 +205,43 @@ export default function AktivitetScreen() {
         <Text style={styles.subtitle}>Dina uppdrag</Text>
       </View>
 
-      {tasks.length === 0 ? (
+      <View style={styles.filterContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+          {FILTERS.map((f) => (
+            <Pressable
+              key={f.key ?? "all"}
+              onPress={() => setFilter(f.key)}
+              style={[
+                styles.filterChip,
+                filter === f.key && styles.filterChipActive,
+              ]}
+            >
+              <Text style={[
+                styles.filterChipText,
+                filter === f.key && styles.filterChipTextActive,
+              ]}>
+                {f.label}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+
+      {filteredTasks.length === 0 ? (
         <View style={styles.centered}>
           <View style={styles.emptyCircle}>
             <Text style={styles.emptyIcon}>✅</Text>
           </View>
-          <Text style={styles.emptyTitle}>Inga uppdrag</Text>
+          <Text style={styles.emptyTitle}>
+            {filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
+          </Text>
           <Text style={styles.emptySubtitle}>
-            Du har inga uppdrag just nu.{"\n"}Dra nedåt för att uppdatera.
+            {filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
           </Text>
         </View>
       ) : (
         <FlatList
-          data={tasks}
+          data={filteredTasks}
           keyExtractor={(item) => item.id ?? Math.random().toString()}
           renderItem={renderTask}
           contentContainerStyle={styles.list}
@@ -218,6 +264,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
+  },
+  filterContainer: {
+    marginBottom: 4,
+  },
+  filterRow: {
+    paddingHorizontal: 24,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  filterChipActive: {
+    backgroundColor: "#16A34A",
+    borderColor: "#16A34A",
+  },
+  filterChipText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#666",
+  },
+  filterChipTextActive: {
+    color: "#fff",
   },
   headerRow: {
     paddingHorizontal: 24,

@@ -226,8 +226,9 @@ export default function ProfilScreen() {
                 ]);
               }
             }}
-            style={({ pressed }) => [
+            style={({ pressed, hovered }: any) => [
               styles.logoutButton,
+              hovered && styles.logoutButtonHovered,
               pressed && styles.buttonPressed,
             ]}
           >
@@ -292,9 +293,10 @@ export default function ProfilScreen() {
           <Pressable
             onPress={handleLogin}
             disabled={!canSubmit}
-            style={({ pressed }) => [
+            style={({ pressed, hovered }: any) => [
               styles.button,
               !canSubmit && styles.buttonDisabled,
+              hovered && canSubmit && styles.buttonHovered,
               pressed && canSubmit && styles.buttonPressed,
             ]}
           >
@@ -313,8 +315,9 @@ export default function ProfilScreen() {
 
           <Pressable
             onPress={() => router.push("/register")}
-            style={({ pressed }) => [
+            style={({ pressed, hovered }: any) => [
               styles.registerButton,
+              hovered && styles.registerButtonHovered,
               pressed && styles.buttonPressed,
             ]}
           >
@@ -329,7 +332,7 @@ export default function ProfilScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F9FA",
   },
   centered: {
     flex: 1,
@@ -379,18 +382,18 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   profileName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "700",
     color: "#111",
     marginBottom: 6,
   },
   bioText: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 15,
+    color: "#555",
     textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 8,
-    paddingHorizontal: 16,
+    lineHeight: 22,
+    marginBottom: 10,
+    paddingHorizontal: 12,
   },
   ratingRow: {
     flexDirection: "row",
@@ -399,11 +402,12 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   star: {
-    fontSize: 20,
+    fontSize: 22,
   },
   ratingText: {
-    fontSize: 14,
-    color: "#888",
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#555",
     marginLeft: 6,
   },
   verifiedPill: {
@@ -431,20 +435,21 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#888",
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#999",
     marginBottom: 8,
     marginTop: 4,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
   detailCard: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 14,
     borderWidth: 1,
     borderColor: "#eee",
     padding: 16,
+    marginBottom: 16,
   },
   detailRow: {
     flexDirection: "row",
@@ -454,12 +459,13 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
+    fontWeight: "500",
+    color: "#888",
   },
   detailValue: {
-    fontSize: 14,
-    color: "#111",
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#222",
     textAlign: "right",
     flex: 1,
     marginLeft: 16,
@@ -496,6 +502,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  buttonHovered: {
+    backgroundColor: "#15913F",
+    transform: [{ scale: 1.015 }],
+  },
   buttonDisabled: { opacity: 0.35 },
   buttonPressed: { opacity: 0.8 },
   buttonText: {
@@ -526,6 +536,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  registerButtonHovered: {
+    backgroundColor: "#f0fdf4",
+    transform: [{ scale: 1.015 }],
+  },
   registerButtonText: {
     fontSize: 16,
     fontWeight: "600",
@@ -539,6 +553,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
+  },
+  logoutButtonHovered: {
+    backgroundColor: "#fef2f2",
+    transform: [{ scale: 1.015 }],
   },
   logoutButtonText: {
     fontSize: 16,

@@ -29,6 +29,23 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: "#dc2626",
 };
 
+function timeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffH = Math.floor(diffMin / 60);
+  const diffD = Math.floor(diffH / 24);
+
+  if (diffMin < 1) return "Just nu";
+  if (diffMin < 60) return `${diffMin} min sedan`;
+  if (diffH < 24) return diffH === 1 ? "1 timme sedan" : `${diffH} timmar sedan`;
+  if (diffD === 1) return "Igår";
+  if (diffD < 7) return `${diffD} dagar sedan`;
+  if (diffD < 14) return "1 vecka sedan";
+  if (diffD < 30) return `${Math.floor(diffD / 7)} veckor sedan`;
+  return date.toLocaleDateString("sv-SE");
+}
+
 export default function AktivitetScreen() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
@@ -104,8 +121,9 @@ export default function AktivitetScreen() {
           </Text>
           <Pressable
             onPress={() => router.push("/(tabs)/profile")}
-            style={({ pressed }) => [
+            style={({ pressed, hovered }: any) => [
               styles.loginButton,
+              hovered && styles.loginButtonHovered,
               pressed && styles.loginButtonPressed,
             ]}
           >
@@ -118,24 +136,29 @@ export default function AktivitetScreen() {
 
   function renderTask({ item }: { item: TaskResponse }) {
     const status = item.status ?? "OPEN";
+    const statusColor = STATUS_COLORS[status] ?? "#888";
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { borderLeftColor: statusColor, borderLeftWidth: 3 }]}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
           </Text>
-          {item.offeredPrice != null && (
-            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
-          )}
-        </View>
-
-        <View style={styles.cardMeta}>
-          <View style={[styles.statusBadge, { backgroundColor: (STATUS_COLORS[status] ?? "#888") + "18" }]}>
-            <Text style={[styles.statusText, { color: STATUS_COLORS[status] ?? "#888" }]}>
+          <View style={[styles.statusBadge, { backgroundColor: statusColor + "18" }]}>
+            <Text style={[styles.statusText, { color: statusColor }]}>
               {STATUS_LABELS[status] ?? status}
             </Text>
           </View>
-          {item.area && <Text style={styles.cardArea}>{item.area}</Text>}
+        </View>
+
+        <View style={styles.cardMeta}>
+          {item.area && (
+            <View style={styles.areaBadge}>
+              <Text style={styles.areaBadgeText}>{item.area}</Text>
+            </View>
+          )}
+          {item.offeredPrice != null && (
+            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
+          )}
         </View>
 
         {item.description ? (
@@ -143,6 +166,12 @@ export default function AktivitetScreen() {
             {item.description}
           </Text>
         ) : null}
+
+        {item.createdAt && (
+          <Text style={styles.cardDate}>
+            {timeAgo(item.createdAt)}
+          </Text>
+        )}
       </View>
     );
   }
@@ -156,10 +185,12 @@ export default function AktivitetScreen() {
 
       {tasks.length === 0 ? (
         <View style={styles.centered}>
-          <Text style={styles.emptyIcon}>✅</Text>
+          <View style={styles.emptyCircle}>
+            <Text style={styles.emptyIcon}>✅</Text>
+          </View>
           <Text style={styles.emptyTitle}>Inga uppdrag</Text>
           <Text style={styles.emptySubtitle}>
-            Du har inga uppdrag just nu
+            Du har inga uppdrag just nu.{"\n"}Dra nedåt för att uppdatera.
           </Text>
         </View>
       ) : (
@@ -180,7 +211,7 @@ export default function AktivitetScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F9FA",
   },
   centered: {
     flex: 1,
@@ -218,7 +249,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   card: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 14,
     padding: 18,
     marginBottom: 14,
@@ -259,18 +290,38 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
-  cardArea: {
-    fontSize: 13,
-    color: "#666",
+  areaBadge: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  areaBadgeText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#16A34A",
+  },
+  cardDate: {
+    fontSize: 12,
+    color: "#aaa",
+    marginTop: 8,
   },
   cardDescription: {
     fontSize: 14,
     color: "#555",
     lineHeight: 20,
   },
+  emptyCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#f0fdf4",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    fontSize: 36,
   },
   emptyTitle: {
     fontSize: 18,
@@ -283,6 +334,10 @@ const styles = StyleSheet.create({
     color: "#888",
     textAlign: "center",
     lineHeight: 20,
+  },
+  loginButtonHovered: {
+    backgroundColor: "#15913F",
+    transform: [{ scale: 1.015 }],
   },
   loginButton: {
     marginTop: 20,

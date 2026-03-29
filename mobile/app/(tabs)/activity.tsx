@@ -5,7 +5,6 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,10 +14,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { taskApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
+import { EmptyState } from "@/src/components/EmptyState";
+import { FilterChips } from "@/src/components/FilterChips";
+import { timeAgo } from "@/src/helpers/time";
 
 const STATUS_ORDER: Record<string, number> = {
-  OPEN: 0,
-  ASSIGNED: 1,
+  ASSIGNED: 0,
+  OPEN: 1,
   CANCELLED: 2,
   COMPLETED: 3,
 };
@@ -36,23 +38,6 @@ const STATUS_COLORS: Record<string, string> = {
   COMPLETED: "#6b7280",
   CANCELLED: "#dc2626",
 };
-
-function timeAgo(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffH = Math.floor(diffMin / 60);
-  const diffD = Math.floor(diffH / 24);
-
-  if (diffMin < 1) return "Just nu";
-  if (diffMin < 60) return `${diffMin} min sedan`;
-  if (diffH < 24) return diffH === 1 ? "1 timme sedan" : `${diffH} timmar sedan`;
-  if (diffD === 1) return "Igår";
-  if (diffD < 7) return `${diffD} dagar sedan`;
-  if (diffD < 14) return "1 vecka sedan";
-  if (diffD < 30) return `${Math.floor(diffD / 7)} veckor sedan`;
-  return date.toLocaleDateString("sv-SE");
-}
 
 export default function AktivitetScreen() {
   const router = useRouter();
@@ -72,7 +57,9 @@ export default function AktivitetScreen() {
     try {
       const res = await taskApi.getMyTasks();
       const sorted = [...res].sort((a, b) => {
-        return (STATUS_ORDER[a.status ?? "OPEN"] ?? 99) - (STATUS_ORDER[b.status ?? "OPEN"] ?? 99);
+        const statusDiff = (STATUS_ORDER[a.status ?? "OPEN"] ?? 99) - (STATUS_ORDER[b.status ?? "OPEN"] ?? 99);
+        if (statusDiff !== 0) return statusDiff;
+        return (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0);
       });
       setTasks(sorted);
     } catch (e) {
@@ -126,11 +113,7 @@ export default function AktivitetScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.centered}>
-          <Text style={styles.emptyIcon}>💬</Text>
-          <Text style={styles.emptyTitle}>Ingen aktivitet</Text>
-          <Text style={styles.emptySubtitle}>
-            Logga in för att se dina uppdrag och chattar
-          </Text>
+          <EmptyState icon="💬" title="Ingen aktivitet" subtitle="Logga in för att se dina uppdrag och chattar" />
           <Pressable
             onPress={() => router.push("/(tabs)/profile")}
             style={({ pressed, hovered }: any) => [
@@ -200,40 +183,14 @@ export default function AktivitetScreen() {
         <Text style={styles.subtitle}>Dina uppdrag</Text>
       </View>
 
-      <View style={styles.filterContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-          {FILTERS.map((f) => (
-            <Pressable
-              key={f.key ?? "all"}
-              onPress={() => setFilter(f.key)}
-              style={[
-                styles.filterChip,
-                filter === f.key && styles.filterChipActive,
-              ]}
-            >
-              <Text style={[
-                styles.filterChipText,
-                filter === f.key && styles.filterChipTextActive,
-              ]}>
-                {f.label}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
+      <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
 
       {filteredTasks.length === 0 ? (
-        <View style={styles.centered}>
-          <View style={styles.emptyCircle}>
-            <Text style={styles.emptyIcon}>✅</Text>
-          </View>
-          <Text style={styles.emptyTitle}>
-            {filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
-          </Text>
-          <Text style={styles.emptySubtitle}>
-            {filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
-          </Text>
-        </View>
+        <EmptyState
+          icon="✅"
+          title={filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
+          subtitle={filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
+        />
       ) : (
         <FlatList
           data={filteredTasks}
@@ -260,48 +217,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 32,
   },
-  filterContainer: {
-    marginBottom: 4,
-  },
-  filterRow: {
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  filterChipActive: {
-    backgroundColor: "#16A34A",
-    borderColor: "#16A34A",
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#666",
-  },
-  filterChipTextActive: {
-    color: "#fff",
-  },
   headerRow: {
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 16,
-  },
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  headerIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
   },
   title: {
     fontSize: 28,
@@ -381,30 +300,6 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: 14,
     color: "#555",
-    lineHeight: 20,
-  },
-  emptyCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#f0fdf4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  emptyIcon: {
-    fontSize: 36,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111",
-    marginBottom: 4,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: "center",
     lineHeight: 20,
   },
   loginButtonHovered: {

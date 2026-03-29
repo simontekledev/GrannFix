@@ -21,6 +21,7 @@ public class TaskMapper {
                 t.getStreet(),
                 t.getOfferedPrice(),
                 t.getStatus(),
+                t.getCreatedById(),
                 t.isActive(),
                 t.getCreatedAt(),
                 t.getUpdatedAt(),

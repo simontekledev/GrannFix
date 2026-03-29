@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { authApi, userApi } from "@/src/api/client";
+import { StarRating } from "@/src/components/StarRating";
 import type { MeUserDto } from "@/src/api/generated/models/MeUserDto";
 
 export default function ProfilScreen() {
@@ -154,25 +155,7 @@ export default function ProfilScreen() {
             />
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
-            <View style={styles.ratingRow}>
-              {[1, 2, 3, 4, 5].map((star) => {
-                const avg = user?.ratingAverage ?? 0;
-                const diff = avg - (star - 1);
-                const fraction = Math.max(0, Math.min(1, diff));
-                // Interpolate color from grey (#D1D5DB) to gold (#F59E0B)
-                const r = Math.round(209 + (245 - 209) * fraction);
-                const g = Math.round(213 + (158 - 213) * fraction);
-                const b = Math.round(219 + (11 - 219) * fraction);
-                return (
-                  <Text key={star} style={[styles.star, { color: `rgb(${r},${g},${b})` }]}>
-                    {"\u2605"}
-                  </Text>
-                );
-              })}
-              <Text style={styles.ratingText}>
-                {(user?.ratingAverage ?? 0).toFixed(1)}
-              </Text>
-            </View>
+            <StarRating rating={user?.ratingAverage ?? 0} />
 
             {user?.bio ? (
               <Text style={styles.bioText}>{user.bio}</Text>
@@ -398,21 +381,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 10,
     paddingHorizontal: 12,
-  },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-    gap: 2,
-  },
-  star: {
-    fontSize: 22,
-  },
-  ratingText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#555",
-    marginLeft: 6,
   },
   verifiedPill: {
     backgroundColor: "#f0fdf4",

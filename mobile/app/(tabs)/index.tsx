@@ -1,7 +1,10 @@
-import { taskQueryApi } from "@/src/api/client";
+import { taskQueryApi, userApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
+import { EmptyState } from "@/src/components/EmptyState";
+import { formatDistance, getDistanceKm, AREA_COORDS } from "@/src/helpers/distance";
+import { timeAgo } from "@/src/helpers/time";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -12,70 +15,25 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const AREA_COORDS: Record<string, { lat: number; lng: number }> = {
-  "Södermalm": { lat: 59.3150, lng: 18.0700 },
-  "Östermalm": { lat: 59.3380, lng: 18.0890 },
-  "Norrmalm": { lat: 59.3340, lng: 18.0640 },
-  "Kungsholmen": { lat: 59.3320, lng: 18.0300 },
-  "Vasastan": { lat: 59.3450, lng: 18.0500 },
-  "Gamla Stan": { lat: 59.3258, lng: 18.0716 },
-  "Bromma": { lat: 59.3380, lng: 17.9380 },
-  "Vällingby": { lat: 59.3630, lng: 17.8710 },
-  "Hässelby": { lat: 59.3630, lng: 17.8330 },
-  "Spånga": { lat: 59.3830, lng: 17.9020 },
-  "Kista": { lat: 59.4030, lng: 17.9440 },
-  "Rinkeby": { lat: 59.3880, lng: 17.9280 },
-  "Tensta": { lat: 59.3940, lng: 17.9170 },
-  "Hägersten": { lat: 59.2960, lng: 18.0080 },
-  "Liljeholmen": { lat: 59.3100, lng: 18.0230 },
-  "Aspudden": { lat: 59.3050, lng: 18.0100 },
-  "Midsommarkransen": { lat: 59.3020, lng: 18.0170 },
-  "Älvsjö": { lat: 59.2780, lng: 18.0100 },
-  "Enskede": { lat: 59.2830, lng: 18.0700 },
-  "Årsta": { lat: 59.2960, lng: 18.0510 },
-  "Farsta": { lat: 59.2430, lng: 18.0930 },
-  "Skarpnäck": { lat: 59.2660, lng: 18.1320 },
-  "Skärholmen": { lat: 59.2760, lng: 17.9530 },
-};
-
-function getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function timeAgo(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffH = Math.floor(diffMin / 60);
-  const diffD = Math.floor(diffH / 24);
-
-  if (diffMin < 1) return "Just nu";
-  if (diffMin < 60) return `${diffMin} min sedan`;
-  if (diffH < 24) return diffH === 1 ? "1 timme sedan" : `${diffH} timmar sedan`;
-  if (diffD === 1) return "Igår";
-  if (diffD < 7) return `${diffD} dagar sedan`;
-  if (diffD < 14) return "1 vecka sedan";
-  if (diffD < 30) return `${Math.floor(diffD / 7)} veckor sedan`;
-  return date.toLocaleDateString("sv-SE");
-}
 
 export default function UpptäckScreen() {
   const router = useRouter();
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [hasMore, setHasMore] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortNearest, setSortNearest] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -87,34 +45,56 @@ export default function UpptäckScreen() {
     })();
   }, []);
 
-  const fetchTasks = useCallback(async () => {
-  try {
-    console.log("Fetching tasks...");
-    const res = await taskQueryApi.listTasks({
-      cursor: undefined,
-      limit: 20,
-      status: "OPEN",
-      city: undefined,
-      area: undefined,
-    });
+  const fetchTasks = useCallback(async (cursor?: string) => {
+    try {
+      const res = await taskQueryApi.listTasks({
+        cursor,
+        limit: 20,
+        status: "OPEN",
+        city: undefined,
+        area: undefined,
+      });
 
-    console.log("API response:", res);
-    setTasks(res.items ?? []);
-  } catch (e: any) {
-    console.log("Failed to load tasks:", e);
-    console.log("Error message:", e?.message);
-    console.log("Error cause:", e?.cause);
-  }
-}, []);
+      if (cursor) {
+        setTasks((prev) => [...prev, ...(res.items ?? [])]);
+      } else {
+        setTasks(res.items ?? []);
+      }
+      setNextCursor(res.nextCursor);
+      setHasMore(res.hasMore ?? false);
+    } catch (e: any) {
+      console.log("Failed to load tasks:", e);
+    }
+  }, []);
 
   const checkAuth = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
-    setLoggedIn(!!token);
+    const isLoggedIn = !!token;
+    setLoggedIn(isLoggedIn);
+    if (isLoggedIn) {
+      try {
+        const me = await userApi.getMe();
+        setUserId(me.id ?? null);
+      } catch (_) {}
+    } else {
+      setUserId(null);
+    }
   }, []);
 
   useEffect(() => {
     Promise.all([fetchTasks(), checkAuth()]).finally(() => setLoading(false));
   }, [fetchTasks, checkAuth]);
+
+  useFocusEffect(
+    useCallback(() => {
+      AsyncStorage.getItem("access_token").then((token) => {
+        const isLoggedIn = !!token;
+        if (isLoggedIn !== loggedIn) {
+          checkAuth();
+        }
+      });
+    }, [loggedIn, checkAuth])
+  );
 
   async function onRefresh() {
     setRefreshing(true);
@@ -122,15 +102,17 @@ export default function UpptäckScreen() {
     setRefreshing(false);
   }
 
+  async function onEndReached() {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    await fetchTasks(nextCursor);
+    setLoadingMore(false);
+  }
+
   function renderTask({ item }: { item: TaskResponse }) {
-    let distanceText: string | null = null;
-    if (userLocation && item.area) {
-      const coords = AREA_COORDS[item.area];
-      if (coords) {
-        const km = getDistanceKm(userLocation.lat, userLocation.lng, coords.lat, coords.lng);
-        distanceText = km < 1 ? `${Math.round(km * 1000)} m bort` : `${km.toFixed(1)} km bort`;
-      }
-    }
+    const distanceText = userLocation && item.area
+      ? formatDistance(userLocation.lat, userLocation.lng, item.area)
+      : null;
 
     return (
       <View style={styles.card}>
@@ -201,24 +183,58 @@ export default function UpptäckScreen() {
         <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
 
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Sök uppdrag..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCorrect={false}
+        />
+        <Pressable
+          onPress={() => setSortNearest((prev) => !prev)}
+          style={[styles.sortButton, sortNearest && styles.sortButtonActive]}
+        >
+          <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
+            Närmast
+          </Text>
+        </Pressable>
+      </View>
+
       <FlatList
-        data={tasks}
+        data={(() => {
+          let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
+          if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase();
+            filtered = filtered.filter((t) =>
+              (t.title?.toLowerCase().includes(q)) ||
+              (t.description?.toLowerCase().includes(q)) ||
+              (t.area?.toLowerCase().includes(q))
+            );
+          }
+          if (sortNearest && userLocation) {
+            filtered = [...filtered].sort((a, b) => {
+              const coordsA = a.area ? AREA_COORDS[a.area] : null;
+              const coordsB = b.area ? AREA_COORDS[b.area] : null;
+              const distA = coordsA ? getDistanceKm(userLocation.lat, userLocation.lng, coordsA.lat, coordsA.lng) : 999;
+              const distB = coordsB ? getDistanceKm(userLocation.lat, userLocation.lng, coordsB.lat, coordsB.lng) : 999;
+              return distA - distB;
+            });
+          }
+          return filtered;
+        })()}
         keyExtractor={(item) => item.id ?? Math.random().toString()}
         renderItem={renderTask}
         contentContainerStyle={tasks.length === 0 ? styles.emptyList : styles.list}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#111" />
         }
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color="#16A34A" /> : null}
         ListEmptyComponent={
-          <View style={styles.centered}>
-            <View style={styles.emptyCircle}>
-              <Text style={styles.emptyIcon}>📋</Text>
-            </View>
-            <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
-            <Text style={styles.emptySubtitle}>
-              Dra nedåt för att uppdatera
-            </Text>
-          </View>
+          <EmptyState icon="📋" title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
         }
       />
     </SafeAreaView>
@@ -236,16 +252,54 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 32,
   },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingBottom: 12,
+    gap: 10,
+  },
+  searchInput: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: "#111",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  sortButton: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  sortButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#666",
+  },
+  sortButtonActive: {
+    backgroundColor: "#16A34A",
+    borderColor: "#16A34A",
+  },
+  sortButtonTextActive: {
+    color: "#fff",
+  },
   headerRow: {
     paddingHorizontal: 24,
     paddingTop: 12,
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   wordmark: {
     width: 140,
     height: 34,
     alignSelf: "flex-start",
-    marginLeft: -24,
+    marginLeft: -22,
   },
   title: {
     fontSize: 28,
@@ -355,28 +409,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
     letterSpacing: 0.3,
-  },
-  emptyCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#f0fdf4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  emptyIcon: {
-    fontSize: 36,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111",
-    marginBottom: 4,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: "center",
   },
 });

@@ -14,6 +14,7 @@ public record TaskResponse(
         String street,
         BigDecimal offeredPrice,
         TaskStatus status,
+        UUID createdById,
         boolean active,
         Instant createdAt,
         Instant updatedAt,

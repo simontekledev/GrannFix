@@ -68,7 +68,13 @@ export interface TaskResponse {
      */
     status?: TaskResponseStatusEnum;
     /**
-     * 
+     *
+     * @type {string}
+     * @memberof TaskResponse
+     */
+    createdById?: string;
+    /**
+     *
      * @type {boolean}
      * @memberof TaskResponse
      */
@@ -131,6 +137,7 @@ export function TaskResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'street': json['street'] == null ? undefined : json['street'],
         'offeredPrice': json['offeredPrice'] == null ? undefined : json['offeredPrice'],
         'status': json['status'] == null ? undefined : json['status'],
+        'createdById': json['createdById'] == null ? undefined : json['createdById'],
         'active': json['active'] == null ? undefined : json['active'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'updatedAt': json['updatedAt'] == null ? undefined : (new Date(json['updatedAt'])),
@@ -157,6 +164,7 @@ export function TaskResponseToJSONTyped(value?: TaskResponse | null, ignoreDiscr
         'street': value['street'],
         'offeredPrice': value['offeredPrice'],
         'status': value['status'],
+        'createdById': value['createdById'],
         'active': value['active'],
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),
         'updatedAt': value['updatedAt'] == null ? value['updatedAt'] : value['updatedAt'].toISOString(),

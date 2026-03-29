@@ -201,27 +201,26 @@ export default function UpptäckScreen() {
         <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
 
-      {tasks.length === 0 ? (
-        <View style={styles.centered}>
-          <View style={styles.emptyCircle}>
-            <Text style={styles.emptyIcon}>📋</Text>
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item.id ?? Math.random().toString()}
+        renderItem={renderTask}
+        contentContainerStyle={tasks.length === 0 ? styles.emptyList : styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#111" />
+        }
+        ListEmptyComponent={
+          <View style={styles.centered}>
+            <View style={styles.emptyCircle}>
+              <Text style={styles.emptyIcon}>📋</Text>
+            </View>
+            <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
+            <Text style={styles.emptySubtitle}>
+              Dra nedåt för att uppdatera
+            </Text>
           </View>
-          <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
-          <Text style={styles.emptySubtitle}>
-            Dra nedåt för att uppdatera
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id ?? Math.random().toString()}
-          renderItem={renderTask}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#111" />
-          }
-        />
-      )}
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -261,6 +260,9 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 24,
     paddingBottom: 32,
+  },
+  emptyList: {
+    flex: 1,
   },
   card: {
     backgroundColor: "#fff",

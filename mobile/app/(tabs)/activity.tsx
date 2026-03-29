@@ -155,22 +155,17 @@ export default function AktivitetScreen() {
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
           </Text>
+          {item.offeredPrice != null && (
+            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
+          )}
+        </View>
+
+        <View style={styles.cardMeta}>
           <View style={[styles.statusBadge, { backgroundColor: statusColor + "18" }]}>
             <Text style={[styles.statusText, { color: statusColor }]}>
               {STATUS_LABELS[status] ?? status}
             </Text>
           </View>
-        </View>
-
-        <View style={styles.cardMeta}>
-          {item.area && (
-            <View style={styles.areaBadge}>
-              <Text style={styles.areaBadgeText}>{item.area}</Text>
-            </View>
-          )}
-          {item.offeredPrice != null && (
-            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
-          )}
         </View>
 
         {item.description ? (

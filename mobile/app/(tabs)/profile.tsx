@@ -241,7 +241,7 @@ export default function ProfilScreen() {
 
   // Not logged in — show login form + register link
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safeLogin}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -333,6 +333,10 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: "#F8F9FA",
+  },
+  safeLogin: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
   centered: {
     flex: 1,
@@ -446,10 +450,13 @@ const styles = StyleSheet.create({
   detailCard: {
     backgroundColor: "#fff",
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#eee",
     padding: 16,
     marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   detailRow: {
     flexDirection: "row",

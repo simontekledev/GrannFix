@@ -203,7 +203,9 @@ export default function UpptäckScreen() {
 
       {tasks.length === 0 ? (
         <View style={styles.centered}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <View style={styles.emptyCircle}>
+            <Text style={styles.emptyIcon}>📋</Text>
+          </View>
           <Text style={styles.emptyTitle}>Inga uppdrag just nu</Text>
           <Text style={styles.emptySubtitle}>
             Dra nedåt för att uppdatera
@@ -227,7 +229,7 @@ export default function UpptäckScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F9FA",
   },
   centered: {
     flex: 1,
@@ -239,16 +241,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 16,
-  },
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  headerIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
   },
   wordmark: {
     width: 140,
@@ -271,12 +263,15 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   card: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 14,
     padding: 18,
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: "#eee",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   cardHeader: {
     flexDirection: "row",
@@ -359,9 +354,17 @@ const styles = StyleSheet.create({
     color: "#fff",
     letterSpacing: 0.3,
   },
+  emptyCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#f0fdf4",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    fontSize: 36,
   },
   emptyTitle: {
     fontSize: 18,

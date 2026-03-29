@@ -111,20 +111,18 @@ export default function AktivitetScreen() {
 
   if (!loggedIn) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.centered}>
-          <EmptyState icon="💬" title="Ingen aktivitet" subtitle="Logga in för att se dina uppdrag och chattar" />
-          <Pressable
-            onPress={() => router.push("/(tabs)/profile")}
-            style={({ pressed, hovered }: any) => [
-              styles.loginButton,
-              hovered && styles.loginButtonHovered,
-              pressed && styles.loginButtonPressed,
-            ]}
-          >
-            <Text style={styles.loginButtonText}>Logga in</Text>
-          </Pressable>
-        </View>
+      <SafeAreaView style={[styles.safe, styles.centeredColumn]}>
+        <EmptyState icon="💬" title="Ingen aktivitet" subtitle="Logga in för att se dina uppdrag och chattar" />
+        <Pressable
+          onPress={() => router.push("/(tabs)/profile")}
+          style={({ pressed, hovered }: any) => [
+            styles.loginButton,
+            hovered && styles.loginButtonHovered,
+            pressed && styles.loginButtonPressed,
+          ]}
+        >
+          <Text style={styles.loginButtonText}>Logga in</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -301,6 +299,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
     lineHeight: 20,
+  },
+  centeredColumn: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   loginButtonHovered: {
     backgroundColor: "#15913F",

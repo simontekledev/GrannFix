@@ -21,7 +21,6 @@ export function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
 
 const styles = StyleSheet.create({
   centered: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,

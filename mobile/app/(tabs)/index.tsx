@@ -177,7 +177,7 @@ export default function UpptäckScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
         <Image
-          source={require("@/assets/images/grannfix-wordmark-cut.png")}
+          source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
           style={styles.wordmark}
           resizeMode="contain"
         />
@@ -322,10 +322,11 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   wordmark: {
-    width: 140,
-    height: 34,
+    width: 650,
+    height: 160,
     alignSelf: "flex-start",
-    marginLeft: -22,
+    marginLeft: -280,
+    marginVertical: -52,
   },
   title: {
     fontSize: 28,

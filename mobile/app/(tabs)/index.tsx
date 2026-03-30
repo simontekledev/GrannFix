@@ -128,11 +128,12 @@ export default function UpptäckScreen() {
         <View style={styles.cardMeta}>
           {item.area && (
             <View style={styles.areaBadge}>
+              <Image source={require("@/assets/images/location-icon-transparent.png")} style={styles.locationIcon} />
               <Text style={styles.areaBadgeText}>{item.area}</Text>
             </View>
           )}
           {distanceText && (
-            <Text style={styles.cardDistance}>{distanceText}</Text>
+            <Text style={styles.cardDistance}>· {distanceText}</Text>
           )}
         </View>
 
@@ -196,9 +197,12 @@ export default function UpptäckScreen() {
           onPress={() => setSortNearest((prev) => !prev)}
           style={[styles.sortButton, sortNearest && styles.sortButtonActive]}
         >
-          <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
-            Närmast
-          </Text>
+          <View style={styles.sortButtonInner}>
+            <Image source={require("@/assets/images/location-icon-transparent.png")} style={[styles.locationIconSmall, { tintColor: sortNearest ? "#fff" : "#16A34A" }]} resizeMode="contain" />
+            <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
+              Närmast
+            </Text>
+          </View>
         </Pressable>
       </View>
 
@@ -207,11 +211,20 @@ export default function UpptäckScreen() {
           let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
           if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
-            filtered = filtered.filter((t) =>
-              (t.title?.toLowerCase().includes(q)) ||
-              (t.description?.toLowerCase().includes(q)) ||
-              (t.area?.toLowerCase().includes(q))
-            );
+            filtered = filtered
+              .filter((t) =>
+                (t.title?.toLowerCase().includes(q)) ||
+                (t.description?.toLowerCase().includes(q)) ||
+                (t.area?.toLowerCase().includes(q))
+              )
+              .sort((a, b) => {
+                const aTitle = a.title?.toLowerCase().includes(q) ? 0 : 1;
+                const bTitle = b.title?.toLowerCase().includes(q) ? 0 : 1;
+                if (aTitle !== bTitle) return aTitle - bTitle;
+                const aDesc = a.description?.toLowerCase().includes(q) ? 0 : 1;
+                const bDesc = b.description?.toLowerCase().includes(q) ? 0 : 1;
+                return aDesc - bDesc;
+              });
           }
           if (sortNearest && userLocation) {
             filtered = [...filtered].sort((a, b) => {
@@ -278,10 +291,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
+  sortButtonInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
   sortButtonText: {
     fontSize: 13,
     fontWeight: "600",
     color: "#666",
+  },
+  locationIcon: {
+    width: 14,
+    height: 14,
+  },
+  locationIconSmall: {
+    width: 18,
+    height: 18,
   },
   sortButtonActive: {
     backgroundColor: "#16A34A",
@@ -360,6 +386,9 @@ const styles = StyleSheet.create({
   },
   areaBadge: {
     alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     backgroundColor: "#f0fdf4",
     borderRadius: 6,
     paddingHorizontal: 8,

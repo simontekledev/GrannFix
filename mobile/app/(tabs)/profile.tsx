@@ -179,6 +179,11 @@ export default function ProfilScreen() {
 
             {user?.verified ? (
               <View style={styles.verifiedPill}>
+                <Image
+                  source={require("@/assets/images/verified-icon.png")}
+                  style={styles.verifiedIcon}
+                  resizeMode="contain"
+                />
                 <Text style={styles.verifiedPillText}>Verifierad</Text>
               </View>
             ) : (
@@ -420,16 +425,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   verifiedPill: {
-    backgroundColor: "#f0fdf4",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    backgroundColor: "#E0ECFF",
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 5,
     marginTop: 4,
   },
+  verifiedIcon: {
+    width: 14,
+    height: 14,
+  },
   verifiedPillText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#16A34A",
+    fontWeight: "500",
+    color: "#3B82F6",
+    opacity: 0.85,
   },
   unverifiedPill: {
     backgroundColor: "#fef2f2",

@@ -22,7 +22,8 @@ public class UserMapper {
                 user.getStreet(),
                 user.isVerified(),
                 safeDouble(user.getRatingAverage()),
-                safeInt(user.getRatingCount())
+                safeInt(user.getRatingCount()),
+                user.getCreatedAt()
         );
     }
 

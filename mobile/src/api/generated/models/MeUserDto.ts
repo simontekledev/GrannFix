@@ -85,6 +85,12 @@ export interface MeUserDto {
      * @memberof MeUserDto
      */
     ratingCount?: number;
+    /**
+     *
+     * @type {Date}
+     * @memberof MeUserDto
+     */
+    createdAt?: Date;
 }
 
 /**
@@ -115,6 +121,7 @@ export function MeUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'verified': json['verified'] == null ? undefined : json['verified'],
         'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
         'ratingCount': json['ratingCount'] == null ? undefined : json['ratingCount'],
+        'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
     };
 }
 
@@ -140,6 +147,7 @@ export function MeUserDtoToJSONTyped(value?: MeUserDto | null, ignoreDiscriminat
         'verified': value['verified'],
         'ratingAverage': value['ratingAverage'],
         'ratingCount': value['ratingCount'],
+        'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),
     };
 }
 

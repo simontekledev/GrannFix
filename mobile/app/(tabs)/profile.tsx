@@ -214,6 +214,29 @@ export default function ProfilScreen() {
             </View>
           </View>
 
+          <Text style={styles.sectionTitle}>Statistik</Text>
+          <View style={styles.detailCard}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Medlem sedan</Text>
+              <Text style={styles.detailValue}>
+                {user?.createdAt
+                  ? user.createdAt.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })
+                  : "—"}
+              </Text>
+            </View>
+            <View style={styles.detailDivider} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Uppdrag</Text>
+              <Text style={styles.detailValue}>
+                {(user?.ratingCount ?? 0) === 0
+                  ? "Inga slutförda uppdrag"
+                  : (user?.ratingCount ?? 0) === 1
+                  ? "1 slutfört uppdrag"
+                  : `${user?.ratingCount ?? 0} slutförda uppdrag`}
+              </Text>
+            </View>
+          </View>
+
         </ScrollView>
       </SafeAreaView>
     );

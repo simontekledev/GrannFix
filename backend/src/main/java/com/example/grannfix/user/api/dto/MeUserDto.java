@@ -1,5 +1,6 @@
 package com.example.grannfix.user.api.dto;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record MeUserDto(
@@ -13,5 +14,6 @@ public record MeUserDto(
         String street,
         boolean verified,
         Double ratingAverage,
-        Integer ratingCount
+        Integer ratingCount,
+        Instant createdAt
 ) {}

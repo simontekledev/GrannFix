@@ -148,7 +148,7 @@ export default function UpptäckScreen() {
         )}
 
         <Pressable
-          onPress={() => loggedIn ? null : router.push("/(tabs)/profile")}
+          onPress={() => loggedIn ? null : router.push("/(tabs)/profile?returnTo=index")}
           style={({ pressed, hovered }: any) => [
             styles.cardButton,
             hovered && styles.cardButtonHovered,

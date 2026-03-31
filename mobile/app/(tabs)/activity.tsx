@@ -114,7 +114,7 @@ export default function AktivitetScreen() {
       <SafeAreaView style={[styles.safe, styles.centeredColumn]}>
         <EmptyState icon="💬" title="Ingen aktivitet" subtitle="Logga in för att se dina uppdrag och chattar" />
         <Pressable
-          onPress={() => router.push("/(tabs)/profile")}
+          onPress={() => router.push("/(tabs)/profile?returnTo=activity")}
           style={({ pressed, hovered }: any) => [
             styles.loginButton,
             hovered && styles.loginButtonHovered,

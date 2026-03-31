@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "expo-router";
 import { authApi, userApi } from "@/src/api/client";
 import { StarRating } from "@/src/components/StarRating";
@@ -22,6 +22,7 @@ import type { MeUserDto } from "@/src/api/generated/models/MeUserDto";
 
 export default function ProfilScreen() {
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [user, setUser] = useState<MeUserDto | null>(null);
 
@@ -101,6 +102,12 @@ export default function ProfilScreen() {
         const me = await userApi.getMe();
         setUser(me);
       } catch (_) {}
+
+      if (returnTo === "index") {
+        router.replace("/(tabs)" as any);
+      } else if (returnTo === "activity") {
+        router.replace("/(tabs)/activity");
+      }
     } catch (e: any) {
       console.log("Login error:", e);
 
@@ -126,12 +133,6 @@ export default function ProfilScreen() {
     }
   }
 
-  async function handleLogout() {
-    await AsyncStorage.removeItem("access_token");
-    await AsyncStorage.removeItem("refresh_token");
-    setLoggedIn(false);
-    setUser(null);
-  }
 
   if (loggedIn === null) {
     return (
@@ -149,7 +150,7 @@ export default function ProfilScreen() {
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.profileScroll}>
           <Pressable
-            onPress={() => {/* TODO: navigate to settings */}}
+            onPress={() => router.push("/(tabs)/settings")}
             style={styles.settingsButton}
           >
             <Image
@@ -206,27 +207,13 @@ export default function ProfilScreen() {
               <Text style={styles.detailLabel}>Område</Text>
               <Text style={styles.detailValue}>{user?.area ?? "—"}</Text>
             </View>
+            <View style={styles.detailDivider} />
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Adress</Text>
+              <Text style={styles.detailValue}>{user?.street ?? "—"}</Text>
+            </View>
           </View>
 
-          <Pressable
-            onPress={() => {
-              if (Platform.OS === "web") {
-                if (window.confirm("Vill du logga ut?")) handleLogout();
-              } else {
-                Alert.alert("Logga ut", "Vill du logga ut?", [
-                  { text: "Avbryt", style: "cancel" },
-                  { text: "Logga ut", style: "destructive", onPress: handleLogout },
-                ]);
-              }
-            }}
-            style={({ pressed, hovered }: any) => [
-              styles.logoutButton,
-              hovered && styles.logoutButtonHovered,
-              pressed && styles.buttonPressed,
-            ]}
-          >
-            <Text style={styles.logoutButtonText}>Logga ut</Text>
-          </Pressable>
         </ScrollView>
       </SafeAreaView>
     );
@@ -541,23 +528,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#16A34A",
-  },
-  logoutButton: {
-    marginTop: 28,
-    borderWidth: 1,
-    borderColor: "#e53e3e",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoutButtonHovered: {
-    backgroundColor: "#fef2f2",
-    transform: [{ scale: 1.015 }],
-  },
-  logoutButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#e53e3e",
   },
 });

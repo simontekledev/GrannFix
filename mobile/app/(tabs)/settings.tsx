@@ -41,7 +41,7 @@ export default function SettingsScreen() {
 
   const APP_ROWS = [
     { icon: require("@/assets/images/notification-icon.png"), label: "Notifikationer", onPress: () => {} },
-    { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => {} },
+    { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => router.push("/(tabs)/about") },
   ];
 
   function renderRow(item: { icon: any; label: string; onPress: () => void }, index: number, isLast: boolean) {

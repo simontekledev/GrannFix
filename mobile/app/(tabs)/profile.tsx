@@ -27,6 +27,8 @@ export default function ProfilScreen() {
   const [user, setUser] = useState<MeUserDto | null>(null);
   const [lastToken, setLastToken] = useState<string | null>(null);
 
+  const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
+
   // Login form
   const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState("");
@@ -165,10 +167,32 @@ export default function ProfilScreen() {
             />
           </Pressable>
           <View style={styles.profileHero}>
-            <Image
-              source={require("@/assets/images/user-profile-icon.png")}
-              style={styles.profileIcon}
-            />
+            <View style={styles.profileIconWrapper}>
+              <Image
+                source={require("@/assets/images/user-profile-icon.png")}
+                style={styles.profileIcon}
+              />
+              {user?.verified && (
+                <Pressable
+                  onPress={() => {
+                    setShowVerifiedTooltip(true);
+                    setTimeout(() => setShowVerifiedTooltip(false), 2000);
+                  }}
+                  style={styles.verifiedIconWrapper}
+                >
+                  <Image
+                    source={require("@/assets/images/verified-icon.png")}
+                    style={styles.verifiedIcon}
+                    resizeMode="contain"
+                  />
+                  {showVerifiedTooltip && (
+                    <View style={styles.tooltip}>
+                      <Text style={styles.tooltipText}>Verifierad</Text>
+                    </View>
+                  )}
+                </Pressable>
+              )}
+            </View>
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
             <StarRating rating={user?.ratingAverage ?? 0} />
@@ -176,21 +200,6 @@ export default function ProfilScreen() {
             {user?.bio ? (
               <Text style={styles.bioText}>{user.bio}</Text>
             ) : null}
-
-            {user?.verified ? (
-              <View style={styles.verifiedPill}>
-                <Image
-                  source={require("@/assets/images/verified-icon.png")}
-                  style={styles.verifiedIcon}
-                  resizeMode="contain"
-                />
-                <Text style={styles.verifiedPillText}>Verifierad</Text>
-              </View>
-            ) : (
-              <View style={styles.unverifiedPill}>
-                <Text style={styles.unverifiedPillText}>Ej verifierad</Text>
-              </View>
-            )}
           </View>
 
           <Text style={styles.sectionTitle}>Kontaktuppgifter</Text>
@@ -404,11 +413,19 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     marginTop: 20,
   },
+  profileIconWrapper: {
+    position: "relative",
+    marginBottom: 14,
+  },
   profileIcon: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    marginBottom: 14,
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   profileName: {
     fontSize: 26,
@@ -424,6 +441,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 12,
   },
+  verifiedText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#3B82F6",
+    marginTop: 2,
+    marginBottom: 4,
+  },
   verifiedPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -434,9 +458,28 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginTop: 4,
   },
+  verifiedIconWrapper: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+  },
   verifiedIcon: {
-    width: 14,
-    height: 14,
+    width: 30,
+    height: 30,
+  },
+  tooltip: {
+    position: "absolute",
+    top: 2,
+    left: 36,
+    backgroundColor: "#3B82F6",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  tooltipText: {
+    fontSize: 12,
+    color: "#fff",
+    fontWeight: "600",
   },
   verifiedPillText: {
     fontSize: 13,

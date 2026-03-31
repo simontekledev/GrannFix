@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Alert,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -32,11 +33,42 @@ export default function SettingsScreen() {
     }
   }
 
+  const ACCOUNT_ROWS = [
+    { icon: require("@/assets/images/pen-icon.png"), label: "Redigera profil", onPress: () => {} },
+    { icon: require("@/assets/images/keylock-icon.png"), label: "Byt lösenord", onPress: () => {} },
+  ];
+
+  const APP_ROWS = [
+    { icon: require("@/assets/images/notification-icon.png"), label: "Notifikationer", onPress: () => {} },
+    { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => {} },
+  ];
+
+  function renderRow(item: { icon: any; label: string; onPress: () => void }, index: number, isLast: boolean) {
+    return (
+      <View key={index}>
+        <Pressable
+          style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+          onPress={item.onPress}
+        >
+          <View style={styles.rowLeft}>
+            <Image source={item.icon} style={styles.rowIcon} resizeMode="contain" />
+            <Text style={styles.rowText}>{item.label}</Text>
+          </View>
+          <Text style={styles.rowArrow}>›</Text>
+        </Pressable>
+        {!isLast && <View style={styles.divider} />}
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.replace("/(tabs)/profile")} style={styles.backButton}>
-          <Text style={styles.backText}>{"‹"} Tillbaka</Text>
+        <Pressable
+          onPress={() => router.replace("/(tabs)/profile")}
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
+        >
+          <Text style={styles.backText}>← Profil</Text>
         </Pressable>
         <Text style={styles.title}>Inställningar</Text>
       </View>
@@ -44,40 +76,12 @@ export default function SettingsScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sectionTitle}>KONTO</Text>
         <View style={styles.card}>
-          <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: edit profile */}}
-          >
-            <Text style={styles.rowText}>Redigera profil</Text>
-            <Text style={styles.rowArrow}>›</Text>
-          </Pressable>
-          <View style={styles.divider} />
-          <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: change password */}}
-          >
-            <Text style={styles.rowText}>Byt lösenord</Text>
-            <Text style={styles.rowArrow}>›</Text>
-          </Pressable>
+          {ACCOUNT_ROWS.map((item, i) => renderRow(item, i, i === ACCOUNT_ROWS.length - 1))}
         </View>
 
         <Text style={styles.sectionTitle}>APP</Text>
         <View style={styles.card}>
-          <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: notifications settings */}}
-          >
-            <Text style={styles.rowText}>Notifikationer</Text>
-            <Text style={styles.rowArrow}>›</Text>
-          </Pressable>
-          <View style={styles.divider} />
-          <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: about */}}
-          >
-            <Text style={styles.rowText}>Om Grannfix</Text>
-            <Text style={styles.rowArrow}>›</Text>
-          </Pressable>
+          {APP_ROWS.map((item, i) => renderRow(item, i, i === APP_ROWS.length - 1))}
         </View>
 
         <Pressable
@@ -90,6 +94,8 @@ export default function SettingsScreen() {
         >
           <Text style={styles.logoutButtonText}>Logga ut</Text>
         </Pressable>
+
+        <Text style={styles.versionText}>Grannfix v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -103,15 +109,16 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 24,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 20,
   },
   backButton: {
-    marginBottom: 8,
+    marginBottom: 12,
+    alignSelf: "flex-start",
   },
   backText: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#16A34A",
-    fontWeight: "500",
+    fontWeight: "600",
   },
   title: {
     fontSize: 28,
@@ -127,7 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#999",
     marginBottom: 8,
-    marginTop: 16,
+    marginTop: 20,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
@@ -150,13 +157,24 @@ const styles = StyleSheet.create({
   rowPressed: {
     backgroundColor: "#f5f5f5",
   },
+  rowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  rowIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "#4B5563",
+    marginTop: 1,
+  },
   rowText: {
     fontSize: 16,
     color: "#222",
   },
   rowArrow: {
     fontSize: 20,
-    color: "#ccc",
+    color: "#4B5563",
   },
   divider: {
     height: 1,
@@ -164,16 +182,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   logoutButton: {
-    marginTop: 32,
-    borderWidth: 1,
-    borderColor: "#e53e3e",
+    marginTop: 36,
+    backgroundColor: "#fef2f2",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   logoutButtonHovered: {
-    backgroundColor: "#fef2f2",
+    backgroundColor: "#fee2e2",
     transform: [{ scale: 1.015 }],
   },
   logoutButtonPressed: {
@@ -183,5 +200,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#e53e3e",
+  },
+  versionText: {
+    textAlign: "center",
+    fontSize: 12,
+    color: "#bbb",
+    marginTop: 24,
   },
 });

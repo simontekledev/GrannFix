@@ -148,6 +148,16 @@ export default function ProfilScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.profileScroll}>
+          <Pressable
+            onPress={() => {/* TODO: navigate to settings */}}
+            style={styles.settingsButton}
+          >
+            <Image
+              source={require("@/assets/images/settings-icon- black-transparent.png")}
+              style={styles.settingsIcon}
+              resizeMode="contain"
+            />
+          </Pressable>
           <View style={styles.profileHero}>
             <Image
               source={require("@/assets/images/user-profile-icon.png")}
@@ -356,6 +366,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: 48,
+  },
+  settingsButton: {
+    position: "absolute",
+    top: 8,
+    right: 0,
+    padding: 10,
+    zIndex: 10,
+  },
+  settingsIcon: {
+    width: 28,
+    height: 28,
+    opacity: 0.8,
   },
   profileHero: {
     alignItems: "center",

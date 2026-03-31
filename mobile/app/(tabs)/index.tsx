@@ -260,7 +260,9 @@ export default function UpptäckScreen() {
         onEndReachedThreshold={0.3}
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color="#16A34A" /> : null}
         ListEmptyComponent={
-          <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
+          <View style={{ paddingTop: 140 }}>
+            <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
+          </View>
         }
       />
     </SafeAreaView>

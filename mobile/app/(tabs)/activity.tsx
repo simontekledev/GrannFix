@@ -181,8 +181,8 @@ export default function AktivitetScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Aktivitet</Text>
-        <Text style={styles.subtitle}>Dina uppdrag</Text>
+        <Text style={styles.title}>Uppdrag</Text>
+        <Text style={styles.subtitle}>Dina aktiva uppdrag</Text>
       </View>
 
       <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
@@ -221,18 +221,19 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     paddingHorizontal: 24,
-    paddingTop: 12,
+    paddingTop: 24,
     paddingBottom: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "700",
     color: "#111",
+    marginLeft: -2,
   },
   subtitle: {
     fontSize: 15,
     color: "#666",
-    marginTop: 2,
+    marginTop: 14,
   },
   list: {
     paddingHorizontal: 24,

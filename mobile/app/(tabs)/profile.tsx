@@ -460,12 +460,15 @@ const styles = StyleSheet.create({
   },
   verifiedIconWrapper: {
     position: "absolute",
-    bottom: 4,
-    right: 4,
+    bottom: 8,
+    right: 8,
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 2,
   },
   verifiedIcon: {
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
   },
   tooltip: {
     position: "absolute",

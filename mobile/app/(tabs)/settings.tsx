@@ -19,6 +19,7 @@ export default function SettingsScreen() {
   async function handleLogout() {
     await AsyncStorage.removeItem("access_token");
     await AsyncStorage.removeItem("refresh_token");
+    await AsyncStorage.removeItem("user_id");
     router.replace("/(tabs)/profile");
   }
 

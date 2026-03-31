@@ -25,6 +25,7 @@ export default function ProfilScreen() {
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [user, setUser] = useState<MeUserDto | null>(null);
+  const [lastToken, setLastToken] = useState<string | null>(null);
 
   // Login form
   const passwordRef = useRef<TextInput>(null);
@@ -61,19 +62,22 @@ export default function ProfilScreen() {
 
   // Load profile data once on mount
   useEffect(() => {
+    AsyncStorage.getItem("access_token").then((token) => {
+      setLastToken(token);
+    });
     loadProfile();
   }, [loadProfile]);
 
-  // Only re-check auth status (local, no API call) on tab focus
+  // Re-check auth and reload profile on tab focus if token changed
   useFocusEffect(
     useCallback(() => {
       AsyncStorage.getItem("access_token").then((token) => {
-        const isLoggedIn = !!token;
-        if (isLoggedIn !== loggedIn) {
+        if (token !== lastToken) {
+          setLastToken(token);
           loadProfile();
         }
       });
-    }, [loggedIn, loadProfile])
+    }, [lastToken, loadProfile])
   );
 
   async function handleLogin() {
@@ -101,6 +105,7 @@ export default function ProfilScreen() {
       try {
         const me = await userApi.getMe();
         setUser(me);
+        if (me.id) await AsyncStorage.setItem("user_id", me.id);
       } catch (_) {}
 
       if (returnTo === "index") {

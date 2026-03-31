@@ -46,6 +46,7 @@ export default function AktivitetScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
+  const [lastToken, setLastToken] = useState<string | null>(null);
 
   const checkAuth = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
@@ -69,6 +70,9 @@ export default function AktivitetScreen() {
 
   // Load data once on mount
   useEffect(() => {
+    AsyncStorage.getItem("access_token").then((token) => {
+      setLastToken(token);
+    });
     checkAuth().then((isLoggedIn) => {
       if (isLoggedIn) {
         fetchTasks().finally(() => setLoading(false));
@@ -78,18 +82,18 @@ export default function AktivitetScreen() {
     });
   }, [checkAuth, fetchTasks]);
 
-  // Only re-check auth (local) on tab focus
+  // Re-check auth and refetch on tab focus if token changed
   useFocusEffect(
     useCallback(() => {
       AsyncStorage.getItem("access_token").then((token) => {
-        const isLoggedIn = !!token;
-        if (isLoggedIn !== loggedIn) {
-          checkAuth().then((loggedIn) => {
-            if (loggedIn) fetchTasks();
+        if (token !== lastToken) {
+          setLastToken(token);
+          checkAuth().then((nowLoggedIn) => {
+            if (nowLoggedIn) fetchTasks();
           });
         }
       });
-    }, [loggedIn, checkAuth, fetchTasks])
+    }, [lastToken, checkAuth, fetchTasks])
   );
 
   async function onRefresh() {
@@ -185,7 +189,7 @@ export default function AktivitetScreen() {
 
       {filteredTasks.length === 0 ? (
         <EmptyState
-          icon="✅"
+          iconImage={require("@/assets/images/empty-inbox-icon.png")}
           title={filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
           subtitle={filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
         />

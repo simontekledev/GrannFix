@@ -31,6 +31,7 @@ export default function UpptäckScreen() {
   const [hasMore, setHasMore] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [lastToken, setLastToken] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortNearest, setSortNearest] = useState(false);
@@ -72,28 +73,40 @@ export default function UpptäckScreen() {
     const isLoggedIn = !!token;
     setLoggedIn(isLoggedIn);
     if (isLoggedIn) {
-      try {
-        const me = await userApi.getMe();
-        setUserId(me.id ?? null);
-      } catch (_) {}
+      const cachedId = await AsyncStorage.getItem("user_id");
+      if (cachedId) {
+        setUserId(cachedId);
+      } else {
+        try {
+          const me = await userApi.getMe();
+          if (me.id) {
+            setUserId(me.id);
+            await AsyncStorage.setItem("user_id", me.id);
+          }
+        } catch (_) {}
+      }
     } else {
       setUserId(null);
     }
   }, []);
 
   useEffect(() => {
+    AsyncStorage.getItem("access_token").then((token) => {
+      setLastToken(token);
+    });
     Promise.all([fetchTasks(), checkAuth()]).finally(() => setLoading(false));
   }, [fetchTasks, checkAuth]);
 
   useFocusEffect(
     useCallback(() => {
       AsyncStorage.getItem("access_token").then((token) => {
-        const isLoggedIn = !!token;
-        if (isLoggedIn !== loggedIn) {
+        if (token !== lastToken) {
+          setLastToken(token);
           checkAuth();
+          fetchTasks();
         }
       });
-    }, [loggedIn, checkAuth])
+    }, [lastToken, checkAuth, fetchTasks])
   );
 
   async function onRefresh() {
@@ -247,7 +260,7 @@ export default function UpptäckScreen() {
         onEndReachedThreshold={0.3}
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color="#16A34A" /> : null}
         ListEmptyComponent={
-          <EmptyState icon="📋" title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
+          <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
         }
       />
     </SafeAreaView>

@@ -66,7 +66,7 @@ export default function AboutScreen() {
         <View style={styles.card}>
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: open terms */}}
+            onPress={() => router.push("/(tabs)/terms")}
           >
             <Text style={styles.rowLabel}>Användarvillkor</Text>
             <Text style={styles.rowArrow}>›</Text>
@@ -74,7 +74,7 @@ export default function AboutScreen() {
           <View style={styles.divider} />
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => {/* TODO: open privacy policy */}}
+            onPress={() => router.push("/(tabs)/privacy")}
           >
             <Text style={styles.rowLabel}>Integritetspolicy</Text>
             <Text style={styles.rowArrow}>›</Text>
@@ -111,25 +111,25 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: -20,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 240,
+    height: 240,
   },
   description: {
     fontSize: 15,
     color: "#555",
     textAlign: "center",
     lineHeight: 22,
-    marginBottom: 24,
+    marginBottom: 8,
     paddingHorizontal: 8,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: "700",
     color: "#999",
-    marginBottom: 8,
+    marginBottom: 6,
     marginTop: 16,
     textTransform: "uppercase",
     letterSpacing: 1,

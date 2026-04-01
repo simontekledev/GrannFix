@@ -116,17 +116,21 @@ export default function AktivitetScreen() {
   if (!loggedIn) {
     return (
       <SafeAreaView style={[styles.safe, styles.centeredColumn]}>
-        <EmptyState icon="💬" title="Ingen aktivitet" subtitle="Logga in för att se dina uppdrag och chattar" />
-        <Pressable
-          onPress={() => router.push("/(tabs)/profile?returnTo=activity")}
-          style={({ pressed, hovered }: any) => [
-            styles.loginButton,
-            hovered && styles.loginButtonHovered,
-            pressed && styles.loginButtonPressed,
-          ]}
-        >
-          <Text style={styles.loginButtonText}>Logga in</Text>
-        </Pressable>
+        <View style={styles.loginContent}>
+          <Text style={styles.loginEmoji}>💬</Text>
+          <Text style={styles.loginTitle}>Dina uppdrag</Text>
+          <Text style={styles.loginSubtitle}>Logga in för att se och hantera dina uppdrag</Text>
+          <Pressable
+            onPress={() => router.push("/(tabs)/profile?returnTo=activity")}
+            style={({ pressed, hovered }: any) => [
+              styles.loginButton,
+              hovered && styles.loginButtonHovered,
+              pressed && styles.loginButtonPressed,
+            ]}
+          >
+            <Text style={styles.loginButtonText}>Logga in</Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     );
   }
@@ -135,7 +139,7 @@ export default function AktivitetScreen() {
     const status = item.status ?? "OPEN";
     const statusColor = STATUS_COLORS[status] ?? "#888";
     return (
-      <View style={[styles.card, { borderLeftColor: statusColor, borderLeftWidth: 3 }]}>
+      <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
@@ -225,10 +229,11 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 23,
     fontWeight: "700",
     color: "#111",
     marginLeft: -2,
+    letterSpacing: -1.0,
   },
   subtitle: {
     fontSize: 15,
@@ -308,13 +313,36 @@ const styles = StyleSheet.create({
   centeredColumn: {
     alignItems: "center",
     justifyContent: "center",
+    paddingBottom: 60,
+  },
+  loginContent: {
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  loginEmoji: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  loginTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  loginSubtitle: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 20,
   },
   loginButtonHovered: {
     backgroundColor: "#15913F",
     transform: [{ scale: 1.015 }],
   },
   loginButton: {
-    marginTop: 20,
+    marginTop: 6,
     backgroundColor: "#16A34A",
     borderRadius: 10,
     paddingVertical: 14,

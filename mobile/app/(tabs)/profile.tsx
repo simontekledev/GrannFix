@@ -185,14 +185,14 @@ export default function ProfilScreen() {
                     style={styles.verifiedIcon}
                     resizeMode="contain"
                   />
-                  {showVerifiedTooltip && (
-                    <View style={styles.tooltip}>
-                      <Text style={styles.tooltipText}>Verifierad</Text>
-                    </View>
-                  )}
                 </Pressable>
               )}
             </View>
+            {showVerifiedTooltip && (
+              <View style={styles.tooltip}>
+                <Text style={styles.tooltipText}>Verifierad</Text>
+              </View>
+            )}
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
             <StarRating rating={user?.ratingAverage ?? 0} />
@@ -274,7 +274,7 @@ export default function ProfilScreen() {
         >
           <View style={styles.logoContainer}>
             <Image
-              source={require("@/assets/images/grannfix-primary-logo.png")}
+              source={require("@/assets/images/grannfix-primary-transparent-logo.png")}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   safeLogin: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8F9FA",
   },
   centered: {
     flex: 1,
@@ -471,18 +471,18 @@ const styles = StyleSheet.create({
     height: 24,
   },
   tooltip: {
-    position: "absolute",
-    top: 2,
-    left: 36,
-    backgroundColor: "#3B82F6",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: "#E0ECFF",
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginTop: -4,
+    marginBottom: -2,
   },
   tooltipText: {
-    fontSize: 12,
-    color: "#fff",
-    fontWeight: "600",
+    fontSize: 11,
+    color: "#3B82F6",
+    fontWeight: "500",
+    letterSpacing: 0.3,
   },
   verifiedPillText: {
     fontSize: 13,

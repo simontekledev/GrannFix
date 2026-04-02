@@ -1,32 +1,24 @@
 
-# PageableObject
+# ChangePasswordRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`offset` | number
-`sort` | [SortObject](SortObject.md)
-`unpaged` | boolean
-`paged` | boolean
-`pageSize` | number
-`pageNumber` | number
+`currentPassword` | string
+`newPassword` | string
 
 ## Example
 
 ```typescript
-import type { PageableObject } from ''
+import type { ChangePasswordRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "offset": null,
-  "sort": null,
-  "unpaged": null,
-  "paged": null,
-  "pageSize": null,
-  "pageNumber": null,
-} satisfies PageableObject
+  "currentPassword": null,
+  "newPassword": null,
+} satisfies ChangePasswordRequest
 
 console.log(example)
 
@@ -35,7 +27,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageableObject
+const exampleParsed = JSON.parse(exampleJSON) as ChangePasswordRequest
 console.log(exampleParsed)
 ```
 

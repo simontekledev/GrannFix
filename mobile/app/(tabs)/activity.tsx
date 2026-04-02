@@ -3,6 +3,7 @@ import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -117,7 +118,11 @@ export default function AktivitetScreen() {
     return (
       <SafeAreaView style={[styles.safe, styles.centeredColumn]}>
         <View style={styles.loginContent}>
-          <Text style={styles.loginEmoji}>💬</Text>
+          <Image
+            source={require("@/assets/images/keylock-icon.png")}
+            style={styles.loginIcon}
+            resizeMode="contain"
+          />
           <Text style={styles.loginTitle}>Dina uppdrag</Text>
           <Text style={styles.loginSubtitle}>Logga in för att se och hantera dina uppdrag</Text>
           <Pressable
@@ -319,8 +324,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 32,
   },
-  loginEmoji: {
-    fontSize: 48,
+  loginIcon: {
+    width: 70,
+    height: 70,
+    tintColor: "#999999",
     marginBottom: 16,
   },
   loginTitle: {
@@ -331,7 +338,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   loginSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#888",
     textAlign: "center",
     lineHeight: 20,

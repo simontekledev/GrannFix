@@ -11,15 +11,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUser } from "@/src/context/UserContext";
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { logout } = useUser();
 
   async function handleLogout() {
-    await AsyncStorage.removeItem("access_token");
-    await AsyncStorage.removeItem("refresh_token");
-    await AsyncStorage.removeItem("user_id");
+    await logout();
     router.replace("/(tabs)/profile");
   }
 
@@ -35,8 +34,8 @@ export default function SettingsScreen() {
   }
 
   const ACCOUNT_ROWS = [
-    { icon: require("@/assets/images/pen-icon.png"), label: "Redigera profil", onPress: () => {} },
-    { icon: require("@/assets/images/keylock-icon.png"), label: "Byt lösenord", onPress: () => {} },
+    { icon: require("@/assets/images/pen-icon.png"), label: "Redigera profil", onPress: () => router.push("/(tabs)/edit-profile") },
+    { icon: require("@/assets/images/keylock-icon.png"), label: "Byt lösenord", onPress: () => router.push("/(tabs)/change-password") },
   ];
 
   const APP_ROWS = [

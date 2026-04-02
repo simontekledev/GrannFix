@@ -56,6 +56,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="change-password"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="edit-profile"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name="terms"
         options={{
           href: null,

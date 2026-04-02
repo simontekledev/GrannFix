@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,17 +15,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useFocusEffect } from "expo-router";
-import { authApi, userApi } from "@/src/api/client";
+import { authApi } from "@/src/api/client";
 import { StarRating } from "@/src/components/StarRating";
-import type { MeUserDto } from "@/src/api/generated/models/MeUserDto";
+import { useUser } from "@/src/context/UserContext";
 
 export default function ProfilScreen() {
   const router = useRouter();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
-  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
-  const [user, setUser] = useState<MeUserDto | null>(null);
-  const [lastToken, setLastToken] = useState<string | null>(null);
+  const { user, loggedIn, loadProfile } = useUser();
 
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
 
@@ -39,48 +36,10 @@ export default function ProfilScreen() {
     return email.trim().length > 0 && password.length > 0 && !submitting;
   }, [email, password, submitting]);
 
-  const loadProfile = useCallback(async () => {
-    const token = await AsyncStorage.getItem("access_token");
-    const isLoggedIn = !!token;
-    setLoggedIn(isLoggedIn);
-    if (isLoggedIn) {
-      try {
-        const me = await userApi.getMe();
-        setUser(me);
-      } catch (e: any) {
-        console.log("Failed to load profile:", e);
-        const status = e?.response?.status ?? e?.status;
-        if (status === 401 || status === 403) {
-          await AsyncStorage.removeItem("access_token");
-          await AsyncStorage.removeItem("refresh_token");
-          setLoggedIn(false);
-          setUser(null);
-        }
-      }
-    } else {
-      setUser(null);
-    }
-  }, []);
-
-  // Load profile data once on mount
+  // Load profile on mount
   useEffect(() => {
-    AsyncStorage.getItem("access_token").then((token) => {
-      setLastToken(token);
-    });
-    loadProfile();
-  }, [loadProfile]);
-
-  // Re-check auth and reload profile on tab focus if token changed
-  useFocusEffect(
-    useCallback(() => {
-      AsyncStorage.getItem("access_token").then((token) => {
-        if (token !== lastToken) {
-          setLastToken(token);
-          loadProfile();
-        }
-      });
-    }, [lastToken, loadProfile])
-  );
+    if (loggedIn === null) loadProfile();
+  }, [loggedIn, loadProfile]);
 
   async function handleLogin() {
     if (!canSubmit) return;
@@ -103,12 +62,7 @@ export default function ProfilScreen() {
 
       setEmail("");
       setPassword("");
-      setLoggedIn(true);
-      try {
-        const me = await userApi.getMe();
-        setUser(me);
-        if (me.id) await AsyncStorage.setItem("user_id", me.id);
-      } catch (_) {}
+      await loadProfile();
 
       if (returnTo === "index") {
         router.replace("/(tabs)" as any);

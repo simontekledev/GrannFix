@@ -7,6 +7,7 @@ import { Image, StyleSheet } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { UserProvider } from '@/src/context/UserContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +37,7 @@ export default function RootLayout() {
   }, [appReady]);
 
   return (
+    <UserProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {appReady && (
         <>
@@ -59,6 +61,7 @@ export default function RootLayout() {
         </Animated.View>
       )}
     </ThemeProvider>
+    </UserProvider>
   );
 }
 

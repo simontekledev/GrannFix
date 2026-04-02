@@ -15,6 +15,9 @@ Name | Type
 `area` | string
 `street` | string
 `verified` | boolean
+`ratingAverage` | number
+`ratingCount` | number
+`createdAt` | Date
 
 ## Example
 
@@ -32,6 +35,9 @@ const example = {
   "area": null,
   "street": null,
   "verified": null,
+  "ratingAverage": null,
+  "ratingCount": null,
+  "createdAt": null,
 } satisfies MeUserDto
 
 console.log(example)

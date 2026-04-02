@@ -15,11 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
+  ChangePasswordRequest,
   MeUserDto,
   PublicUserDto,
   UpdateMeRequest,
 } from '../models/index';
 import {
+    ChangePasswordRequestFromJSON,
+    ChangePasswordRequestToJSON,
     MeUserDtoFromJSON,
     MeUserDtoToJSON,
     PublicUserDtoFromJSON,
@@ -27,6 +30,10 @@ import {
     UpdateMeRequestFromJSON,
     UpdateMeRequestToJSON,
 } from '../models/index';
+
+export interface ChangePasswordOperationRequest {
+    changePasswordRequest: ChangePasswordRequest;
+}
 
 export interface GetPublicUserRequest {
     id: string;
@@ -40,6 +47,58 @@ export interface UpdateMeOperationRequest {
  * 
  */
 export class UserControllerApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for changePassword without sending the request
+     */
+    async changePasswordRequestOpts(requestParameters: ChangePasswordOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['changePasswordRequest'] == null) {
+            throw new runtime.RequiredError(
+                'changePasswordRequest',
+                'Required parameter "changePasswordRequest" was null or undefined when calling changePassword().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/users/me/password`;
+
+        return {
+            path: urlPath,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ChangePasswordRequestToJSON(requestParameters['changePasswordRequest']),
+        };
+    }
+
+    /**
+     */
+    async changePasswordRaw(requestParameters: ChangePasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.changePasswordRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async changePassword(requestParameters: ChangePasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.changePasswordRaw(requestParameters, initOverrides);
+    }
 
     /**
      * Creates request options for getMe without sending the request

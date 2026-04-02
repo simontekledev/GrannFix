@@ -8,9 +8,12 @@ import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
 import com.example.grannfix.user.api.dto.MeUserDto;
 import com.example.grannfix.user.api.dto.PublicUserDto;
+import com.example.grannfix.user.api.dto.ChangePasswordRequest;
 import com.example.grannfix.user.api.dto.UpdateMeRequest;
 import com.example.grannfix.user.domain.User;
+import com.example.grannfix.common.errors.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
@@ -23,6 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TaskAdminPort taskAdminPort;
+    private final PasswordEncoder passwordEncoder;
     @Transactional(readOnly = true)
     public MeUserDto getMe(UUID userId) {
         return UserMapper.toMeDto(getActiveUserOrThrow(userId));
@@ -48,6 +52,15 @@ public class UserService {
             }
         }
         return UserMapper.toMeDto(u);
+    }
+
+    @Transactional
+    public void changePassword(UUID userId, ChangePasswordRequest req) {
+        User u = getActiveUserOrThrow(userId);
+        if (!passwordEncoder.matches(req.currentPassword(), u.getPassword())) {
+            throw new UnauthorizedException("Wrong password");
+        }
+        u.setPassword(passwordEncoder.encode(req.newPassword()));
     }
 
     @Transactional

@@ -4,11 +4,81 @@ All URIs are relative to *http://localhost:8080*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
+| [**changePassword**](UserControllerApi.md#changepasswordoperation) | **PATCH** /users/me/password |  |
 | [**getMe**](UserControllerApi.md#getme) | **GET** /users/me |  |
 | [**getPublicUser**](UserControllerApi.md#getpublicuser) | **GET** /users/{id} |  |
 | [**removeMe**](UserControllerApi.md#removeme) | **DELETE** /users/me |  |
 | [**updateMe**](UserControllerApi.md#updatemeoperation) | **PATCH** /users/me |  |
 
+
+
+## changePassword
+
+> changePassword(changePasswordRequest)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UserControllerApi,
+} from '';
+import type { ChangePasswordOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UserControllerApi(config);
+
+  const body = {
+    // ChangePasswordRequest
+    changePasswordRequest: ...,
+  } satisfies ChangePasswordOperationRequest;
+
+  try {
+    const data = await api.changePassword(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **changePasswordRequest** | [ChangePasswordRequest](ChangePasswordRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getMe

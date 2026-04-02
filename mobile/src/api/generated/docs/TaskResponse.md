@@ -14,6 +14,7 @@ Name | Type
 `street` | string
 `offeredPrice` | number
 `status` | string
+`createdById` | string
 `active` | boolean
 `createdAt` | Date
 `updatedAt` | Date
@@ -34,6 +35,7 @@ const example = {
   "street": null,
   "offeredPrice": null,
   "status": null,
+  "createdById": null,
   "active": null,
   "createdAt": null,
   "updatedAt": null,

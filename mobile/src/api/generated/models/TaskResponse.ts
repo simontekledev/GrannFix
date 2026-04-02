@@ -68,13 +68,13 @@ export interface TaskResponse {
      */
     status?: TaskResponseStatusEnum;
     /**
-     *
+     * 
      * @type {string}
      * @memberof TaskResponse
      */
     createdById?: string;
     /**
-     *
+     * 
      * @type {boolean}
      * @memberof TaskResponse
      */

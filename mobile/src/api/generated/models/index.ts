@@ -3,6 +3,7 @@
 export * from './AdminUserDto';
 export * from './AuthResponse';
 export * from './AuthUserDto';
+export * from './ChangePasswordRequest';
 export * from './CreateOfferRequest';
 export * from './CreateTaskRequest';
 export * from './CursorPageResponseTaskResponse';

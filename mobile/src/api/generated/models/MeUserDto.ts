@@ -74,19 +74,19 @@ export interface MeUserDto {
      */
     verified?: boolean;
     /**
-     *
+     * 
      * @type {number}
      * @memberof MeUserDto
      */
     ratingAverage?: number;
     /**
-     *
+     * 
      * @type {number}
      * @memberof MeUserDto
      */
     ratingCount?: number;
     /**
-     *
+     * 
      * @type {Date}
      * @memberof MeUserDto
      */

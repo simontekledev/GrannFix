@@ -1,6 +1,7 @@
 package com.example.grannfix.task.infrastructure;
 
 import com.example.grannfix.common.errors.NotFoundException;
+import com.example.grannfix.chat.application.port.out.TaskChatPort;
 import com.example.grannfix.offer.application.port.out.TaskAssignmentPort;
 import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.task.domain.Task;
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort {
+public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort, TaskChatPort {
 
     private final TaskRepository taskRepository;
     @Override
@@ -61,5 +62,17 @@ public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort {
 
         task.setCompletedAt(now);
         task.setStatus(TaskStatus.COMPLETED);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TaskChatView> findTaskForChat(UUID taskId) {
+        return taskRepository.findById(taskId)
+                .map(t -> new TaskChatView(
+                        t.getId(),
+                        t.getCreatedById(),
+                        t.getAssignedToId(),
+                        t.getStatus().name()
+                ));
     }
 }

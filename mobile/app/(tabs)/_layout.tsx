@@ -86,6 +86,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="public-user"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name="task-detail"
         options={{
           href: null,

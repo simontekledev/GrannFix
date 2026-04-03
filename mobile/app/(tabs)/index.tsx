@@ -136,9 +136,12 @@ export default function UpptäckScreen() {
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
           </Text>
-          {item.offeredPrice != null && (
-            <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
-          )}
+          <View style={styles.cardHeaderRight}>
+            {item.offeredPrice != null && (
+              <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
+            )}
+            <Text style={styles.cardChevron}>›</Text>
+          </View>
         </View>
 
         <View style={styles.cardMeta}>
@@ -159,9 +162,12 @@ export default function UpptäckScreen() {
           </Text>
         ) : null}
 
-        {item.createdAt && (
-          <Text style={styles.cardDate}>{timeAgo(item.createdAt)}</Text>
-        )}
+        <View style={styles.cardFooter}>
+          {item.createdAt && (
+            <Text style={styles.cardDate}>{timeAgo(item.createdAt)}</Text>
+          )}
+          <Text style={styles.cardDetailLink}>Visa detaljer →</Text>
+        </View>
 
         <Pressable
           onPress={() => loggedIn ? null : router.push("/(tabs)/profile?returnTo=index")}
@@ -387,6 +393,15 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
+  cardHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  cardChevron: {
+    fontSize: 20,
+    color: "#ccc",
+  },
   cardPrice: {
     fontSize: 16,
     fontWeight: "700",
@@ -426,10 +441,20 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 4,
   },
+  cardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 6,
+  },
   cardDate: {
     fontSize: 12,
     color: "#aaa",
-    marginTop: 4,
+  },
+  cardDetailLink: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#16A34A",
   },
   cardButton: {
     marginTop: 14,

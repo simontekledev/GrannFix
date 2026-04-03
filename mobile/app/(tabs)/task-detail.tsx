@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { taskApi, chatApi } from "@/src/api/client";
+import { useUser } from "@/src/context/UserContext";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
 import { timeAgo } from "@/src/helpers/time";
 
@@ -23,16 +24,17 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Avbruten",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  OPEN: "#16A34A",
-  ASSIGNED: "#2563eb",
-  COMPLETED: "#6b7280",
-  CANCELLED: "#dc2626",
+const STATUS_COLORS = {
+  OPEN: "#22C55E",       
+  ASSIGNED: "#F59E0B",  
+  COMPLETED: "#6366F1", 
+  CANCELLED: "#EF4444",  
 };
 
 export default function TaskDetailScreen() {
   const router = useRouter();
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+  const { user } = useUser();
   const [task, setTask] = useState<TaskDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
@@ -195,18 +197,29 @@ export default function TaskDetailScreen() {
         {task.createdBy && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SKAPAD AV</Text>
-            <Pressable
-              onPress={() => router.push(`/(tabs)/user?id=${task.createdBy?.id}` as any)}
-              style={styles.userRow}
-            >
-              <View style={styles.userAvatar}>
-                <Text style={styles.userAvatarText}>
-                  {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                </Text>
+            {task.createdBy.id === user?.id ? (
+              <View style={styles.userRow}>
+                <View style={styles.userAvatar}>
+                  <Text style={styles.userAvatarText}>
+                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.userName}>{task.createdBy.name}</Text>
               </View>
-              <Text style={styles.userName}>{task.createdBy.name}</Text>
-              <Text style={styles.userArrow}>›</Text>
-            </Pressable>
+            ) : (
+              <Pressable
+                onPress={() => router.push(`/(tabs)/public-user?id=${task.createdBy?.id}&taskId=${id}&from=${from}` as any)}
+                style={styles.userRow}
+              >
+                <View style={styles.userAvatar}>
+                  <Text style={styles.userAvatarText}>
+                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.userName}>{task.createdBy.name}</Text>
+                <Text style={styles.userArrow}>›</Text>
+              </Pressable>
+            )}
           </View>
         )}
 

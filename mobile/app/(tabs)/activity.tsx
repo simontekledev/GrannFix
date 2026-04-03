@@ -144,7 +144,10 @@ export default function AktivitetScreen() {
     const status = item.status ?? "OPEN";
     const statusColor = STATUS_COLORS[status] ?? "#888";
     return (
-      <View style={styles.card}>
+      <Pressable
+        style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
+        onPress={() => router.push(`/(tabs)/task-detail?id=${item.id}&from=activity`)}
+      >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
@@ -173,7 +176,7 @@ export default function AktivitetScreen() {
             {timeAgo(item.createdAt)}
           </Text>
         )}
-      </View>
+      </Pressable>
     );
   }
 

@@ -1,5 +1,6 @@
 apis/AdminUserControllerApi.ts
 apis/AuthControllerApi.ts
+apis/ChatControllerApi.ts
 apis/OfferControllerApi.ts
 apis/PingControllerApi.ts
 apis/TaskControllerApi.ts
@@ -13,6 +14,9 @@ docs/AuthControllerApi.md
 docs/AuthResponse.md
 docs/AuthUserDto.md
 docs/ChangePasswordRequest.md
+docs/ChatControllerApi.md
+docs/ChatMessageResponse.md
+docs/ChatResponse.md
 docs/CreateOfferRequest.md
 docs/CreateTaskRequest.md
 docs/CursorPageResponseTaskResponse.md
@@ -29,6 +33,7 @@ docs/PingControllerApi.md
 docs/PublicUserDto.md
 docs/RegisterRequest.md
 docs/ResetPasswordRequest.md
+docs/SendMessageRequest.md
 docs/SortObject.md
 docs/TaskControllerApi.md
 docs/TaskDetailResponse.md
@@ -45,6 +50,8 @@ models/AdminUserDto.ts
 models/AuthResponse.ts
 models/AuthUserDto.ts
 models/ChangePasswordRequest.ts
+models/ChatMessageResponse.ts
+models/ChatResponse.ts
 models/CreateOfferRequest.ts
 models/CreateTaskRequest.ts
 models/CursorPageResponseTaskResponse.ts
@@ -59,6 +66,7 @@ models/Permissions.ts
 models/PublicUserDto.ts
 models/RegisterRequest.ts
 models/ResetPasswordRequest.ts
+models/SendMessageRequest.ts
 models/SortObject.ts
 models/TaskDetailResponse.ts
 models/TaskResponse.ts

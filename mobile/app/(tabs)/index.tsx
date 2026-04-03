@@ -128,7 +128,10 @@ export default function UpptäckScreen() {
       : null;
 
     return (
-      <View style={styles.card}>
+      <Pressable
+        style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
+        onPress={() => router.push(`/(tabs)/task-detail?id=${item.id}`)}
+      >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
@@ -172,7 +175,7 @@ export default function UpptäckScreen() {
             {loggedIn ? "Hjälp till" : "Logga in för att hjälpa till"}
           </Text>
         </Pressable>
-      </View>
+      </Pressable>
     );
   }
 

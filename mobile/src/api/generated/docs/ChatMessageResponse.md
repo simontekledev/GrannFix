@@ -1,26 +1,30 @@
 
-# SortObject
+# ChatMessageResponse
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`empty` | boolean
-`unsorted` | boolean
-`sorted` | boolean
+`id` | string
+`chatId` | string
+`senderId` | string
+`content` | string
+`createdAt` | Date
 
 ## Example
 
 ```typescript
-import type { SortObject } from ''
+import type { ChatMessageResponse } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "empty": null,
-  "unsorted": null,
-  "sorted": null,
-} satisfies SortObject
+  "id": null,
+  "chatId": null,
+  "senderId": null,
+  "content": null,
+  "createdAt": null,
+} satisfies ChatMessageResponse
 
 console.log(example)
 
@@ -29,7 +33,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SortObject
+const exampleParsed = JSON.parse(exampleJSON) as ChatMessageResponse
 console.log(exampleParsed)
 ```
 

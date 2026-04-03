@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AdminUserControllerApi';
 export * from './AuthControllerApi';
+export * from './ChatControllerApi';
 export * from './OfferControllerApi';
 export * from './PingControllerApi';
 export * from './TaskControllerApi';

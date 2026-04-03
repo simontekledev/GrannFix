@@ -13,6 +13,12 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: '#999',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: '#eee',
+          borderTopWidth: 1,
+        },
         headerShown: false,
         tabBarButton: HapticTab,
       }}>
@@ -75,6 +81,18 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="privacy"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="task-detail"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
         options={{
           href: null,
         }}

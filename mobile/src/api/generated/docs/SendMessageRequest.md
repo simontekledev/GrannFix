@@ -1,26 +1,22 @@
 
-# SortObject
+# SendMessageRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`empty` | boolean
-`unsorted` | boolean
-`sorted` | boolean
+`content` | string
 
 ## Example
 
 ```typescript
-import type { SortObject } from ''
+import type { SendMessageRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "empty": null,
-  "unsorted": null,
-  "sorted": null,
-} satisfies SortObject
+  "content": null,
+} satisfies SendMessageRequest
 
 console.log(example)
 
@@ -29,7 +25,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SortObject
+const exampleParsed = JSON.parse(exampleJSON) as SendMessageRequest
 console.log(exampleParsed)
 ```
 

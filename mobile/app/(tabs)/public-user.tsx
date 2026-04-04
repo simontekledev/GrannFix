@@ -47,7 +47,7 @@ export default function PublicUserScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#16A34A" />
         </View>
@@ -57,7 +57,7 @@ export default function PublicUserScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Användaren kunde inte hittas</Text>
           <Pressable onPress={() => goBack()} style={styles.backLink}>
@@ -69,7 +69,7 @@ export default function PublicUserScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
           onPress={() => goBack()}

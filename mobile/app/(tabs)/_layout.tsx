@@ -18,6 +18,7 @@ export default function TabLayout() {
           backgroundColor: '#fff',
           borderTopColor: '#eee',
           borderTopWidth: 1,
+          elevation: 0,
         },
         headerShown: false,
         tabBarButton: HapticTab,
@@ -26,21 +27,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Upptäck',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/explore-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/explore-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
         }}
       />
       <Tabs.Screen
         name="activity"
         options={{
           title: 'Aktivitet',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/profile-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/profile-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
         }}
       />
       <Tabs.Screen

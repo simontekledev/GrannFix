@@ -186,7 +186,7 @@ export default function UpptäckScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#111" />
         </View>
@@ -195,7 +195,7 @@ export default function UpptäckScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.headerRow}>
         <Image
           source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
@@ -351,9 +351,9 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   headerLogo: {
-    width: 700,
-    height: 170,
-    marginVertical: -58,
+    width: 800,
+    height: 195,
+    marginVertical: -68,
   },
   headerLogoRow: {
     alignItems: "center",
@@ -370,12 +370,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 15,
-    color: "#666",
+    color: "#252525",
     marginTop: 2,
   },
   list: {
     paddingHorizontal: 24,
-    paddingBottom: 32,
+    paddingBottom: 8,
   },
   emptyList: {
     flex: 1,

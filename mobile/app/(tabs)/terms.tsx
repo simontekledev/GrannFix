@@ -48,7 +48,7 @@ export default function TermsScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
           onPress={() => router.replace("/(tabs)/about")}

@@ -82,7 +82,7 @@ export default function ChangePasswordScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
           onPress={() => router.replace("/(tabs)/settings")}

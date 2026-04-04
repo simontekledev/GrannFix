@@ -106,7 +106,7 @@ export default function AktivitetScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#16A34A" />
         </View>
@@ -116,7 +116,7 @@ export default function AktivitetScreen() {
 
   if (!loggedIn) {
     return (
-      <SafeAreaView style={[styles.safe, styles.centeredColumn]}>
+      <SafeAreaView style={[styles.safe, styles.centeredColumn]} edges={["top"]}>
         <View style={styles.loginContent}>
           <Image
             source={require("@/assets/images/keylock-icon.png")}
@@ -196,7 +196,7 @@ export default function AktivitetScreen() {
   const filteredTasks = filter ? tasks.filter((t) => t.status === filter) : tasks;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>Uppdrag</Text>
         <Text style={styles.subtitle}>Dina aktiva uppdrag</Text>

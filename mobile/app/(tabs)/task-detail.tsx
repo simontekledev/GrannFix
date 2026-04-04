@@ -93,7 +93,7 @@ export default function TaskDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#16A34A" />
         </View>
@@ -103,7 +103,7 @@ export default function TaskDetailScreen() {
 
   if (!task) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Uppdraget kunde inte hittas</Text>
           <Pressable onPress={() => from === "activity" ? router.replace("/(tabs)/activity") : router.replace("/(tabs)" as any)} style={styles.backLink}>
@@ -119,7 +119,7 @@ export default function TaskDetailScreen() {
   const perms = task.permissions;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
           onPress={() => {

@@ -97,7 +97,7 @@ export default function ProfilScreen() {
 
   if (loggedIn === null) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#111" />
         </View>
@@ -108,7 +108,7 @@ export default function ProfilScreen() {
   // Logged in state
   if (loggedIn) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
         <ScrollView contentContainerStyle={styles.profileScroll}>
           <Pressable
             onPress={() => router.push("/(tabs)/settings")}
@@ -217,7 +217,7 @@ export default function ProfilScreen() {
 
   // Not logged in — show login form + register link
   return (
-    <SafeAreaView style={styles.safeLogin}>
+    <SafeAreaView style={styles.safeLogin} edges={["top"]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}

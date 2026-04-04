@@ -130,7 +130,7 @@ export default function UpptäckScreen() {
     return (
       <Pressable
         style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
-        onPress={() => router.push(`/(tabs)/task-detail?id=${item.id}`)}
+        onPress={() => router.push(`/task-detail?id=${item.id}`)}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>

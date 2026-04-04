@@ -22,11 +22,7 @@ export default function PublicUserScreen() {
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
 
   function goBack() {
-    if (taskId) {
-      router.replace(`/(tabs)/task-detail?id=${taskId}&from=${from ?? ""}` as any);
-    } else {
-      router.back();
-    }
+    router.back();
   }
 
   useEffect(() => {

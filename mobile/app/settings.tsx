@@ -19,7 +19,7 @@ export default function SettingsScreen() {
 
   async function handleLogout() {
     await logout();
-    router.replace("/(tabs)/profile");
+    router.back();
   }
 
   function confirmLogout() {
@@ -34,13 +34,13 @@ export default function SettingsScreen() {
   }
 
   const ACCOUNT_ROWS = [
-    { icon: require("@/assets/images/pen-icon.png"), label: "Redigera profil", onPress: () => router.push("/(tabs)/edit-profile") },
-    { icon: require("@/assets/images/keylock-icon.png"), label: "Byt lösenord", onPress: () => router.push("/(tabs)/change-password") },
+    { icon: require("@/assets/images/pen-icon.png"), label: "Redigera profil", onPress: () => router.push("/edit-profile") },
+    { icon: require("@/assets/images/keylock-icon.png"), label: "Byt lösenord", onPress: () => router.push("/change-password") },
   ];
 
   const APP_ROWS = [
     { icon: require("@/assets/images/notification-icon.png"), label: "Notifikationer", onPress: () => {} },
-    { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => router.push("/(tabs)/about") },
+    { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => router.push("/about") },
   ];
 
   function renderRow(item: { icon: any; label: string; onPress: () => void }, index: number, isLast: boolean) {
@@ -65,7 +65,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)/profile")}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Profil</Text>

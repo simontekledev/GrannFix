@@ -111,7 +111,7 @@ export default function ProfilScreen() {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <ScrollView contentContainerStyle={styles.profileScroll}>
           <Pressable
-            onPress={() => router.push("/(tabs)/settings")}
+            onPress={() => router.push("/settings")}
             style={styles.settingsButton}
           >
             <Image

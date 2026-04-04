@@ -47,7 +47,7 @@ export default function PrivacyScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)/about")}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Om Grannfix</Text>

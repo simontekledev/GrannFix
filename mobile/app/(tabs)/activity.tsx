@@ -146,7 +146,7 @@ export default function AktivitetScreen() {
     return (
       <Pressable
         style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
-        onPress={() => router.push(`/(tabs)/task-detail?id=${item.id}&from=activity`)}
+        onPress={() => router.push(`/task-detail?id=${item.id}&from=activity`)}
       >
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle} numberOfLines={1}>

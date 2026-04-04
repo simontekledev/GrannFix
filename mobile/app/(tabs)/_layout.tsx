@@ -44,66 +44,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Image source={require("@/assets/images/profile-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
         }}
       />
-      <Tabs.Screen
-        name="register"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="about"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="change-password"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="edit-profile"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="terms"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="privacy"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="public-user"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="task-detail"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }

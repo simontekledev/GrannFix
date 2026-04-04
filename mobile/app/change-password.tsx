@@ -61,7 +61,7 @@ export default function ChangePasswordScreen() {
       } else {
         Alert.alert("Klart", "Ditt lösenord har ändrats");
       }
-      router.replace("/(tabs)/settings");
+      router.back();
     } catch (e: any) {
       console.log("Change password error:", e);
       let msg = "Något gick fel. Försök igen.";
@@ -85,7 +85,7 @@ export default function ChangePasswordScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)/settings")}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Inställningar</Text>

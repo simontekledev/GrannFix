@@ -60,7 +60,7 @@ export default function TaskDetailScreen() {
       setCancelling(true);
       try {
         await taskApi.cancelTask({ id });
-        router.replace("/(tabs)/activity");
+        router.back();
       } catch (e) {
         console.log("Cancel error:", e);
         const msg = "Kunde inte avbryta uppdraget";
@@ -106,7 +106,7 @@ export default function TaskDetailScreen() {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Uppdraget kunde inte hittas</Text>
-          <Pressable onPress={() => from === "activity" ? router.replace("/(tabs)/activity") : router.replace("/(tabs)" as any)} style={styles.backLink}>
+          <Pressable onPress={() => router.back()} style={styles.backLink}>
             <Text style={styles.backLinkText}>← Tillbaka</Text>
           </Pressable>
         </View>
@@ -122,13 +122,7 @@ export default function TaskDetailScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => {
-            if (from === "activity") {
-              router.replace("/(tabs)/activity");
-            } else {
-              router.replace("/(tabs)" as any);
-            }
-          }}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Tillbaka</Text>
@@ -199,7 +193,7 @@ export default function TaskDetailScreen() {
               </View>
             ) : (
               <Pressable
-                onPress={() => router.push(`/(tabs)/public-user?id=${task.createdBy?.id}&taskId=${id}&from=${from}` as any)}
+                onPress={() => router.push(`/public-user?id=${task.createdBy?.id}&taskId=${id}&from=${from}` as any)}
                 style={styles.userRow}
               >
                 <View style={styles.userAvatar}>
@@ -228,7 +222,7 @@ export default function TaskDetailScreen() {
               </View>
             ) : (
               <Pressable
-                onPress={() => router.push(`/(tabs)/public-user?id=${task.assignedTo?.id}&taskId=${id}&from=${from}` as any)}
+                onPress={() => router.push(`/public-user?id=${task.assignedTo?.id}&taskId=${id}&from=${from}` as any)}
                 style={styles.userRow}
               >
                 <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>

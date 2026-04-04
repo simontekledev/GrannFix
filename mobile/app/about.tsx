@@ -18,7 +18,7 @@ export default function AboutScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)/settings")}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Inställningar</Text>
@@ -66,7 +66,7 @@ export default function AboutScreen() {
         <View style={styles.card}>
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => router.push("/(tabs)/terms")}
+            onPress={() => router.push("/terms")}
           >
             <Text style={styles.rowLabel}>Användarvillkor</Text>
             <Text style={styles.rowArrow}>›</Text>
@@ -74,7 +74,7 @@ export default function AboutScreen() {
           <View style={styles.divider} />
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            onPress={() => router.push("/(tabs)/privacy")}
+            onPress={() => router.push("/privacy")}
           >
             <Text style={styles.rowLabel}>Integritetspolicy</Text>
             <Text style={styles.rowArrow}>›</Text>

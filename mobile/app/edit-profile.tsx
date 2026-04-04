@@ -65,7 +65,7 @@ export default function EditProfileScreen() {
         },
       });
       setUser(updated);
-      router.replace("/(tabs)/profile");
+      router.back();
     } catch (e: any) {
       console.log("Update error:", e);
       const msg = "Kunde inte uppdatera profilen. Försök igen.";
@@ -93,7 +93,7 @@ export default function EditProfileScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.replace("/(tabs)/settings")}
+          onPress={() => router.back()}
           style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Inställningar</Text>

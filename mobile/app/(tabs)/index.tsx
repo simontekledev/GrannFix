@@ -136,12 +136,11 @@ export default function UpptäckScreen() {
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
           </Text>
-          <View style={styles.cardHeaderRight}>
-            {item.offeredPrice != null && (
+          {item.offeredPrice != null && (
+            <View style={styles.priceBadge}>
               <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
-            )}
-            <Text style={styles.cardChevron}>›</Text>
-          </View>
+            </View>
+          )}
         </View>
 
         <View style={styles.cardMeta}>
@@ -200,34 +199,10 @@ export default function UpptäckScreen() {
       <View style={styles.headerRow}>
         <Image
           source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
-          style={styles.wordmark}
+          style={styles.headerLogo}
           resizeMode="contain"
         />
-        <Text style={styles.subtitle}>Tillgängliga uppdrag</Text>
       </View>
-
-      <View style={styles.searchRow}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Sök uppdrag..."
-          placeholderTextColor="#999"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoCorrect={false}
-        />
-        <Pressable
-          onPress={() => setSortNearest((prev) => !prev)}
-          style={[styles.sortButton, sortNearest && styles.sortButtonActive]}
-        >
-          <View style={styles.sortButtonInner}>
-            <Image source={require("@/assets/images/location-icon-transparent.png")} style={[styles.locationIconSmall, { tintColor: sortNearest ? "#fff" : "#16A34A" }]} resizeMode="contain" />
-            <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
-              Närmast
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-
       <FlatList
         data={(() => {
           let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
@@ -267,6 +242,32 @@ export default function UpptäckScreen() {
         }
         onEndReached={onEndReached}
         onEndReachedThreshold={0.3}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.listTitle}>Tillgängliga uppdrag</Text>
+            <View style={styles.searchRow}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Sök uppdrag..."
+                placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCorrect={false}
+              />
+              <Pressable
+                onPress={() => setSortNearest((prev) => !prev)}
+                style={[styles.sortButton, sortNearest && styles.sortButtonActive]}
+              >
+                <View style={styles.sortButtonInner}>
+                  <Image source={require("@/assets/images/location-icon-transparent.png")} style={[styles.locationIconSmall, { tintColor: sortNearest ? "#fff" : "#16A34A" }]} resizeMode="contain" />
+                  <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
+                    Närmast
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          </>
+        }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color="#16A34A" /> : null}
         ListEmptyComponent={
           <View style={{ paddingTop: 140 }}>
@@ -292,7 +293,6 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 24,
     paddingBottom: 12,
     gap: 10,
   },
@@ -340,16 +340,27 @@ const styles = StyleSheet.create({
   sortButtonTextActive: {
     color: "#fff",
   },
+  listTitle: {
+    fontSize: 15,
+    color: "#666",
+    marginBottom: 10,
+  },
   headerRow: {
-    paddingHorizontal: 24,
+    alignItems: "center",
     paddingTop: 12,
     paddingBottom: 12,
+  },
+  headerLogo: {
+    width: 700,
+    height: 170,
+    marginVertical: -58,
+  },
+  headerLogoRow: {
+    alignItems: "center",
   },
   wordmark: {
     width: 650,
     height: 160,
-    alignSelf: "flex-start",
-    marginLeft: -280,
     marginVertical: -52,
   },
   title: {
@@ -402,8 +413,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#ccc",
   },
+  priceBadge: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   cardPrice: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
     color: "#16A34A",
   },

@@ -29,7 +29,7 @@ public class TaskMapper {
         );
     }
 
-    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String name) {
+    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String ownerName, String helperName) {
         if (task == null) return null;
 
         UUID ownerId = task.getCreatedById();
@@ -41,7 +41,10 @@ public class TaskMapper {
         boolean canOffer = viewerUserId != null && !isOwner && task.isActive() && task.getStatus() == TaskStatus.OPEN;
         boolean canChat = isOwner && task.isActive() && task.getStatus() == TaskStatus.ASSIGNED;
 
-        var createdBy = new TaskDetailResponse.UserSummary(ownerId, name);
+        var createdBy = new TaskDetailResponse.UserSummary(ownerId, ownerName);
+        var assignedTo = task.getAssignedToId() != null
+                ? new TaskDetailResponse.UserSummary(task.getAssignedToId(), helperName)
+                : null;
 
         return new TaskDetailResponse(
                 task.getId(),
@@ -57,6 +60,7 @@ public class TaskMapper {
                 task.getUpdatedAt(),
                 task.getCompletedAt(),
                 createdBy,
+                assignedTo,
                 null,
                 null,
                 new TaskDetailResponse.Permissions(canEdit, canCancel, canOffer, canChat)

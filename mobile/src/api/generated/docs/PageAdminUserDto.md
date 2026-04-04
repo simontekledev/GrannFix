@@ -8,12 +8,12 @@ Name | Type
 ------------ | -------------
 `totalElements` | number
 `totalPages` | number
-`first` | boolean
-`last` | boolean
 `size` | number
 `content` | [Array&lt;AdminUserDto&gt;](AdminUserDto.md)
 `number` | number
 `sort` | [SortObject](SortObject.md)
+`first` | boolean
+`last` | boolean
 `numberOfElements` | number
 `pageable` | [PageableObject](PageableObject.md)
 `empty` | boolean
@@ -27,12 +27,12 @@ import type { PageAdminUserDto } from ''
 const example = {
   "totalElements": null,
   "totalPages": null,
-  "first": null,
-  "last": null,
   "size": null,
   "content": null,
   "number": null,
   "sort": null,
+  "first": null,
+  "last": null,
   "numberOfElements": null,
   "pageable": null,
   "empty": null,

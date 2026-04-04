@@ -19,6 +19,7 @@ Name | Type
 `updatedAt` | Date
 `completedAt` | Date
 `createdBy` | [UserSummary](UserSummary.md)
+`assignedTo` | [UserSummary](UserSummary.md)
 `offersCount` | number
 `chatId` | string
 `permissions` | [Permissions](Permissions.md)
@@ -43,6 +44,7 @@ const example = {
   "updatedAt": null,
   "completedAt": null,
   "createdBy": null,
+  "assignedTo": null,
   "offersCount": null,
   "chatId": null,
   "permissions": null,

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -15,7 +14,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { taskApi, chatApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
-import { timeAgo } from "@/src/helpers/time";
+
 
 const STATUS_LABELS: Record<string, string> = {
   OPEN: "Öppen",
@@ -150,18 +149,10 @@ export default function TaskDetailScreen() {
               {STATUS_LABELS[status] ?? status}
             </Text>
           </View>
-          {task.area && (
-            <View style={styles.areaBadge}>
-              <Image
-                source={require("@/assets/images/location-icon-transparent.png")}
-                style={styles.locationIcon}
-                resizeMode="contain"
-              />
-              <Text style={styles.areaBadgeText}>{task.area}</Text>
-            </View>
-          )}
           {task.createdAt && (
-            <Text style={styles.dateText}>{timeAgo(task.createdAt)}</Text>
+            <Text style={styles.dateText}>
+              Publicerad {task.createdAt.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}
+            </Text>
           )}
         </View>
 
@@ -223,11 +214,51 @@ export default function TaskDetailScreen() {
           </View>
         )}
 
+        {task.assignedTo && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>HJÄLPARE</Text>
+            {task.assignedTo.id === user?.id ? (
+              <View style={styles.userRow}>
+                <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                  <Text style={styles.userAvatarText}>
+                    {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.userName}>{task.assignedTo.name} (du)</Text>
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => router.push(`/(tabs)/public-user?id=${task.assignedTo?.id}&taskId=${id}&from=${from}` as any)}
+                style={styles.userRow}
+              >
+                <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                  <Text style={styles.userAvatarText}>
+                    {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.userName}>{task.assignedTo.name}</Text>
+                <Text style={styles.userArrow}>›</Text>
+              </Pressable>
+            )}
+          </View>
+        )}
+
         {task.offersCount != null && task.offersCount > 0 && (
           <View style={styles.card}>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Erbjudanden</Text>
               <Text style={styles.detailValue}>{task.offersCount}</Text>
+            </View>
+          </View>
+        )}
+
+        {task.completedAt && (
+          <View style={styles.card}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Slutfört</Text>
+              <Text style={styles.detailValue}>
+                {task.completedAt.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}
+              </Text>
             </View>
           </View>
         )}

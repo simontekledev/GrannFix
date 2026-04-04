@@ -76,8 +76,9 @@ public class TaskService {
         if (!isOwner && task.getStatus() != TaskStatus.OPEN) {
             throw new ForbiddenException("Forbidden");
         }
-        String name = userLookupPort.displayName(task.getCreatedById());
-        return TaskMapper.toDetailResponse(task, userId, name);
+        String ownerName = userLookupPort.displayName(task.getCreatedById());
+        String helperName = task.getAssignedToId() != null ? userLookupPort.displayName(task.getAssignedToId()) : null;
+        return TaskMapper.toDetailResponse(task, userId, ownerName, helperName);
     }
 
     @Transactional

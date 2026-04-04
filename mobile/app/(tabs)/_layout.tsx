@@ -13,7 +13,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: '#999',
+        tabBarInactiveTintColor: '#555',
         tabBarStyle: {
           backgroundColor: '#fff',
           borderTopColor: '#eee',
@@ -26,21 +26,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Upptäck',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/explore-icon.png")} style={{ width: 24, height: 24, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/explore-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
         }}
       />
       <Tabs.Screen
         name="activity"
         options={{
           title: 'Aktivitet',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 24, height: 24, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/profile-icon.png")} style={{ width: 24, height: 24, tintColor: color }} />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/profile-icon.png")} style={{ width: 28, height: 28, tintColor: color }} />,
         }}
       />
       <Tabs.Screen

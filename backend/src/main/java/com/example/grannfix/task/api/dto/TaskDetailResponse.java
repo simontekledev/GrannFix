@@ -21,6 +21,7 @@ public record TaskDetailResponse(
         Instant completedAt,
 
         UserSummary createdBy,
+        UserSummary assignedTo,
         Integer offersCount,
         UUID chatId,
         Permissions permissions

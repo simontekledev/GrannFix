@@ -152,12 +152,11 @@ export default function AktivitetScreen() {
           <Text style={styles.cardTitle} numberOfLines={1}>
             {item.title ?? "Uppdrag"}
           </Text>
-          <View style={styles.cardHeaderRight}>
-            {item.offeredPrice != null && (
+          {item.offeredPrice != null && (
+            <View style={styles.priceBadge}>
               <Text style={styles.cardPrice}>{item.offeredPrice} kr</Text>
-            )}
-            <Text style={styles.cardChevron}>›</Text>
-          </View>
+            </View>
+          )}
         </View>
 
         <View style={styles.cardMeta}>
@@ -291,8 +290,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#ccc",
   },
+  priceBadge: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
   cardPrice: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
     color: "#16A34A",
   },

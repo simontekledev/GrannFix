@@ -114,6 +114,12 @@ export interface TaskDetailResponse {
     createdBy?: UserSummary;
     /**
      * 
+     * @type {UserSummary}
+     * @memberof TaskDetailResponse
+     */
+    assignedTo?: UserSummary;
+    /**
+     * 
      * @type {number}
      * @memberof TaskDetailResponse
      */
@@ -175,6 +181,7 @@ export function TaskDetailResponseFromJSONTyped(json: any, ignoreDiscriminator: 
         'updatedAt': json['updatedAt'] == null ? undefined : (new Date(json['updatedAt'])),
         'completedAt': json['completedAt'] == null ? undefined : (new Date(json['completedAt'])),
         'createdBy': json['createdBy'] == null ? undefined : UserSummaryFromJSON(json['createdBy']),
+        'assignedTo': json['assignedTo'] == null ? undefined : UserSummaryFromJSON(json['assignedTo']),
         'offersCount': json['offersCount'] == null ? undefined : json['offersCount'],
         'chatId': json['chatId'] == null ? undefined : json['chatId'],
         'permissions': json['permissions'] == null ? undefined : PermissionsFromJSON(json['permissions']),
@@ -205,6 +212,7 @@ export function TaskDetailResponseToJSONTyped(value?: TaskDetailResponse | null,
         'updatedAt': value['updatedAt'] == null ? value['updatedAt'] : value['updatedAt'].toISOString(),
         'completedAt': value['completedAt'] == null ? value['completedAt'] : value['completedAt'].toISOString(),
         'createdBy': UserSummaryToJSON(value['createdBy']),
+        'assignedTo': UserSummaryToJSON(value['assignedTo']),
         'offersCount': value['offersCount'],
         'chatId': value['chatId'],
         'permissions': PermissionsToJSON(value['permissions']),

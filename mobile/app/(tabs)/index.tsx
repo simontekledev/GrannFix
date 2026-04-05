@@ -6,7 +6,7 @@ import { timeAgo } from "@/src/helpers/time";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -18,6 +18,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -35,6 +36,7 @@ export default function UpptäckScreen() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortNearest, setSortNearest] = useState(false);
+  const searchInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     (async () => {
@@ -195,14 +197,26 @@ export default function UpptäckScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.headerRow}>
-        <Image
-          source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
-          style={styles.headerLogo}
-          resizeMode="contain"
-        />
-      </View>
+    <View style={styles.safe}>
+      <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
+        <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
+          <Image
+            source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
+            style={styles.headerLogo}
+            resizeMode="contain"
+          />
+          <Pressable
+            onPress={() => searchInputRef.current?.focus()}
+            style={({ pressed }) => [styles.headerSearchButton, pressed && { opacity: 0.6 }]}
+          >
+            <Image
+              source={require("@/assets/images/search-icon.png")}
+              style={styles.headerSearchIcon}
+              resizeMode="contain"
+            />
+          </Pressable>
+        </LinearGradient>
+      </SafeAreaView>
       <FlatList
         data={(() => {
           let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
@@ -275,7 +289,7 @@ export default function UpptäckScreen() {
           </View>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -283,6 +297,9 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: "#F8F9FA",
+  },
+  safeTop: {
+    backgroundColor: "#e8f5e9",
   },
   centered: {
     flex: 1,
@@ -346,14 +363,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    justifyContent: "center",
+    paddingTop: 8,
     paddingBottom: 12,
+    paddingHorizontal: 16,
+  },
+  headerSearchButton: {
+    position: "absolute",
+    right: 16,
+    padding: 6,
+  },
+  headerSearchIcon: {
+    width: 26,
+    height: 26,
   },
   headerLogo: {
     width: 800,
     height: 195,
-    marginVertical: -68,
+    marginVertical: -78,
   },
   headerLogoRow: {
     alignItems: "center",

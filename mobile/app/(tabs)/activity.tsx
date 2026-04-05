@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -196,11 +197,13 @@ export default function AktivitetScreen() {
   const filteredTasks = filter ? tasks.filter((t) => t.status === filter) : tasks;
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>Uppdrag</Text>
-        <Text style={styles.subtitle}>Dina aktiva uppdrag</Text>
-      </View>
+    <View style={styles.safe}>
+      <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
+        <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
+          <Text style={styles.title}>Uppdrag</Text>
+          <Text style={styles.subtitle}>Dina aktiva uppdrag</Text>
+        </LinearGradient>
+      </SafeAreaView>
 
       <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
 
@@ -221,7 +224,7 @@ export default function AktivitetScreen() {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -237,9 +240,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   headerRow: {
+    alignItems: "center",
     paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   title: {
     fontSize: 23,
@@ -249,6 +253,7 @@ const styles = StyleSheet.create({
     letterSpacing: -1.0,
   },
   subtitle: {
+    alignSelf: "flex-start",
     fontSize: 15,
     color: "#666",
     marginTop: 14,

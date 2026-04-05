@@ -33,7 +33,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activity"
         options={{
-          title: 'Aktivitet',
+          title: 'Uppdrag',
           tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
         }}
       />

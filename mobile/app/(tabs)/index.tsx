@@ -36,6 +36,7 @@ export default function UpptäckScreen() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortNearest, setSortNearest] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
@@ -206,7 +207,10 @@ export default function UpptäckScreen() {
             resizeMode="contain"
           />
           <Pressable
-            onPress={() => searchInputRef.current?.focus()}
+            onPress={() => {
+              setSearchOpen(true);
+              setTimeout(() => searchInputRef.current?.focus(), 100);
+            }}
             style={({ pressed }) => [styles.headerSearchButton, pressed && { opacity: 0.6 }]}
           >
             <Image
@@ -289,6 +293,64 @@ export default function UpptäckScreen() {
           </View>
         }
       />
+
+      {searchOpen && (
+        <View style={styles.searchOverlay}>
+          <SafeAreaView style={{ backgroundColor: "#fff", flex: 1 }} edges={["top"]}>
+            <View style={styles.searchOverlayHeader}>
+              <TextInput
+                ref={searchInputRef}
+                style={styles.searchOverlayInput}
+                placeholder="Sök uppdrag..."
+                placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCorrect={false}
+              />
+              <Pressable
+                onPress={() => {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
+                style={({ pressed }) => [pressed && { opacity: 0.6 }]}
+              >
+                <Text style={styles.searchCancel}>Avbryt</Text>
+              </Pressable>
+            </View>
+            <FlatList
+              data={searchQuery.trim()
+                ? (userId ? tasks.filter((t) => t.createdById !== userId) : tasks)
+                    .filter((t) => {
+                      const q = searchQuery.toLowerCase();
+                      return (
+                        (t.title?.toLowerCase().includes(q)) ||
+                        (t.description?.toLowerCase().includes(q)) ||
+                        (t.area?.toLowerCase().includes(q))
+                      );
+                    })
+                    .sort((a, b) => {
+                      const q = searchQuery.toLowerCase();
+                      const aTitle = a.title?.toLowerCase().includes(q) ? 0 : 1;
+                      const bTitle = b.title?.toLowerCase().includes(q) ? 0 : 1;
+                      if (aTitle !== bTitle) return aTitle - bTitle;
+                      const aDesc = a.description?.toLowerCase().includes(q) ? 0 : 1;
+                      const bDesc = b.description?.toLowerCase().includes(q) ? 0 : 1;
+                      return aDesc - bDesc;
+                    })
+                : []}
+              keyExtractor={(item) => item.id ?? Math.random().toString()}
+              renderItem={renderTask}
+              contentContainerStyle={styles.list}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                searchQuery.trim() ? (
+                  <Text style={styles.searchEmptyText}>Inga träffar</Text>
+                ) : null
+              }
+            />
+          </SafeAreaView>
+        </View>
+      )}
     </View>
   );
 }
@@ -321,8 +383,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
     color: "#111",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
   },
   sortButton: {
     backgroundColor: "#fff",
@@ -378,6 +438,44 @@ const styles = StyleSheet.create({
   headerSearchIcon: {
     width: 26,
     height: 26,
+  },
+  searchOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#fff",
+    zIndex: 10,
+  },
+  searchOverlayHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  searchOverlayInput: {
+    flex: 1,
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: "#111",
+  },
+  searchCancel: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#16A34A",
+  },
+  searchEmptyText: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#888",
+    marginTop: 40,
   },
   headerLogo: {
     width: 800,

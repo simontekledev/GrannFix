@@ -2,12 +2,18 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -49,6 +55,66 @@ export default function AktivitetScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
   const [lastToken, setLastToken] = useState<string | null>(null);
+
+  // Create task modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [newArea, setNewArea] = useState("");
+  const [newStreet, setNewStreet] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [areaPickerOpen, setAreaPickerOpen] = useState(false);
+  const [areaSearch, setAreaSearch] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  const STOCKHOLM_AREAS = [
+    "Södermalm", "Östermalm", "Norrmalm", "Kungsholmen", "Vasastan", "Gamla Stan",
+    "Bromma", "Vällingby", "Hässelby", "Spånga", "Kista", "Rinkeby", "Tensta",
+    "Hägersten", "Liljeholmen", "Aspudden", "Midsommarkransen",
+    "Älvsjö", "Enskede", "Årsta", "Farsta", "Skarpnäck", "Skärholmen", "Annat",
+  ];
+
+  const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
+    a.toLowerCase().includes(areaSearch.toLowerCase())
+  );
+
+  const canCreate = newTitle.trim().length > 0 && newDescription.trim().length > 0 && newArea.length > 0 && !creating;
+
+  function resetCreateForm() {
+    setNewTitle("");
+    setNewDescription("");
+    setNewArea("");
+    setNewStreet("");
+    setNewPrice("");
+    setAreaSearch("");
+  }
+
+  async function handleCreateTask() {
+    if (!canCreate) return;
+    setCreating(true);
+    try {
+      await taskApi.createTask({
+        createTaskRequest: {
+          title: newTitle.trim(),
+          description: newDescription.trim(),
+          city: "Stockholm",
+          area: newArea,
+          street: newStreet.trim() || undefined,
+          offeredPrice: newPrice ? Number(newPrice) : undefined,
+        },
+      });
+      resetCreateForm();
+      setShowCreateModal(false);
+      fetchTasks();
+    } catch (e: any) {
+      console.log("Create task error:", e);
+      const msg = "Kunde inte skapa uppdraget. Försök igen.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setCreating(false);
+    }
+  }
 
   const checkAuth = useCallback(async () => {
     const token = await AsyncStorage.getItem("access_token");
@@ -201,7 +267,7 @@ export default function AktivitetScreen() {
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
         <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
           <Text style={styles.title}>Uppdrag</Text>
-          <Text style={styles.subtitle}>Dina aktiva uppdrag</Text>
+          <Text style={styles.subtitle}>Dina uppdrag</Text>
         </LinearGradient>
       </SafeAreaView>
 
@@ -224,6 +290,135 @@ export default function AktivitetScreen() {
           }
         />
       )}
+
+      {loggedIn && (
+        <Pressable
+          onPress={() => setShowCreateModal(true)}
+          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </Pressable>
+      )}
+
+      <Modal
+        visible={showCreateModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => { setShowCreateModal(false); resetCreateForm(); }}
+      >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable
+              style={styles.modalOverlayTouchable}
+              onPress={() => { setShowCreateModal(false); resetCreateForm(); }}
+            />
+            <View style={styles.modalContent}>
+              <View style={styles.modalHandle} />
+              <Text style={styles.modalTitle}>Nytt uppdrag</Text>
+
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalLabel}>Titel</Text>
+                <TextInput
+                  value={newTitle}
+                  onChangeText={setNewTitle}
+                  placeholder="Vad behöver du hjälp med?"
+                  placeholderTextColor="#a0a0a0"
+                  style={styles.modalInput}
+                />
+
+                <Text style={styles.modalLabel}>Beskrivning</Text>
+                <TextInput
+                  value={newDescription}
+                  onChangeText={setNewDescription}
+                  placeholder="Beskriv uppdraget..."
+                  placeholderTextColor="#a0a0a0"
+                  style={[styles.modalInput, styles.modalTextArea]}
+                  multiline
+                />
+
+                <Text style={styles.modalLabel}>Område</Text>
+                {areaPickerOpen ? (
+                  <View>
+                    <TextInput
+                      value={areaSearch}
+                      onChangeText={setAreaSearch}
+                      placeholder="Sök område..."
+                      placeholderTextColor="#a0a0a0"
+                      style={styles.modalInput}
+                      autoFocus
+                    />
+                    <FlatList
+                      data={filteredAreas}
+                      keyExtractor={(item) => item}
+                      keyboardShouldPersistTaps="handled"
+                      style={styles.areaList}
+                      renderItem={({ item }) => (
+                        <Pressable
+                          onPress={() => {
+                            setNewArea(item);
+                            setAreaPickerOpen(false);
+                            setAreaSearch("");
+                          }}
+                          style={({ pressed }) => [styles.areaItem, pressed && { backgroundColor: "#f5f5f5" }]}
+                        >
+                          <Text style={[styles.areaItemText, item === newArea && { color: "#16A34A", fontWeight: "600" }]}>{item}</Text>
+                        </Pressable>
+                      )}
+                    />
+                  </View>
+                ) : (
+                  <Pressable
+                    onPress={() => setAreaPickerOpen(true)}
+                    style={styles.modalInput}
+                  >
+                    <Text style={newArea ? styles.areaSelectedText : styles.areaPlaceholderText}>
+                      {newArea || "Välj område"}
+                    </Text>
+                  </Pressable>
+                )}
+
+                <Text style={styles.modalLabel}>Adress (valfritt)</Text>
+                <TextInput
+                  value={newStreet}
+                  onChangeText={setNewStreet}
+                  placeholder="Gatuadress"
+                  placeholderTextColor="#a0a0a0"
+                  style={styles.modalInput}
+                />
+
+                <Text style={styles.modalLabel}>Pris (valfritt)</Text>
+                <TextInput
+                  value={newPrice}
+                  onChangeText={setNewPrice}
+                  placeholder="Ersättning i kr"
+                  placeholderTextColor="#a0a0a0"
+                  keyboardType="number-pad"
+                  style={styles.modalInput}
+                />
+
+                <Pressable
+                  onPress={handleCreateTask}
+                  disabled={!canCreate}
+                  style={({ pressed }) => [
+                    styles.createButton,
+                    !canCreate && styles.createButtonDisabled,
+                    pressed && canCreate && { opacity: 0.85 },
+                  ]}
+                >
+                  {creating ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.createButtonText}>Publicera uppdrag</Text>
+                  )}
+                </Pressable>
+              </ScrollView>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
@@ -260,7 +455,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 24,
-    paddingBottom: 32,
+    paddingBottom: 90,
   },
   card: {
     backgroundColor: "#fff",
@@ -400,5 +595,127 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "#fff",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  modalOverlayTouchable: {
+    flex: 1,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "85%",
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  modalHandle: {
+    width: 36,
+    height: 4,
+    backgroundColor: "#ddd",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 10,
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+    marginTop: 14,
+  },
+  modalInput: {
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#111",
+    outlineStyle: "none",
+  } as any,
+  modalTextArea: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  areaList: {
+    maxHeight: 150,
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    marginTop: 4,
+  },
+  areaItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#eee",
+  },
+  areaItemText: {
+    fontSize: 15,
+    color: "#111",
+  },
+  areaSelectedText: {
+    fontSize: 15,
+    color: "#111",
+  },
+  areaPlaceholderText: {
+    fontSize: 15,
+    color: "#a0a0a0",
+  },
+  createButton: {
+    marginTop: 24,
+    backgroundColor: "#16A34A",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#16A34A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  createButtonDisabled: {
+    opacity: 0.35,
+  },
+  createButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#16A34A",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#16A34A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  fabPressed: {
+    opacity: 0.85,
+  },
+  fabText: {
+    fontSize: 28,
+    fontWeight: "400",
+    color: "#fff",
+    marginTop: -2,
   },
 });

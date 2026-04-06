@@ -383,7 +383,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
     color: "#111",
-  },
+    outlineStyle: "none",
+  } as any,
   sortButton: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -438,6 +439,7 @@ const styles = StyleSheet.create({
   headerSearchIcon: {
     width: 26,
     height: 26,
+    tintColor: "#1C1C1E"
   },
   searchOverlay: {
     position: "absolute",
@@ -465,7 +467,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
     color: "#111",
-  },
+    outlineStyle: "none",
+  } as any,
   searchCancel: {
     fontSize: 15,
     fontWeight: "500",

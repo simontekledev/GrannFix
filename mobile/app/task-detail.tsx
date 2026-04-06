@@ -182,29 +182,14 @@ export default function TaskDetailScreen() {
         {task.createdBy && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SKAPAD AV</Text>
-            {task.createdBy.id === user?.id ? (
-              <View style={styles.userRow}>
-                <View style={styles.userAvatar}>
-                  <Text style={styles.userAvatarText}>
-                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                  </Text>
-                </View>
-                <Text style={styles.userName}>{task.createdBy.name}</Text>
+            <View style={styles.userRow}>
+              <View style={styles.userAvatar}>
+                <Text style={styles.userAvatarText}>
+                  {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
+                </Text>
               </View>
-            ) : (
-              <Pressable
-                onPress={() => router.push(`/public-user?id=${task.createdBy?.id}&taskId=${id}&from=${from}` as any)}
-                style={styles.userRow}
-              >
-                <View style={styles.userAvatar}>
-                  <Text style={styles.userAvatarText}>
-                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                  </Text>
-                </View>
-                <Text style={styles.userName}>{task.createdBy.name}</Text>
-                <Text style={styles.userArrow}>›</Text>
-              </Pressable>
-            )}
+              <Text style={styles.userName}>{task.createdBy.name}</Text>
+            </View>
           </View>
         )}
 
@@ -271,18 +256,6 @@ export default function TaskDetailScreen() {
             </Pressable>
           )}
 
-          {perms?.canChat && (
-            <Pressable
-              style={({ pressed, hovered }: any) => [
-                styles.primaryButton,
-                hovered && styles.primaryButtonHovered,
-                pressed && styles.primaryButtonPressed,
-              ]}
-              onPress={handleChat}
-            >
-              <Text style={styles.primaryButtonText}>Chatta</Text>
-            </Pressable>
-          )}
 
           {perms?.canCancel && (
             <Pressable
@@ -338,9 +311,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 12,
+  },
+  chatIconButton: {
+    padding: 4,
+  },
+  chatIconText: {
+    fontSize: 22,
   },
   backButton: {
     alignSelf: "flex-start",

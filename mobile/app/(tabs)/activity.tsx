@@ -25,6 +25,9 @@ import { taskApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { EmptyState } from "@/src/components/EmptyState";
 import { timeAgo } from "@/src/helpers/time";
+import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
+import { modalStyles } from "@/src/styles/modal";
+import { formStyles } from "@/src/styles/form";
 
 const STATUS_ORDER: Record<string, number> = {
   ASSIGNED: 0,
@@ -67,12 +70,6 @@ export default function AktivitetScreen() {
   const [areaSearch, setAreaSearch] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const STOCKHOLM_AREAS = [
-    "Södermalm", "Östermalm", "Norrmalm", "Kungsholmen", "Vasastan", "Gamla Stan",
-    "Bromma", "Vällingby", "Hässelby", "Spånga", "Kista", "Rinkeby", "Tensta",
-    "Hägersten", "Liljeholmen", "Aspudden", "Midsommarkransen",
-    "Älvsjö", "Enskede", "Årsta", "Farsta", "Skarpnäck", "Skärholmen", "Annat",
-  ];
 
   const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
     a.toLowerCase().includes(areaSearch.toLowerCase())
@@ -273,7 +270,7 @@ export default function AktivitetScreen() {
     <View style={styles.safe}>
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
         <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
-          <Text style={styles.title}>Uppdrag</Text>
+          <Text style={styles.title}>Aktivitet</Text>
         </LinearGradient>
       </SafeAreaView>
 
@@ -352,36 +349,36 @@ export default function AktivitetScreen() {
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <View style={styles.modalOverlay}>
+          <View style={modalStyles.overlay}>
             <Pressable
-              style={styles.modalOverlayTouchable}
+              style={modalStyles.overlayTouchable}
               onPress={() => { setShowCreateModal(false); resetCreateForm(); }}
             />
-            <View style={styles.modalContent}>
-              <View style={styles.modalHandle} />
-              <Text style={styles.modalTitle}>Nytt uppdrag</Text>
+            <View style={modalStyles.content}>
+              <View style={modalStyles.handle} />
+              <Text style={modalStyles.title}>Nytt uppdrag</Text>
 
               <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                <Text style={styles.modalLabel}>Titel <Text style={styles.required}>*</Text></Text>
+                <Text style={formStyles.label}>Titel <Text style={formStyles.required}>*</Text></Text>
                 <TextInput
                   value={newTitle}
                   onChangeText={setNewTitle}
                   placeholder="Vad behöver du hjälp med?"
                   placeholderTextColor="#a0a0a0"
-                  style={styles.modalInput}
+                  style={formStyles.input}
                 />
 
-                <Text style={styles.modalLabel}>Beskrivning <Text style={styles.required}>*</Text></Text>
+                <Text style={formStyles.label}>Beskrivning <Text style={formStyles.required}>*</Text></Text>
                 <TextInput
                   value={newDescription}
                   onChangeText={setNewDescription}
                   placeholder="Beskriv uppdraget..."
                   placeholderTextColor="#a0a0a0"
-                  style={[styles.modalInput, styles.modalTextArea]}
+                  style={[formStyles.input, formStyles.textArea]}
                   multiline
                 />
 
-                <Text style={styles.modalLabel}>Område <Text style={styles.required}>*</Text></Text>
+                <Text style={formStyles.label}>Område <Text style={formStyles.required}>*</Text></Text>
                 {areaPickerOpen ? (
                   <View>
                     <TextInput
@@ -389,7 +386,7 @@ export default function AktivitetScreen() {
                       onChangeText={setAreaSearch}
                       placeholder="Sök område..."
                       placeholderTextColor="#a0a0a0"
-                      style={styles.modalInput}
+                      style={formStyles.input}
                       autoFocus
                     />
                     <FlatList
@@ -414,7 +411,7 @@ export default function AktivitetScreen() {
                 ) : (
                   <Pressable
                     onPress={() => setAreaPickerOpen(true)}
-                    style={styles.modalInput}
+                    style={formStyles.input}
                   >
                     <Text style={newArea ? styles.areaSelectedText : styles.areaPlaceholderText}>
                       {newArea || "Välj område"}
@@ -422,23 +419,23 @@ export default function AktivitetScreen() {
                   </Pressable>
                 )}
 
-                <Text style={styles.modalLabel}>Adress <Text style={styles.optional}>(valfritt)</Text></Text>
+                <Text style={formStyles.label}>Adress <Text style={formStyles.optional}>(valfritt)</Text></Text>
                 <TextInput
                   value={newStreet}
                   onChangeText={setNewStreet}
                   placeholder="Gatuadress"
                   placeholderTextColor="#a0a0a0"
-                  style={styles.modalInput}
+                  style={formStyles.input}
                 />
 
-                <Text style={styles.modalLabel}>Pris <Text style={styles.optional}>(valfritt)</Text></Text>
+                <Text style={formStyles.label}>Pris <Text style={formStyles.optional}>(valfritt)</Text></Text>
                 <TextInput
                   value={newPrice}
                   onChangeText={setNewPrice}
                   placeholder="Ersättning i kr"
                   placeholderTextColor="#a0a0a0"
                   keyboardType="number-pad"
-                  style={styles.modalInput}
+                  style={formStyles.input}
                 />
 
                 <Pressable
@@ -657,38 +654,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#fff",
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalOverlayTouchable: {
-    flex: 1,
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "85%",
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-  },
-  modalHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: "#ddd",
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 8,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111",
-    textAlign: "center",
-    marginBottom: 16,
-  },
   viewToggle: {
     flexDirection: "row",
     marginHorizontal: 24,
@@ -722,35 +687,6 @@ const styles = StyleSheet.create({
   toggleIcon: {
     width: 16,
     height: 16,
-  },
-  required: {
-    color: "#e53e3e",
-    fontWeight: "400",
-  },
-  optional: {
-    color: "#999",
-    fontWeight: "400",
-    fontSize: 12,
-  },
-  modalLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-    marginTop: 14,
-  },
-  modalInput: {
-    backgroundColor: "#F8F9FA",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: "#111",
-    outlineStyle: "none",
-  } as any,
-  modalTextArea: {
-    minHeight: 80,
-    textAlignVertical: "top",
   },
   areaList: {
     maxHeight: 150,

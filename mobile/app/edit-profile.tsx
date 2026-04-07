@@ -17,14 +17,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { userApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
-
-const STOCKHOLM_AREAS = [
-  "Södermalm", "Östermalm", "Norrmalm", "Kungsholmen", "Vasastan", "Gamla Stan",
-  "Bromma", "Vällingby", "Hässelby", "Spånga", "Kista", "Rinkeby", "Tensta",
-  "Hägersten", "Liljeholmen", "Aspudden", "Midsommarkransen",
-  "Älvsjö", "Enskede", "Årsta", "Farsta", "Skarpnäck", "Skärholmen",
-  "Annat",
-];
+import { formStyles } from "@/src/styles/form";
+import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -109,7 +103,7 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.label}>Namn <Text style={styles.required}>*</Text></Text>
+          <Text style={styles.label}>Namn <Text style={formStyles.required}>*</Text></Text>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -118,7 +112,7 @@ export default function EditProfileScreen() {
             placeholderTextColor="#a0a0a0"
           />
 
-          <Text style={styles.label}>Bio <Text style={styles.optional}>(valfritt)</Text></Text>
+          <Text style={styles.label}>Bio <Text style={formStyles.optional}>(valfritt)</Text></Text>
           <TextInput
             value={bio}
             onChangeText={setBio}
@@ -128,7 +122,7 @@ export default function EditProfileScreen() {
             multiline
           />
 
-          <Text style={styles.label}>E-post <Text style={styles.required}>*</Text></Text>
+          <Text style={styles.label}>E-post <Text style={formStyles.required}>*</Text></Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -144,7 +138,7 @@ export default function EditProfileScreen() {
             <Text style={styles.disabledText}>{city}</Text>
           </View>
 
-          <Text style={styles.label}>Område <Text style={styles.required}>*</Text></Text>
+          <Text style={styles.label}>Område <Text style={formStyles.required}>*</Text></Text>
           <Pressable
             onPress={() => setAreaModalVisible(true)}
             style={styles.input}
@@ -154,7 +148,7 @@ export default function EditProfileScreen() {
             </Text>
           </Pressable>
 
-          <Text style={styles.label}>Adress <Text style={styles.optional}>(valfritt)</Text></Text>
+          <Text style={styles.label}>Adress <Text style={formStyles.optional}>(valfritt)</Text></Text>
           <TextInput
             value={street}
             onChangeText={setStreet}
@@ -267,15 +261,6 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 24,
     paddingBottom: 48,
-  },
-  required: {
-    color: "#e53e3e",
-    fontWeight: "400",
-  },
-  optional: {
-    color: "#999",
-    fontWeight: "400",
-    fontSize: 12,
   },
   label: {
     fontSize: 14,

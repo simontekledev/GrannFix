@@ -18,36 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { authApi } from "@/src/api/client";
 import { validatePassword } from "@/src/helpers/password";
-
-const STOCKHOLM_AREAS = [
-  "Södermalm",
-  "Östermalm",
-  "Norrmalm",
-  "Kungsholmen",
-  "Vasastan",
-  "Gamla Stan",
-
-  "Bromma",
-  "Vällingby",
-  "Hässelby",
-  "Spånga",
-  "Kista",
-  "Rinkeby",
-  "Tensta",
-
-  "Hägersten",
-  "Liljeholmen",
-  "Aspudden",
-  "Midsommarkransen",
-  "Älvsjö",
-  "Enskede",
-  "Årsta",
-  "Farsta",
-  "Skarpnäck",
-  "Skärholmen",
-
-  "Annat",
-];
+import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 
 export default function RegisterScreen() {
   const router = useRouter();

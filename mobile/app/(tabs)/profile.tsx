@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { authApi } from "@/src/api/client";
@@ -108,18 +109,22 @@ export default function ProfilScreen() {
   // Logged in state
   if (loggedIn) {
     return (
-      <SafeAreaView style={styles.safe} edges={["top"]}>
+      <View style={styles.safe}>
+        <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
+          <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.profileGradientHeader}>
+            <Pressable
+              onPress={() => router.push("/settings")}
+              style={styles.settingsButton}
+            >
+              <Image
+                source={require("@/assets/images/settings-icon- black-transparent.png")}
+                style={styles.settingsIcon}
+                resizeMode="contain"
+              />
+            </Pressable>
+          </LinearGradient>
+        </SafeAreaView>
         <ScrollView contentContainerStyle={styles.profileScroll}>
-          <Pressable
-            onPress={() => router.push("/settings")}
-            style={styles.settingsButton}
-          >
-            <Image
-              source={require("@/assets/images/settings-icon- black-transparent.png")}
-              style={styles.settingsIcon}
-              resizeMode="contain"
-            />
-          </Pressable>
           <View style={styles.profileHero}>
             <View style={styles.profileIconWrapper}>
               <Image
@@ -149,7 +154,7 @@ export default function ProfilScreen() {
             )}
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
-            <StarRating rating={user?.ratingAverage ?? 0} />
+            <StarRating rating={user?.ratingAverage ?? 0} color="green" />
 
             {user?.bio ? (
               <Text style={styles.bioText}>{user.bio}</Text>
@@ -215,7 +220,7 @@ export default function ProfilScreen() {
           </View>
 
         </ScrollView>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -349,27 +354,30 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
+  profileGradientHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
   profileScroll: {
     paddingHorizontal: 24,
-    paddingTop: 12,
+    paddingTop: 0,
     paddingBottom: 48,
   },
   settingsButton: {
-    position: "absolute",
-    top: 8,
-    right: 0,
-    padding: 10,
-    zIndex: 10,
+    padding: 6,
   },
   settingsIcon: {
-    width: 28,
-    height: 28,
-    opacity: 0.8,
+    width: 26,
+    height: 26,
+    opacity: 0.7,
   },
   profileHero: {
     alignItems: "center",
     marginBottom: 28,
-    marginTop: 20,
+    marginTop: 4,
   },
   profileIconWrapper: {
     position: "relative",

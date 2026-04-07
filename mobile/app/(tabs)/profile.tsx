@@ -123,7 +123,7 @@ export default function ProfilScreen() {
           <View style={styles.profileHero}>
             <View style={styles.profileIconWrapper}>
               <Image
-                source={require("@/assets/images/user-profile-icon.png")}
+                source={require("@/assets/images/user-profile1-icon.png")}
                 style={styles.profileIcon}
               />
               {user?.verified && (
@@ -374,14 +374,6 @@ const styles = StyleSheet.create({
   profileIconWrapper: {
     position: "relative",
     marginBottom: 14,
-    borderWidth: 3,
-    borderColor: "#16A34A",
-    borderRadius: 73,
-    shadowColor: "#16A34A",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
   },
   profileIcon: {
     width: 140,

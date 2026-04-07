@@ -79,7 +79,7 @@ export default function PublicUserScreen() {
         <View style={styles.profileHero}>
           <View style={styles.profileIconWrapper}>
             <Image
-              source={require("@/assets/images/user-profile-icon.png")}
+              source={require("@/assets/images/user-profile1-icon.png")}
               style={styles.profileIcon}
             />
             {user.verified && (

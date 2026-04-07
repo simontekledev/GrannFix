@@ -11,6 +11,7 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
+  SectionList,
   StyleSheet,
   Text,
   TextInput,
@@ -23,7 +24,6 @@ import { useRouter } from "expo-router";
 import { taskApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { EmptyState } from "@/src/components/EmptyState";
-import { FilterChips } from "@/src/components/FilterChips";
 import { timeAgo } from "@/src/helpers/time";
 
 const STATUS_ORDER: Record<string, number> = {
@@ -53,7 +53,6 @@ export default function AktivitetScreen() {
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [filter, setFilter] = useState<string | null>(null);
   const [lastToken, setLastToken] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<"tasks" | "messages">("tasks");
 
@@ -262,15 +261,13 @@ export default function AktivitetScreen() {
     );
   }
 
-  const FILTERS = [
-    { key: null, label: "Alla" },
-    { key: "OPEN", label: "Öppna" },
-    { key: "ASSIGNED", label: "Tilldelade" },
-    { key: "CANCELLED", label: "Avbrutna" },
-    { key: "COMPLETED", label: "Klara" },
-  ];
+  const activeTasks = tasks.filter((t) => t.status === "OPEN" || t.status === "ASSIGNED");
+  const finishedTasks = tasks.filter((t) => t.status === "COMPLETED" || t.status === "CANCELLED");
 
-  const filteredTasks = filter ? tasks.filter((t) => t.status === filter) : tasks;
+  const sections = [
+    ...(activeTasks.length > 0 ? [{ title: "Aktiva", data: activeTasks }] : []),
+    ...(finishedTasks.length > 0 ? [{ title: "Avslutade", data: finishedTasks }] : []),
+  ];
 
   return (
     <View style={styles.safe}>
@@ -302,23 +299,25 @@ export default function AktivitetScreen() {
 
       {activeView === "tasks" && (
         <>
-          <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
-
-          {filteredTasks.length === 0 ? (
+          {tasks.length === 0 ? (
             <EmptyState
               iconImage={require("@/assets/images/empty-inbox-icon.png")}
-              title={filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
-              subtitle={filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
+              title="Inga uppdrag"
+              subtitle="Du har inga uppdrag just nu."
             />
           ) : (
-            <FlatList
-              data={filteredTasks}
+            <SectionList
+              sections={sections}
               keyExtractor={(item) => item.id ?? Math.random().toString()}
-              renderItem={renderTask}
+              renderItem={({ item }) => renderTask({ item })}
+              renderSectionHeader={({ section: { title } }) => (
+                <Text style={styles.sectionHeader}>{title}</Text>
+              )}
               contentContainerStyle={styles.list}
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
               }
+              stickySectionHeadersEnabled={false}
             />
           )}
 
@@ -495,6 +494,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#666",
     marginTop: 14,
+  },
+  sectionHeader: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#999",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 8,
+    marginTop: 16,
   },
   list: {
     paddingHorizontal: 24,

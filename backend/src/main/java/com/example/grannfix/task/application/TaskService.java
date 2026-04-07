@@ -97,7 +97,9 @@ public class TaskService {
             throw new BadRequestException("Assigned or completed tasks cannot be updated.");
         }
 
-        if (req.offeredPrice() != null) task.setOfferedPrice(req.offeredPrice());
+        if (req.offeredPrice() != null) {
+            task.setOfferedPrice(req.offeredPrice().compareTo(BigDecimal.ZERO) == 0 ? null : req.offeredPrice());
+        }
         if (req.title() != null) {
             String v = req.title().trim();
             if (v.isEmpty()) throw new BadRequestException("title cannot be blank");

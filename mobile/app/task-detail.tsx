@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +41,49 @@ export default function TaskDetailScreen() {
   const [task, setTask] = useState<TaskDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+
+  // Edit modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editStreet, setEditStreet] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  function openEditModal() {
+    if (!task) return;
+    setEditTitle(task.title ?? "");
+    setEditDescription(task.description ?? "");
+    setEditPrice(task.offeredPrice != null ? String(task.offeredPrice) : "");
+    setEditStreet(task.street ?? "");
+    setShowEditModal(true);
+  }
+
+  async function handleSaveEdit() {
+    if (!id || !editTitle.trim() || !editDescription.trim()) return;
+    setSaving(true);
+    try {
+      await taskApi.updateMyTask({
+        id,
+        updateTaskRequest: {
+          title: editTitle.trim(),
+          description: editDescription.trim(),
+          offeredPrice: editPrice ? Number(editPrice) : 0,
+          street: editStreet.trim() || "",
+        },
+      });
+      const updated = await taskApi.getTask({ id });
+      setTask(updated);
+      setShowEditModal(false);
+    } catch (e: any) {
+      console.log("Edit task error:", e);
+      const msg = "Kunde inte uppdatera uppdraget";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -276,13 +323,92 @@ export default function TaskDetailScreen() {
           {perms?.canEdit && (
             <Pressable
               style={({ pressed }) => [styles.outlineButton, pressed && { opacity: 0.7 }]}
-              onPress={() => {/* TODO: edit task */}}
+              onPress={openEditModal}
             >
               <Text style={styles.outlineButtonText}>Redigera</Text>
             </Pressable>
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showEditModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowEditModal(false)}
+      >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={styles.modalOverlay}>
+            <Pressable
+              style={styles.modalOverlayTouchable}
+              onPress={() => setShowEditModal(false)}
+            />
+            <View style={styles.modalContent}>
+              <View style={styles.modalHandle} />
+              <Text style={styles.modalTitle}>Redigera uppdrag</Text>
+
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalLabel}>Titel</Text>
+                <TextInput
+                  value={editTitle}
+                  onChangeText={setEditTitle}
+                  placeholder="Titel"
+                  placeholderTextColor="#a0a0a0"
+                  style={styles.modalInput}
+                />
+
+                <Text style={styles.modalLabel}>Beskrivning</Text>
+                <TextInput
+                  value={editDescription}
+                  onChangeText={setEditDescription}
+                  placeholder="Beskrivning"
+                  placeholderTextColor="#a0a0a0"
+                  style={[styles.modalInput, styles.modalTextArea]}
+                  multiline
+                />
+
+                <Text style={styles.modalLabel}>Pris (valfritt)</Text>
+                <TextInput
+                  value={editPrice}
+                  onChangeText={setEditPrice}
+                  placeholder="Ersättning i kr"
+                  placeholderTextColor="#a0a0a0"
+                  keyboardType="number-pad"
+                  style={styles.modalInput}
+                />
+
+                <Text style={styles.modalLabel}>Adress (valfritt)</Text>
+                <TextInput
+                  value={editStreet}
+                  onChangeText={setEditStreet}
+                  placeholder="Gatuadress"
+                  placeholderTextColor="#a0a0a0"
+                  style={styles.modalInput}
+                />
+
+                <Pressable
+                  onPress={handleSaveEdit}
+                  disabled={saving || !editTitle.trim() || !editDescription.trim()}
+                  style={({ pressed }) => [
+                    styles.saveButton,
+                    (saving || !editTitle.trim() || !editDescription.trim()) && styles.saveButtonDisabled,
+                    pressed && { opacity: 0.85 },
+                  ]}
+                >
+                  {saving ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.saveButtonText}>Spara ändringar</Text>
+                  )}
+                </Pressable>
+              </ScrollView>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -519,5 +645,73 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#666",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  modalOverlayTouchable: {
+    flex: 1,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+  modalHandle: {
+    width: 36,
+    height: 4,
+    backgroundColor: "#ddd",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 10,
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 6,
+    marginTop: 14,
+  },
+  modalInput: {
+    backgroundColor: "#F8F9FA",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: "#111",
+    outlineStyle: "none",
+  } as any,
+  modalTextArea: {
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+  saveButton: {
+    marginTop: 24,
+    backgroundColor: "#16A34A",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButtonDisabled: {
+    opacity: 0.35,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
   },
 });

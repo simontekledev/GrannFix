@@ -180,11 +180,15 @@ export default function ProfilScreen() {
               <Text style={styles.detailLabel}>Område</Text>
               <Text style={styles.detailValue}>{user?.area ?? "—"}</Text>
             </View>
-            <View style={styles.detailDivider} />
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Adress</Text>
-              <Text style={styles.detailValue}>{user?.street ?? "—"}</Text>
-            </View>
+            {user?.street ? (
+              <>
+                <View style={styles.detailDivider} />
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Adress</Text>
+                  <Text style={styles.detailValue}>{user.street}</Text>
+                </View>
+              </>
+            ) : null}
           </View>
 
           <Text style={styles.sectionTitle}>Statistik</Text>

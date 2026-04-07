@@ -57,11 +57,11 @@ export default function EditProfileScreen() {
       const updated = await userApi.updateMe({
         updateMeRequest: {
           name: name.trim(),
-          bio: bio.trim() || undefined,
-          email: email.trim() || undefined,
+          bio: bio.trim(),
+          email: email.trim(),
           city,
           area: area.trim(),
-          street: street.trim() || undefined,
+          street: street.trim(),
         },
       });
       setUser(updated);
@@ -109,7 +109,7 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.label}>Namn</Text>
+          <Text style={styles.label}>Namn <Text style={styles.required}>*</Text></Text>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -118,7 +118,7 @@ export default function EditProfileScreen() {
             placeholderTextColor="#a0a0a0"
           />
 
-          <Text style={styles.label}>Bio</Text>
+          <Text style={styles.label}>Bio <Text style={styles.optional}>(valfritt)</Text></Text>
           <TextInput
             value={bio}
             onChangeText={setBio}
@@ -128,7 +128,7 @@ export default function EditProfileScreen() {
             multiline
           />
 
-          <Text style={styles.label}>E-post</Text>
+          <Text style={styles.label}>E-post <Text style={styles.required}>*</Text></Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -144,7 +144,7 @@ export default function EditProfileScreen() {
             <Text style={styles.disabledText}>{city}</Text>
           </View>
 
-          <Text style={styles.label}>Område</Text>
+          <Text style={styles.label}>Område <Text style={styles.required}>*</Text></Text>
           <Pressable
             onPress={() => setAreaModalVisible(true)}
             style={styles.input}
@@ -154,7 +154,7 @@ export default function EditProfileScreen() {
             </Text>
           </Pressable>
 
-          <Text style={styles.label}>Adress</Text>
+          <Text style={styles.label}>Adress <Text style={styles.optional}>(valfritt)</Text></Text>
           <TextInput
             value={street}
             onChangeText={setStreet}
@@ -267,6 +267,15 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: 24,
     paddingBottom: 48,
+  },
+  required: {
+    color: "#e53e3e",
+    fontWeight: "400",
+  },
+  optional: {
+    color: "#999",
+    fontWeight: "400",
+    fontSize: 12,
   },
   label: {
     fontSize: 14,

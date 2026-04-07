@@ -55,6 +55,7 @@ export default function AktivitetScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
   const [lastToken, setLastToken] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<"tasks" | "messages">("tasks");
 
   // Create task modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -246,7 +247,16 @@ export default function AktivitetScreen() {
               {timeAgo(item.createdAt)}
             </Text>
           )}
-          <Text style={styles.cardDetailLink}>Visa detaljer →</Text>
+          <View style={styles.cardFooterRight}>
+            {status === "ASSIGNED" && (
+              <Image
+                source={require("@/assets/images/chat-icon.png")}
+                style={styles.chatIndicator}
+                resizeMode="contain"
+              />
+            )}
+            <Text style={styles.cardDetailLink}>Visa detaljer →</Text>
+          </View>
         </View>
       </Pressable>
     );
@@ -267,37 +277,70 @@ export default function AktivitetScreen() {
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
         <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
           <Text style={styles.title}>Uppdrag</Text>
-          <Text style={styles.subtitle}>Dina uppdrag</Text>
         </LinearGradient>
       </SafeAreaView>
 
-      <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
+      <View style={styles.viewToggle}>
+        <Pressable
+          onPress={() => setActiveView("tasks")}
+          style={[styles.toggleButton, activeView === "tasks" && styles.toggleButtonActive]}
+        >
+          <Text style={[styles.toggleText, activeView === "tasks" && styles.toggleTextActive]}>Uppdrag</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setActiveView("messages")}
+          style={[styles.toggleButton, activeView === "messages" && styles.toggleButtonActive]}
+        >
+          <Image
+            source={require("@/assets/images/chat-icon.png")}
+            style={[styles.toggleIcon, { tintColor: activeView === "messages" ? "#fff" : "#555" }]}
+            resizeMode="contain"
+          />
+          <Text style={[styles.toggleText, activeView === "messages" && styles.toggleTextActive]}>Meddelanden</Text>
+        </Pressable>
+      </View>
 
-      {filteredTasks.length === 0 ? (
-        <EmptyState
-          iconImage={require("@/assets/images/empty-inbox-icon.png")}
-          title={filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
-          subtitle={filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
-        />
-      ) : (
-        <FlatList
-          data={filteredTasks}
-          keyExtractor={(item) => item.id ?? Math.random().toString()}
-          renderItem={renderTask}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
-          }
-        />
+      {activeView === "tasks" && (
+        <>
+          <FilterChips filters={FILTERS} active={filter} onChange={setFilter} />
+
+          {filteredTasks.length === 0 ? (
+            <EmptyState
+              iconImage={require("@/assets/images/empty-inbox-icon.png")}
+              title={filter ? `Inga ${FILTERS.find((f) => f.key === filter)?.label.toLowerCase()} uppdrag` : "Inga uppdrag"}
+              subtitle={filter ? "Prova ett annat filter" : "Du har inga uppdrag just nu.\nDra nedåt för att uppdatera."}
+            />
+          ) : (
+            <FlatList
+              data={filteredTasks}
+              keyExtractor={(item) => item.id ?? Math.random().toString()}
+              renderItem={renderTask}
+              contentContainerStyle={styles.list}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
+              }
+            />
+          )}
+
+          {loggedIn && (
+            <Pressable
+              onPress={() => setShowCreateModal(true)}
+              style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+            >
+              <Text style={styles.fabText}>+</Text>
+            </Pressable>
+          )}
+        </>
       )}
 
-      {loggedIn && (
-        <Pressable
-          onPress={() => setShowCreateModal(true)}
-          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
-        >
-          <Text style={styles.fabText}>+</Text>
-        </Pressable>
+      {activeView === "messages" && (
+        <View style={styles.centered}>
+          <EmptyState
+            iconImage={require("@/assets/images/chat-icon.png")}
+            title="Inga meddelanden"
+            subtitle="Här visas dina chattar när du har aktiva uppdrag"
+          />
+        </View>
       )}
 
       <Modal
@@ -320,7 +363,7 @@ export default function AktivitetScreen() {
               <Text style={styles.modalTitle}>Nytt uppdrag</Text>
 
               <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                <Text style={styles.modalLabel}>Titel</Text>
+                <Text style={styles.modalLabel}>Titel <Text style={styles.required}>*</Text></Text>
                 <TextInput
                   value={newTitle}
                   onChangeText={setNewTitle}
@@ -329,7 +372,7 @@ export default function AktivitetScreen() {
                   style={styles.modalInput}
                 />
 
-                <Text style={styles.modalLabel}>Beskrivning</Text>
+                <Text style={styles.modalLabel}>Beskrivning <Text style={styles.required}>*</Text></Text>
                 <TextInput
                   value={newDescription}
                   onChangeText={setNewDescription}
@@ -339,7 +382,7 @@ export default function AktivitetScreen() {
                   multiline
                 />
 
-                <Text style={styles.modalLabel}>Område</Text>
+                <Text style={styles.modalLabel}>Område <Text style={styles.required}>*</Text></Text>
                 {areaPickerOpen ? (
                   <View>
                     <TextInput
@@ -380,7 +423,7 @@ export default function AktivitetScreen() {
                   </Pressable>
                 )}
 
-                <Text style={styles.modalLabel}>Adress (valfritt)</Text>
+                <Text style={styles.modalLabel}>Adress <Text style={styles.optional}>(valfritt)</Text></Text>
                 <TextInput
                   value={newStreet}
                   onChangeText={setNewStreet}
@@ -389,7 +432,7 @@ export default function AktivitetScreen() {
                   style={styles.modalInput}
                 />
 
-                <Text style={styles.modalLabel}>Pris (valfritt)</Text>
+                <Text style={styles.modalLabel}>Pris <Text style={styles.optional}>(valfritt)</Text></Text>
                 <TextInput
                   value={newPrice}
                   onChangeText={setNewPrice}
@@ -538,6 +581,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#aaa",
   },
+  cardFooterRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  chatIndicator: {
+    width: 18,
+    height: 18,
+    tintColor: "#16A34A",
+  },
   cardDetailLink: {
     fontSize: 13,
     fontWeight: "500",
@@ -627,6 +680,49 @@ const styles = StyleSheet.create({
     color: "#111",
     textAlign: "center",
     marginBottom: 16,
+  },
+  viewToggle: {
+    flexDirection: "row",
+    marginHorizontal: 24,
+    marginBottom: 12,
+    gap: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  toggleButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  toggleButtonActive: {
+    borderBottomColor: "#16A34A",
+  },
+  toggleText: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#999",
+  },
+  toggleTextActive: {
+    color: "#111",
+    fontWeight: "600",
+  },
+  toggleIcon: {
+    width: 16,
+    height: 16,
+  },
+  required: {
+    color: "#e53e3e",
+    fontWeight: "400",
+  },
+  optional: {
+    color: "#999",
+    fontWeight: "400",
+    fontSize: 12,
   },
   modalLabel: {
     fontSize: 14,

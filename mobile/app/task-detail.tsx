@@ -304,6 +304,15 @@ export default function TaskDetailScreen() {
           )}
 
 
+          {perms?.canEdit && (
+            <Pressable
+              style={({ pressed }) => [styles.outlineButton, pressed && { opacity: 0.7 }]}
+              onPress={openEditModal}
+            >
+              <Text style={styles.outlineButtonText}>Redigera</Text>
+            </Pressable>
+          )}
+
           {perms?.canCancel && (
             <Pressable
               onPress={handleCancel}
@@ -317,15 +326,6 @@ export default function TaskDetailScreen() {
               <Text style={styles.dangerButtonText}>
                 {cancelling ? "Avbryter..." : "Avbryt uppdrag"}
               </Text>
-            </Pressable>
-          )}
-
-          {perms?.canEdit && (
-            <Pressable
-              style={({ pressed }) => [styles.outlineButton, pressed && { opacity: 0.7 }]}
-              onPress={openEditModal}
-            >
-              <Text style={styles.outlineButtonText}>Redigera</Text>
             </Pressable>
           )}
         </View>

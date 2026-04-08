@@ -97,6 +97,12 @@ export interface TaskResponse {
      * @memberof TaskResponse
      */
     completedAt?: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof TaskResponse
+     */
+    pendingOffersCount?: number;
 }
 
 
@@ -142,6 +148,7 @@ export function TaskResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'updatedAt': json['updatedAt'] == null ? undefined : (new Date(json['updatedAt'])),
         'completedAt': json['completedAt'] == null ? undefined : (new Date(json['completedAt'])),
+        'pendingOffersCount': json['pendingOffersCount'] == null ? undefined : json['pendingOffersCount'],
     };
 }
 
@@ -169,6 +176,7 @@ export function TaskResponseToJSONTyped(value?: TaskResponse | null, ignoreDiscr
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),
         'updatedAt': value['updatedAt'] == null ? value['updatedAt'] : value['updatedAt'].toISOString(),
         'completedAt': value['completedAt'] == null ? value['completedAt'] : value['completedAt'].toISOString(),
+        'pendingOffersCount': value['pendingOffersCount'],
     };
 }
 

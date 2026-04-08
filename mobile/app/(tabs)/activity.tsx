@@ -150,6 +150,7 @@ export default function AktivitetScreen() {
   // Re-check auth and refetch on tab focus if token changed
   useFocusEffect(
     useCallback(() => {
+      if (lastToken === null) return;
       AsyncStorage.getItem("access_token").then((token) => {
         if (token !== lastToken) {
           setLastToken(token);
@@ -229,6 +230,12 @@ export default function AktivitetScreen() {
               {STATUS_LABELS[status] ?? status}
             </Text>
           </View>
+          {item.pendingOffersCount != null && item.pendingOffersCount > 0 && (
+            <View style={styles.offerBadge}>
+              <View style={styles.offerDot} />
+              <Text style={styles.offerBadgeText}>{item.pendingOffersCount} nya</Text>
+            </View>
+          )}
         </View>
 
         {item.description ? (
@@ -244,13 +251,6 @@ export default function AktivitetScreen() {
             </Text>
           )}
           <View style={styles.cardFooterRight}>
-            {status === "ASSIGNED" && (
-              <Image
-                source={require("@/assets/images/chat-icon.png")}
-                style={styles.chatIndicator}
-                resizeMode="contain"
-              />
-            )}
             <Text style={styles.cardDetailLink}>Visa detaljer →</Text>
           </View>
         </View>
@@ -269,7 +269,7 @@ export default function AktivitetScreen() {
   return (
     <View style={styles.safe}>
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-        <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
+        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
           <Text style={styles.title}>Aktivitet</Text>
         </LinearGradient>
       </SafeAreaView>
@@ -465,7 +465,7 @@ export default function AktivitetScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   centered: {
     flex: 1,
@@ -565,6 +565,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
   },
+  offerBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  offerDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#16A34A",
+  },
+  offerBadgeText: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#16A34A",
+  },
   areaBadge: {
     backgroundColor: "#f0fdf4",
     borderRadius: 6,
@@ -591,10 +607,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  chatIndicator: {
-    width: 18,
-    height: 18,
+  chatButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#f0fdf4",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  chatButtonIcon: {
+    width: 14,
+    height: 14,
     tintColor: "#16A34A",
+  },
+  chatButtonText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#16A34A",
   },
   cardDetailLink: {
     fontSize: 13,
@@ -690,7 +720,7 @@ const styles = StyleSheet.create({
   },
   areaList: {
     maxHeight: 150,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
     borderRadius: 12,
     marginTop: 4,
   },

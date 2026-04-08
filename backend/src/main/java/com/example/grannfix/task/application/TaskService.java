@@ -61,9 +61,11 @@ public class TaskService {
         if (!userLookupPort.existsActive(userId)) {
             throw new NotFoundException("User not found: " + userId);
         }
-        return taskRepository.findByCreatedByIdAndActiveTrue(userId)
-                .stream()
-                .map(TaskMapper::toResponse)
+        var tasks = taskRepository.findByCreatedByIdAndActiveTrue(userId);
+        var taskIds = tasks.stream().map(Task::getId).toList();
+        var offerCounts = offerTaskPort.countPendingOffersForTasks(taskIds);
+        return tasks.stream()
+                .map(t -> TaskMapper.toResponse(t, offerCounts.getOrDefault(t.getId(), 0)))
                 .toList();
     }
 
@@ -78,7 +80,9 @@ public class TaskService {
         }
         String ownerName = userLookupPort.displayName(task.getCreatedById());
         String helperName = task.getAssignedToId() != null ? userLookupPort.displayName(task.getAssignedToId()) : null;
-        return TaskMapper.toDetailResponse(task, userId, ownerName, helperName);
+        int pendingOffers = offerTaskPort.countPendingOffers(taskId);
+        boolean viewerHasOffer = offerTaskPort.hasOffer(taskId, userId);
+        return TaskMapper.toDetailResponse(task, userId, ownerName, helperName, pendingOffers, viewerHasOffer);
     }
 
     @Transactional

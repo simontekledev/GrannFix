@@ -18,6 +18,7 @@ public record TaskResponse(
         boolean active,
         Instant createdAt,
         Instant updatedAt,
-        Instant completedAt
+        Instant completedAt,
+        int pendingOffersCount
 ) {}
 

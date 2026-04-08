@@ -12,6 +12,10 @@ import java.util.UUID;
 public class TaskMapper {
 
     public TaskResponse toResponse(Task t) {
+        return toResponse(t, 0);
+    }
+
+    public TaskResponse toResponse(Task t, int pendingOffersCount) {
         return new TaskResponse(
                 t.getId(),
                 t.getTitle(),
@@ -25,11 +29,12 @@ public class TaskMapper {
                 t.isActive(),
                 t.getCreatedAt(),
                 t.getUpdatedAt(),
-                t.getCompletedAt()
+                t.getCompletedAt(),
+                pendingOffersCount
         );
     }
 
-    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String ownerName, String helperName) {
+    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String ownerName, String helperName, int pendingOffersCount, boolean viewerHasOffer) {
         if (task == null) return null;
 
         UUID ownerId = task.getCreatedById();
@@ -38,7 +43,7 @@ public class TaskMapper {
         boolean canEdit = isOwner && task.isActive() && task.getStatus() == TaskStatus.OPEN;
         boolean canCancel = isOwner && task.isActive()
                 && (task.getStatus() == TaskStatus.OPEN || task.getStatus() == TaskStatus.ASSIGNED);
-        boolean canOffer = viewerUserId != null && !isOwner && task.isActive() && task.getStatus() == TaskStatus.OPEN;
+        boolean canOffer = viewerUserId != null && !isOwner && task.isActive() && task.getStatus() == TaskStatus.OPEN && !viewerHasOffer;
         boolean canChat = isOwner && task.isActive() && task.getStatus() == TaskStatus.ASSIGNED;
 
         var createdBy = new TaskDetailResponse.UserSummary(ownerId, ownerName);
@@ -61,7 +66,7 @@ public class TaskMapper {
                 task.getCompletedAt(),
                 createdBy,
                 assignedTo,
-                null,
+                pendingOffersCount,
                 null,
                 new TaskDetailResponse.Permissions(canEdit, canCancel, canOffer, canChat)
         );

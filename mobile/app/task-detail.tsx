@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -15,8 +16,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { taskApi, chatApi } from "@/src/api/client";
+import { taskApi, chatApi, taskOfferApi, offerApi } from "@/src/api/client";
+import type { OfferResponse } from "@/src/api/generated/models/OfferResponse";
 import { useUser } from "@/src/context/UserContext";
+import { timeAgo } from "@/src/helpers/time";
 import { modalStyles } from "@/src/styles/modal";
 import { formStyles } from "@/src/styles/form";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
@@ -38,11 +41,79 @@ const STATUS_COLORS = {
 
 export default function TaskDetailScreen() {
   const router = useRouter();
-  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+  const { id, offer } = useLocalSearchParams<{ id: string; offer?: string }>();
   const { user } = useUser();
   const [task, setTask] = useState<TaskDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
+
+  // Offers list
+  const [offers, setOffers] = useState<OfferResponse[]>([]);
+  const [showOffers, setShowOffers] = useState(false);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
+
+  async function loadOffers() {
+    if (!id) return;
+    try {
+      const res = await taskOfferApi.getOffers({ taskId: id });
+      setOffers(res);
+    } catch (e) {
+      console.log("Failed to load offers:", e);
+    }
+  }
+
+  async function handleAcceptOffer(offerId: string) {
+    setAcceptingId(offerId);
+    try {
+      await offerApi.acceptOffer({ offerId });
+      const updated = await taskApi.getTask({ id: id! });
+      setTask(updated);
+      setShowOffers(false);
+      if (Platform.OS === "web") window.alert("Erbjudande accepterat!");
+      else Alert.alert("Accepterat", "Uppdraget har tilldelats");
+    } catch (e: any) {
+      console.log("Accept error:", e);
+      const msg = "Kunde inte acceptera erbjudandet";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setAcceptingId(null);
+    }
+  }
+
+  // Offer modal
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerPrice, setOfferPrice] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [sendingOffer, setSendingOffer] = useState(false);
+
+  async function handleSendOffer() {
+    if (!id) return;
+    setSendingOffer(true);
+    try {
+      await taskOfferApi.createOffer({
+        taskId: id,
+        createOfferRequest: {
+          proposedPrice: offerPrice ? Number(offerPrice.replace(/[^0-9]/g, "")) || undefined : undefined,
+          message: offerMessage.trim() || undefined,
+        },
+      });
+      setShowOfferModal(false);
+      setOfferPrice("");
+      setOfferMessage("");
+      const updated = await taskApi.getTask({ id });
+      setTask(updated);
+      if (Platform.OS === "web") window.alert("Erbjudande skickat!");
+      else Alert.alert("Skickat", "Ditt erbjudande har skickats");
+    } catch (e: any) {
+      console.log("Offer error:", e);
+      const msg = "Kunde inte skicka erbjudandet";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setSendingOffer(false);
+    }
+  }
 
   // Edit modal
   const [showEditModal, setShowEditModal] = useState(false);
@@ -95,6 +166,9 @@ export default function TaskDetailScreen() {
       try {
         const res = await taskApi.getTask({ id });
         setTask(res);
+        if (offer === "true" && res.permissions?.canOffer) {
+          setShowOfferModal(true);
+        }
       } catch (e) {
         console.log("Failed to load task:", e);
       } finally {
@@ -206,6 +280,63 @@ export default function TaskDetailScreen() {
           </View>
         ) : null}
 
+        {task.offersCount != null && task.offersCount > 0 && task.createdBy?.id === user?.id && (
+          <View style={styles.card}>
+            <Pressable
+              onPress={() => {
+                if (!showOffers) loadOffers();
+                setShowOffers((prev) => !prev);
+              }}
+              style={styles.offerHeaderRow}
+            >
+              <Text style={styles.sectionTitle}>ERBJUDANDEN</Text>
+              <View style={styles.offersCountRow}>
+                <View style={styles.offersCountBadge}>
+                  <Text style={styles.offersCountText}>{task.offersCount}</Text>
+                </View>
+                <Text style={styles.expandArrow}>{showOffers ? "▲" : "▼"}</Text>
+              </View>
+            </Pressable>
+
+            {showOffers && (
+              <View style={styles.offersList}>
+                {offers.length === 0 ? (
+                  <ActivityIndicator color="#16A34A" style={{ paddingVertical: 12 }} />
+                ) : (
+                  offers.filter((o) => o.status === "PENDING").map((offer) => (
+                    <View key={offer.id} style={styles.offerItem}>
+                      <View style={styles.offerInfo}>
+                        {offer.proposedPrice != null && (
+                          <Text style={styles.offerPrice}>{offer.proposedPrice} kr</Text>
+                        )}
+                        {offer.message && (
+                          <Text style={styles.offerMessage} numberOfLines={2}>{offer.message}</Text>
+                        )}
+                        {offer.createdAt && (
+                          <Text style={styles.offerDate}>{timeAgo(offer.createdAt)}</Text>
+                        )}
+                      </View>
+                      <Pressable
+                        onPress={() => handleAcceptOffer(offer.id!)}
+                        disabled={acceptingId === offer.id}
+                        style={({ pressed }) => [
+                          styles.acceptButton,
+                          pressed && { opacity: 0.7 },
+                          acceptingId === offer.id && { opacity: 0.4 },
+                        ]}
+                      >
+                        <Text style={styles.acceptButtonText}>
+                          {acceptingId === offer.id ? "..." : "Acceptera"}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  ))
+                )}
+              </View>
+            )}
+          </View>
+        )}
+
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>PLATS</Text>
           <View style={styles.detailRow}>
@@ -231,53 +362,59 @@ export default function TaskDetailScreen() {
         {task.createdBy && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>SKAPAD AV</Text>
-            <View style={styles.userRow}>
-              <View style={styles.userAvatar}>
-                <Text style={styles.userAvatarText}>
-                  {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                </Text>
-              </View>
-              <Text style={styles.userName}>{task.createdBy.name}</Text>
-            </View>
-          </View>
-        )}
-
-        {task.assignedTo && (
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>HJÄLPARE</Text>
-            {task.assignedTo.id === user?.id ? (
+            {task.createdBy.id === user?.id ? (
               <View style={styles.userRow}>
-                <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                <View style={styles.userAvatar}>
                   <Text style={styles.userAvatarText}>
-                    {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
                   </Text>
                 </View>
-                <Text style={styles.userName}>{task.assignedTo.name} (du)</Text>
+                <Text style={styles.userName}>{task.createdBy.name}</Text>
               </View>
             ) : (
               <Pressable
-                onPress={() => router.push(`/public-user?id=${task.assignedTo?.id}&taskId=${id}&from=${from}` as any)}
+                onPress={() => router.push(`/public-user?id=${task.createdBy?.id}` as any)}
                 style={styles.userRow}
               >
-                <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                <View style={styles.userAvatar}>
                   <Text style={styles.userAvatarText}>
-                    {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
                   </Text>
                 </View>
-                <Text style={styles.userName}>{task.assignedTo.name}</Text>
+                <Text style={styles.userName}>{task.createdBy.name}</Text>
                 <Text style={styles.userArrow}>›</Text>
               </Pressable>
             )}
           </View>
         )}
 
-        {task.offersCount != null && task.offersCount > 0 && (
-          <View style={styles.card}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Erbjudanden</Text>
-              <Text style={styles.detailValue}>{task.offersCount}</Text>
+        {task.assignedTo && (
+          <Pressable
+            style={({ pressed }) => [styles.card, perms?.canChat && styles.cardChatActive, pressed && perms?.canChat && { opacity: 0.7 }]}
+            onPress={perms?.canChat ? handleChat : undefined}
+            disabled={!perms?.canChat}
+          >
+            <Text style={styles.sectionTitle}>HJÄLPARE</Text>
+            <View style={styles.userRow}>
+              <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                <Text style={styles.userAvatarText}>
+                  {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <Text style={styles.userName}>
+                {task.assignedTo.name}{task.assignedTo.id === user?.id ? " (du)" : ""}
+              </Text>
+              {perms?.canChat && (
+                <View style={styles.chatBubble}>
+                  <Image
+                    source={require("@/assets/images/chat-icon.png")}
+                    style={styles.chatBubbleIcon}
+                    resizeMode="contain"
+                  />
+                </View>
+              )}
             </View>
-          </View>
+          </Pressable>
         )}
 
         {task.completedAt && (
@@ -299,7 +436,7 @@ export default function TaskDetailScreen() {
                 hovered && styles.primaryButtonHovered,
                 pressed && styles.primaryButtonPressed,
               ]}
-              onPress={() => {/* TODO: offer flow */}}
+              onPress={() => setShowOfferModal(true)}
             >
               <Text style={styles.primaryButtonText}>Hjälp till</Text>
             </Pressable>
@@ -332,6 +469,67 @@ export default function TaskDetailScreen() {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showOfferModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowOfferModal(false)}
+      >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={modalStyles.overlay}>
+            <Pressable
+              style={modalStyles.overlayTouchable}
+              onPress={() => setShowOfferModal(false)}
+            />
+            <View style={modalStyles.content}>
+              <View style={modalStyles.handle} />
+              <Text style={modalStyles.title}>Skicka erbjudande</Text>
+
+              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                <Text style={formStyles.label}>Pris <Text style={formStyles.optional}>(valfritt)</Text></Text>
+                <TextInput
+                  value={offerPrice}
+                  onChangeText={setOfferPrice}
+                  placeholder={task?.offeredPrice ? `Föreslaget: ${task.offeredPrice} kr` : "Ditt pris i kr"}
+                  placeholderTextColor="#a0a0a0"
+                  keyboardType="number-pad"
+                  style={formStyles.input}
+                />
+
+                <Text style={formStyles.label}>Meddelande <Text style={formStyles.optional}>(valfritt)</Text></Text>
+                <TextInput
+                  value={offerMessage}
+                  onChangeText={setOfferMessage}
+                  placeholder="Berätta varför du kan hjälpa..."
+                  placeholderTextColor="#a0a0a0"
+                  style={[formStyles.input, formStyles.textArea]}
+                  multiline
+                />
+
+                <Pressable
+                  onPress={handleSendOffer}
+                  disabled={sendingOffer}
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    sendingOffer && { opacity: 0.35 },
+                    pressed && !sendingOffer && styles.primaryButtonPressed,
+                  ]}
+                >
+                  {sendingOffer ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.primaryButtonText}>Skicka erbjudande</Text>
+                  )}
+                </Pressable>
+              </ScrollView>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
 
       <Modal
         visible={showEditModal}
@@ -418,7 +616,7 @@ export default function TaskDetailScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   centered: {
     flex: 1,
@@ -530,6 +728,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  cardChatActive: {
+    borderWidth: 1,
+    borderColor: "#dcfce7",
+  },
   sectionTitle: {
     fontSize: 12,
     fontWeight: "600",
@@ -618,14 +820,42 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#fff",
   },
+  chatRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    gap: 8,
+    backgroundColor: "#f0fdf4",
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  chatBubble: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 10,
+    padding: 8,
+  },
+  chatBubbleIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "#16A34A",
+  },
+  chatRowText: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#16A34A",
+    flex: 1,
+  },
   dangerButton: {
-    backgroundColor: "#fef2f2",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#DC2626",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
   },
   dangerButtonHovered: {
-    backgroundColor: "#fee2e2",
+    backgroundColor: "#fef2f2",
     transform: [{ scale: 1.015 }],
   },
   dangerButtonPressed: {
@@ -634,11 +864,12 @@ const styles = StyleSheet.create({
   dangerButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#e53e3e",
+    color: "#DC2626",
   },
   outlineButton: {
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#6B7280",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
@@ -646,7 +877,76 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#666",
+    color: "#6B7280",
+  },
+  offerHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  offersCountRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  offersCountBadge: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    minWidth: 24,
+    alignItems: "center",
+  },
+  offersCountText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#16A34A",
+  },
+  expandArrow: {
+    fontSize: 10,
+    color: "#aaa",
+  },
+  offersList: {
+    marginTop: 8,
+    gap: 8,
+  },
+  offerItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9faf8",
+    borderRadius: 10,
+    padding: 12,
+  },
+  offerInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  offerPrice: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#16A34A",
+  },
+  offerMessage: {
+    fontSize: 13,
+    color: "#555",
+    lineHeight: 18,
+  },
+  offerDate: {
+    fontSize: 11,
+    color: "#aaa",
+  },
+  acceptButton: {
+    backgroundColor: "#16A34A",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginLeft: 10,
+  },
+  acceptButtonText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#fff",
   },
   saveButton: {
     marginTop: 24,

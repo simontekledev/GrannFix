@@ -104,7 +104,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   header: {
     paddingHorizontal: 24,
@@ -183,14 +183,16 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginTop: 36,
-    backgroundColor: "#fef2f2",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#DC2626",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   logoutButtonHovered: {
-    backgroundColor: "#fee2e2",
+    backgroundColor: "#fef2f2",
     transform: [{ scale: 1.015 }],
   },
   logoutButtonPressed: {
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#e53e3e",
+    color: "#DC2626",
   },
   versionText: {
     textAlign: "center",

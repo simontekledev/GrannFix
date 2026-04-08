@@ -19,6 +19,7 @@ Name | Type
 `createdAt` | Date
 `updatedAt` | Date
 `completedAt` | Date
+`pendingOffersCount` | number
 
 ## Example
 
@@ -40,6 +41,7 @@ const example = {
   "createdAt": null,
   "updatedAt": null,
   "completedAt": null,
+  "pendingOffersCount": null,
 } satisfies TaskResponse
 
 console.log(example)

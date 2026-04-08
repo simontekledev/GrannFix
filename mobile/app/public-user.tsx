@@ -16,7 +16,7 @@ import { StarRating } from "@/src/components/StarRating";
 
 export default function PublicUserScreen() {
   const router = useRouter();
-  const { id, taskId, from } = useLocalSearchParams<{ id: string; taskId?: string; from?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [user, setUser] = useState<PublicUserDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
@@ -105,7 +105,7 @@ export default function PublicUserScreen() {
           )}
           <Text style={styles.profileName}>{user.name ?? "—"}</Text>
 
-          <StarRating rating={user.ratingAverage ?? 0} />
+          <StarRating rating={user.ratingAverage ?? 0} color="green" />
 
           {user.bio ? (
             <Text style={styles.bioText}>{user.bio}</Text>
@@ -146,7 +146,7 @@ export default function PublicUserScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   centered: {
     flex: 1,

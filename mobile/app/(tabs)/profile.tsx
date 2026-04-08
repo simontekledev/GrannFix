@@ -111,7 +111,7 @@ export default function ProfilScreen() {
     return (
       <View style={styles.safe}>
         <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-          <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.profileGradientHeader}>
+          <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.profileGradientHeader}>
             <Pressable
               onPress={() => router.push("/settings")}
               style={styles.settingsButton}
@@ -135,7 +135,7 @@ export default function ProfilScreen() {
                 <Pressable
                   onPress={() => {
                     setShowVerifiedTooltip(true);
-                    setTimeout(() => setShowVerifiedTooltip(false), 2000);
+                    setTimeout(() => setShowVerifiedTooltip(false), 1300);
                   }}
                   style={styles.verifiedIconWrapper}
                 >
@@ -208,7 +208,7 @@ export default function ProfilScreen() {
             </View>
             <View style={styles.detailDivider} />
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Uppdrag</Text>
+              <Text style={styles.detailLabel}>Slutförda uppdrag</Text>
               <Text style={styles.detailValue}>
                 {(user?.ratingCount ?? 0) === 0
                   ? "Inga slutförda uppdrag"
@@ -317,7 +317,7 @@ export default function ProfilScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   safeLogin: {
     flex: 1,

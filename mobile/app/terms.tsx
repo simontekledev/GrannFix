@@ -75,7 +75,7 @@ export default function TermsScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   header: {
     paddingHorizontal: 24,

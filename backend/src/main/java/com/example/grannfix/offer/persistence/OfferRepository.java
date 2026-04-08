@@ -13,6 +13,7 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
     boolean existsByTaskIdAndHelperId(UUID taskId, UUID helperId);
     List<Offer> findByTaskIdOrderByCreatedAtDesc(UUID taskId);
     boolean existsByTaskIdAndStatus(UUID taskId, OfferStatus offerStatus);
+    int countByTaskIdAndStatus(UUID taskId, OfferStatus status);
     @Modifying
     @Query("""
         update Offer o
@@ -30,6 +31,9 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
     set o.status = com.example.grannfix.offer.domain.OfferStatus.DECLINED
     where o.taskId = :taskId
       and o.status = com.example.grannfix.offer.domain.OfferStatus.PENDING
-""")
+    """)
     int declinePendingOffersByTaskId(@Param("taskId") UUID taskId);
+
+    @Query("SELECT o.taskId, COUNT(o) FROM Offer o WHERE o.taskId IN :taskIds AND o.status = :status GROUP BY o.taskId")
+    List<Object[]> countPendingByTaskIds(@Param("taskIds") List<UUID> taskIds, @Param("status") OfferStatus status);
 }

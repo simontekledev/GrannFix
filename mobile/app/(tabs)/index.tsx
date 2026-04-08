@@ -172,11 +172,14 @@ export default function UpptäckScreen() {
         </View>
 
         <Pressable
-          onPress={() => loggedIn ? null : router.push("/(tabs)/profile?returnTo=index")}
+          onPress={() => loggedIn
+            ? router.push(`/task-detail?id=${item.id}&offer=true`)
+            : router.push("/(tabs)/profile?returnTo=index")
+          }
           style={({ pressed, hovered }: any) => [
             styles.cardButton,
             hovered && styles.cardButtonHovered,
-            pressed && !loggedIn && styles.cardButtonPressed,
+            pressed && styles.cardButtonPressed,
           ]}
         >
           <Text style={styles.cardButtonText}>
@@ -200,7 +203,7 @@ export default function UpptäckScreen() {
   return (
     <View style={styles.safe}>
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-        <LinearGradient colors={["#e8f5e9", "#F8F9FA"]} style={styles.headerRow}>
+        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
           <Image
             source={require("@/assets/images/grannfix-wordmark-transparent.png.png")}
             style={styles.headerLogo}
@@ -358,7 +361,7 @@ export default function UpptäckScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
   },
   safeTop: {
     backgroundColor: "#e8f5e9",
@@ -469,7 +472,7 @@ const styles = StyleSheet.create({
   },
   searchOverlayInput: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: "#f5faf2",
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,

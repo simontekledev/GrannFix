@@ -29,24 +29,6 @@ import {
 export interface PageableObject {
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    offset?: number;
-    /**
-     * 
-     * @type {SortObject}
-     * @memberof PageableObject
-     */
-    sort?: SortObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    unpaged?: boolean;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageableObject
      */
@@ -63,6 +45,24 @@ export interface PageableObject {
      * @memberof PageableObject
      */
     pageNumber?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageableObject
+     */
+    unpaged?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageableObject
+     */
+    offset?: number;
+    /**
+     * 
+     * @type {SortObject}
+     * @memberof PageableObject
+     */
+    sort?: SortObject;
 }
 
 /**
@@ -82,12 +82,12 @@ export function PageableObjectFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'offset': json['offset'] == null ? undefined : json['offset'],
-        'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
-        'unpaged': json['unpaged'] == null ? undefined : json['unpaged'],
         'paged': json['paged'] == null ? undefined : json['paged'],
         'pageSize': json['pageSize'] == null ? undefined : json['pageSize'],
         'pageNumber': json['pageNumber'] == null ? undefined : json['pageNumber'],
+        'unpaged': json['unpaged'] == null ? undefined : json['unpaged'],
+        'offset': json['offset'] == null ? undefined : json['offset'],
+        'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
     };
 }
 
@@ -102,12 +102,12 @@ export function PageableObjectToJSONTyped(value?: PageableObject | null, ignoreD
 
     return {
         
-        'offset': value['offset'],
-        'sort': SortObjectToJSON(value['sort']),
-        'unpaged': value['unpaged'],
         'paged': value['paged'],
         'pageSize': value['pageSize'],
         'pageNumber': value['pageNumber'],
+        'unpaged': value['unpaged'],
+        'offset': value['offset'],
+        'sort': SortObjectToJSON(value['sort']),
     };
 }
 

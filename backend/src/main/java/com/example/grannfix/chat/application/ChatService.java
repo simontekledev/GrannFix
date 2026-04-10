@@ -2,6 +2,7 @@ package com.example.grannfix.chat.application;
 
 import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
+import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
 import com.example.grannfix.chat.application.port.out.TaskChatPort;
 import com.example.grannfix.chat.application.port.out.TaskChatPort.TaskChatView;
@@ -10,6 +11,7 @@ import com.example.grannfix.chat.domain.ChatMessage;
 import com.example.grannfix.chat.mapper.ChatMapper;
 import com.example.grannfix.chat.persistence.ChatMessageRepository;
 import com.example.grannfix.chat.persistence.ChatRepository;
+import com.example.grannfix.common.contracts.UserLookupPort;
 import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,28 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatMessageRepository messageRepository;
     private final TaskChatPort taskChatPort;
+    private final UserLookupPort userLookupPort;
+
+    @Transactional(readOnly = true)
+    public List<ChatSummaryResponse> getMyChats(UUID userId) {
+        var chats = chatRepository.findByOwnerIdOrHelperIdOrderByCreatedAtDesc(userId, userId);
+
+        return chats.stream().map(chat -> {
+            String taskTitle = taskChatPort.taskTitle(chat.getTaskId());
+            UUID otherPartyId = chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId();
+            String otherPartyName = userLookupPort.displayName(otherPartyId);
+            var lastMsg = messageRepository.findFirstByChatIdOrderByCreatedAtDesc(chat.getId()).orElse(null);
+
+            return new ChatSummaryResponse(
+                    chat.getId(),
+                    chat.getTaskId(),
+                    taskTitle,
+                    otherPartyName,
+                    lastMsg != null ? lastMsg.getContent() : null,
+                    lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt()
+            );
+        }).toList();
+    }
 
     @Transactional
     public ChatResponse getOrCreateChatForTask(UUID taskId, UUID userId) {

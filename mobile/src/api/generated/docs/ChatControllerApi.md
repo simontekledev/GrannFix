@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost:8080*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**getMessages**](ChatControllerApi.md#getmessages) | **GET** /chats/{chatId}/messages |  |
+| [**getMyChats**](ChatControllerApi.md#getmychats) | **GET** /chats |  |
 | [**getOrCreateChat**](ChatControllerApi.md#getorcreatechat) | **GET** /tasks/{taskId}/chat |  |
 | [**sendMessage**](ChatControllerApi.md#sendmessageoperation) | **POST** /chats/{chatId}/messages |  |
 
@@ -63,6 +64,67 @@ example().catch(console.error);
 ### Return type
 
 [**Array&lt;ChatMessageResponse&gt;**](ChatMessageResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getMyChats
+
+> Array&lt;ChatSummaryResponse&gt; getMyChats()
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ChatControllerApi,
+} from '';
+import type { GetMyChatsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new ChatControllerApi(config);
+
+  try {
+    const data = await api.getMyChats();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Array&lt;ChatSummaryResponse&gt;**](ChatSummaryResponse.md)
 
 ### Authorization
 

@@ -50,14 +50,13 @@ const STATUS_COLORS = {
   CANCELLED: "#EF4444",  
 };
 
-export default function AktivitetScreen() {
+export default function TasksScreen() {
   const router = useRouter();
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastToken, setLastToken] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"tasks" | "messages">("tasks");
 
   // Create task modal
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -191,7 +190,7 @@ export default function AktivitetScreen() {
           <Text style={styles.loginTitle}>Dina uppdrag</Text>
           <Text style={styles.loginSubtitle}>Logga in för att se och hantera dina uppdrag</Text>
           <Pressable
-            onPress={() => router.push("/(tabs)/profile?returnTo=activity")}
+            onPress={() => router.push("/(tabs)/profile?returnTo=tasks")}
             style={({ pressed, hovered }: any) => [
               styles.loginButton,
               hovered && styles.loginButtonHovered,
@@ -233,7 +232,7 @@ export default function AktivitetScreen() {
           {item.pendingOffersCount != null && item.pendingOffersCount > 0 && (
             <View style={styles.offerBadge}>
               <View style={styles.offerDot} />
-              <Text style={styles.offerBadgeText}>{item.pendingOffersCount} nya</Text>
+              <Text style={styles.offerBadgeText}>{item.pendingOffersCount} {item.pendingOffersCount === 1 ? "erbjudande" : "erbjudanden"}</Text>
             </View>
           )}
         </View>
@@ -262,81 +261,47 @@ export default function AktivitetScreen() {
   const finishedTasks = tasks.filter((t) => t.status === "COMPLETED" || t.status === "CANCELLED");
 
   const sections = [
-    ...(activeTasks.length > 0 ? [{ title: "Aktiva", data: activeTasks }] : []),
-    ...(finishedTasks.length > 0 ? [{ title: "Avslutade", data: finishedTasks }] : []),
+    ...(activeTasks.length > 0 ? [{ title: "Aktiva uppdrag", data: activeTasks }] : []),
+    ...(finishedTasks.length > 0 ? [{ title: "Avslutade uppdrag", data: finishedTasks }] : []),
   ];
 
   return (
     <View style={styles.safe}>
       <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
         <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
-          <Text style={styles.title}>Aktivitet</Text>
+          <Text style={styles.title}>Uppdrag</Text>
         </LinearGradient>
       </SafeAreaView>
 
-      <View style={styles.viewToggle}>
-        <Pressable
-          onPress={() => setActiveView("tasks")}
-          style={[styles.toggleButton, activeView === "tasks" && styles.toggleButtonActive]}
-        >
-          <Text style={[styles.toggleText, activeView === "tasks" && styles.toggleTextActive]}>Uppdrag</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setActiveView("messages")}
-          style={[styles.toggleButton, activeView === "messages" && styles.toggleButtonActive]}
-        >
-          <Image
-            source={require("@/assets/images/chat-icon.png")}
-            style={[styles.toggleIcon, { tintColor: activeView === "messages" ? "#fff" : "#555" }]}
-            resizeMode="contain"
-          />
-          <Text style={[styles.toggleText, activeView === "messages" && styles.toggleTextActive]}>Meddelanden</Text>
-        </Pressable>
-      </View>
-
-      {activeView === "tasks" && (
-        <>
-          {tasks.length === 0 ? (
-            <EmptyState
-              iconImage={require("@/assets/images/empty-inbox-icon.png")}
-              title="Inga uppdrag"
-              subtitle="Du har inga uppdrag just nu."
-            />
-          ) : (
-            <SectionList
-              sections={sections}
-              keyExtractor={(item) => item.id ?? Math.random().toString()}
-              renderItem={({ item }) => renderTask({ item })}
-              renderSectionHeader={({ section: { title } }) => (
-                <Text style={styles.sectionHeader}>{title}</Text>
-              )}
-              contentContainerStyle={styles.list}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
-              }
-              stickySectionHeadersEnabled={false}
-            />
+      {tasks.length === 0 ? (
+        <EmptyState
+          iconImage={require("@/assets/images/empty-inbox-icon.png")}
+          title="Inga uppdrag"
+          subtitle="Du har inga uppdrag just nu."
+        />
+      ) : (
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => item.id ?? Math.random().toString()}
+          renderItem={({ item }) => renderTask({ item })}
+          renderSectionHeader={({ section: { title } }) => (
+            <Text style={styles.sectionHeader}>{title}</Text>
           )}
-
-          {loggedIn && (
-            <Pressable
-              onPress={() => setShowCreateModal(true)}
-              style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
-            >
-              <Text style={styles.fabText}>+</Text>
-            </Pressable>
-          )}
-        </>
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
+          }
+          stickySectionHeadersEnabled={false}
+        />
       )}
 
-      {activeView === "messages" && (
-        <View style={styles.centered}>
-          <EmptyState
-            iconImage={require("@/assets/images/chat-icon.png")}
-            title="Inga meddelanden"
-            subtitle="Här visas dina chattar när du har aktiva uppdrag"
-          />
-        </View>
+      {loggedIn && (
+        <Pressable
+          onPress={() => setShowCreateModal(true)}
+          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </Pressable>
       )}
 
       <Modal
@@ -683,40 +648,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "#fff",
-  },
-  viewToggle: {
-    flexDirection: "row",
-    marginHorizontal: 24,
-    marginBottom: 12,
-    gap: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  toggleButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 12,
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
-  },
-  toggleButtonActive: {
-    borderBottomColor: "#16A34A",
-  },
-  toggleText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#999",
-  },
-  toggleTextActive: {
-    color: "#111",
-    fontWeight: "600",
-  },
-  toggleIcon: {
-    width: 16,
-    height: 16,
   },
   areaList: {
     maxHeight: 150,

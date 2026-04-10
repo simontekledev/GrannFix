@@ -67,8 +67,8 @@ export default function ProfilScreen() {
 
       if (returnTo === "index") {
         router.replace("/(tabs)" as any);
-      } else if (returnTo === "activity") {
-        router.replace("/(tabs)/activity");
+      } else if (returnTo === "tasks") {
+        router.replace("/(tabs)/tasks");
       }
     } catch (e: any) {
       console.log("Login error:", e);

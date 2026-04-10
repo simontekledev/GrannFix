@@ -75,4 +75,12 @@ public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort, Task
                         t.getStatus().name()
                 ));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String taskTitle(UUID taskId) {
+        return taskRepository.findById(taskId)
+                .map(Task::getTitle)
+                .orElse("Uppdrag");
+    }
 }

@@ -31,10 +31,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="activity"
+        name="tasks"
         options={{
-          title: 'Aktivitet',
+          title: 'Uppdrag',
           tabBarIcon: ({ color }) => <Image source={require("@/assets/images/activity-icon.png")} style={{ width: 22, height: 22, tintColor: color }} />,
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Chatt',
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/test.png")} style={{ width: 32, height: 32, tintColor: color }} resizeMode="contain" />,
         }}
       />
       <Tabs.Screen

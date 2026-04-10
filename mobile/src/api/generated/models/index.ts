@@ -6,6 +6,7 @@ export * from './AuthUserDto';
 export * from './ChangePasswordRequest';
 export * from './ChatMessageResponse';
 export * from './ChatResponse';
+export * from './ChatSummaryResponse';
 export * from './CreateOfferRequest';
 export * from './CreateTaskRequest';
 export * from './CursorPageResponseTaskResponse';

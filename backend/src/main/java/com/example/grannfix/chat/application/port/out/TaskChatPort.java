@@ -7,6 +7,8 @@ public interface TaskChatPort {
 
     Optional<TaskChatView> findTaskForChat(UUID taskId);
 
+    String taskTitle(UUID taskId);
+
     record TaskChatView(
             UUID id,
             UUID createdById,

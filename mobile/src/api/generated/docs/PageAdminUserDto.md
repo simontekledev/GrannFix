@@ -6,8 +6,8 @@
 
 Name | Type
 ------------ | -------------
-`totalElements` | number
 `totalPages` | number
+`totalElements` | number
 `numberOfElements` | number
 `pageable` | [PageableObject](PageableObject.md)
 `size` | number
@@ -25,8 +25,8 @@ import type { PageAdminUserDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "totalElements": null,
   "totalPages": null,
+  "totalElements": null,
   "numberOfElements": null,
   "pageable": null,
   "size": null,

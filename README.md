@@ -60,6 +60,15 @@ GrannFix/
 - Task owners can accept an offer, which auto-declines all other pending offers and assigns the task
 - Two-step completion flow: helper marks done → task owner confirms done
 - One offer per helper per task (enforced via unique constraint)
+- Pending offer count surfaced on task detail (visible only to task owner)
+- `canOffer` permission disables the offer button for users who already have an offer
+
+### Chat
+
+- One chat per assigned task between owner and helper
+- Real-time messaging via polling (every 4 seconds)
+- Chat list shows task title, other party's name, and last message preview
+- Participant validation on every message endpoint
 
 ### API Documentation
 
@@ -131,6 +140,10 @@ npm run generate-api
 | Offers | `POST /offers/{id}/accept`        | Accept an offer                |
 | Offers | `POST /offers/{id}/mark-done`     | Helper marks offer as done     |
 | Offers | `POST /offers/{id}/confirm-done`  | Owner confirms completion      |
+| Chat   | `GET /chats`                      | List current user's chats      |
+| Chat   | `GET /tasks/{taskId}/chat`        | Get or create chat for task    |
+| Chat   | `GET /chats/{chatId}/messages`    | Get messages (with `after`)    |
+| Chat   | `POST /chats/{chatId}/messages`   | Send a message                 |
 | Admin  | `GET /admin/users`                | List all users (paginated)     |
 | Health | `GET /ping`                       | Health check                   |
 
@@ -144,14 +157,23 @@ backend/src/main/java/com/example/grannfix/
 ├── user/          # User profiles, admin operations
 ├── task/          # Task CRUD, search, status transitions
 ├── offer/         # Offer lifecycle, acceptance, completion
+├── chat/          # Chats, messages, task-scoped conversations
 └── common/        # Security config, error handling, shared contracts
 ```
 
 ```
 mobile/
 ├── app/           # Screens and navigation (Expo Router)
-│   └── (tabs)/    # Tab-based screens (Login, Register, Explore)
+│   ├── (tabs)/    # Tab-based screens (Discover, Tasks, Chat, Profile)
+│   ├── task-detail.tsx        # Task details, offers, edit, cancel
+│   ├── chat-conversation.tsx  # Message thread for a chat
+│   ├── edit-profile.tsx       # Edit user profile
+│   ├── settings.tsx           # Account & app settings
+│   └── public-user.tsx        # Public profile view
 ├── src/api/       # Auto-generated API clients and config
+├── src/context/   # React contexts (UserContext)
+├── src/helpers/   # Utilities (time formatting, distance, areas)
+├── src/styles/    # Shared styles (modal, form)
 ├── components/    # Reusable UI components
 └── constants/     # Theme and color definitions
 ```

@@ -46,13 +46,13 @@ export interface PageAdminUserDto {
      * @type {number}
      * @memberof PageAdminUserDto
      */
-    totalElements?: number;
+    totalPages?: number;
     /**
      * 
      * @type {number}
      * @memberof PageAdminUserDto
      */
-    totalPages?: number;
+    totalElements?: number;
     /**
      * 
      * @type {number}
@@ -126,8 +126,8 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
+        'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
         'pageable': json['pageable'] == null ? undefined : PageableObjectFromJSON(json['pageable']),
         'size': json['size'] == null ? undefined : json['size'],
@@ -151,8 +151,8 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
 
     return {
         
-        'totalElements': value['totalElements'],
         'totalPages': value['totalPages'],
+        'totalElements': value['totalElements'],
         'numberOfElements': value['numberOfElements'],
         'pageable': PageableObjectToJSON(value['pageable']),
         'size': value['size'],

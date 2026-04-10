@@ -208,7 +208,9 @@ export default function TaskDetailScreen() {
     if (!id) return;
     try {
       const chat = await chatApi.getOrCreateChat({ taskId: id });
-      router.push(`/(tabs)/chat?id=${chat.id}` as any);
+      const helperName = task?.assignedTo?.name ?? "";
+      const taskTitle = task?.title ?? "";
+      router.push(`/chat-conversation?chatId=${chat.id}&name=${encodeURIComponent(helperName)}&taskTitle=${encodeURIComponent(taskTitle)}` as any);
     } catch (e) {
       console.log("Chat error:", e);
     }
@@ -253,12 +255,7 @@ export default function TaskDetailScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{task.title}</Text>
-          {task.offeredPrice != null && (
-            <Text style={styles.price}>{task.offeredPrice} kr</Text>
-          )}
-        </View>
+        <Text style={styles.title}>{task.title}</Text>
 
         <View style={styles.metaRow}>
           <View style={[styles.statusBadge, { backgroundColor: statusColor + "18" }]}>
@@ -266,9 +263,14 @@ export default function TaskDetailScreen() {
               {STATUS_LABELS[status] ?? status}
             </Text>
           </View>
+          {task.offeredPrice != null && (
+            <View style={styles.priceBadge}>
+              <Text style={styles.priceText}>{task.offeredPrice} kr</Text>
+            </View>
+          )}
           {task.createdAt && (
             <Text style={styles.dateText}>
-              Publicerad {task.createdAt.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}
+              {task.createdAt.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}
             </Text>
           )}
         </View>
@@ -662,21 +664,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 48,
   },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
   title: {
     fontSize: 24,
     fontWeight: "700",
     color: "#111",
-    flex: 1,
-    marginRight: 12,
+    marginBottom: 12,
   },
-  price: {
-    fontSize: 22,
+  priceBadge: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  priceText: {
+    fontSize: 14,
     fontWeight: "700",
     color: "#16A34A",
   },

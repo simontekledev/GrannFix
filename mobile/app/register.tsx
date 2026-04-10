@@ -105,7 +105,7 @@ export default function RegisterScreen() {
       }
 
       Alert.alert("Konto skapat", "Du är registrerad och redo att börja.");
-      router.replace("/(tabs)/activity");
+      router.replace("/(tabs)/tasks");
     } catch (e: any) {
       console.log("Register error:", e);
 

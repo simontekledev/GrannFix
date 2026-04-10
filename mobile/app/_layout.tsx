@@ -52,6 +52,7 @@ export default function RootLayout() {
             <Stack.Screen name="task-detail" options={{ headerShown: false }} />
             <Stack.Screen name="public-user" options={{ headerShown: false }} />
             <Stack.Screen name="register" options={{ headerShown: false }} />
+            <Stack.Screen name="chat-conversation" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <StatusBar style="dark" />

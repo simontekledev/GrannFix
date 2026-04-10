@@ -1,0 +1,251 @@
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter, useFocusEffect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { EmptyState } from "@/src/components/EmptyState";
+import { timeAgo } from "@/src/helpers/time";
+
+interface ChatSummary {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  otherPartyName: string;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+}
+
+const BASE_URL = "http://192.168.1.164:8080";
+
+export default function ChatListScreen() {
+  const router = useRouter();
+  const [chats, setChats] = useState<ChatSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+
+  const fetchChats = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      if (!token) return;
+      const res = await fetch(`${BASE_URL}/chats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed");
+      const data: ChatSummary[] = await res.json();
+      setChats(data);
+    } catch (e) {
+      console.log("Failed to load chats:", e);
+    }
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    setLoggedIn(!!token);
+    return !!token;
+  }, []);
+
+  useEffect(() => {
+    checkAuth().then((isLoggedIn) => {
+      if (isLoggedIn) {
+        fetchChats().finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
+    });
+  }, [checkAuth, fetchChats]);
+
+  useFocusEffect(
+    useCallback(() => {
+      checkAuth().then((isLoggedIn) => {
+        if (isLoggedIn) fetchChats();
+      });
+    }, [checkAuth, fetchChats])
+  );
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await fetchChats();
+    setRefreshing(false);
+  }
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#16A34A" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
+          <Text style={styles.title}>Chatt</Text>
+        </LinearGradient>
+        <View style={styles.centered}>
+          <EmptyState
+            iconImage={require("@/assets/images/chat-icon.png")}
+            title="Logga in"
+            subtitle="Logga in för att se dina chattar"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  function renderChat({ item }: { item: ChatSummary }) {
+    const initial = (item.otherPartyName ?? "?").charAt(0).toUpperCase();
+
+    return (
+      <Pressable
+        style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
+        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&name=${encodeURIComponent(item.otherPartyName)}&taskTitle=${encodeURIComponent(item.taskTitle)}` as any)}
+      >
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{initial}</Text>
+        </View>
+        <View style={styles.chatContent}>
+          <View style={styles.chatTopRow}>
+            <Text style={styles.chatName} numberOfLines={1}>{item.otherPartyName}</Text>
+            {item.lastMessageAt && (
+              <Text style={styles.chatTime}>{timeAgo(new Date(item.lastMessageAt))}</Text>
+            )}
+          </View>
+          {item.lastMessage && (
+            <Text style={styles.chatPreview} numberOfLines={1}>{item.lastMessage}</Text>
+          )}
+        </View>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={styles.safe}>
+      <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
+        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
+          <Text style={styles.title}>Chatt</Text>
+        </LinearGradient>
+      </SafeAreaView>
+
+      <FlatList
+        data={chats}
+        keyExtractor={(item) => item.id}
+        renderItem={renderChat}
+        contentContainerStyle={chats.length === 0 ? styles.emptyList : styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
+        }
+        ListEmptyComponent={
+          <View style={{ paddingTop: 140 }}>
+            <EmptyState
+              iconImage={require("@/assets/images/chat-icon.png")}
+              title="Inga chattar"
+              subtitle="Här visas dina chattar när du har aktiva uppdrag"
+            />
+          </View>
+        }
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#f5faf2",
+  },
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerRow: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  title: {
+    fontSize: 23,
+    fontWeight: "700",
+    color: "#111",
+    letterSpacing: -1.0,
+  },
+  list: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  emptyList: {
+    flex: 1,
+  },
+  chatRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#16A34A",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  avatarText: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  chatContent: {
+    flex: 1,
+  },
+  chatTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  chatName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111",
+    flex: 1,
+    marginRight: 8,
+  },
+  chatTime: {
+    fontSize: 12,
+    color: "#aaa",
+  },
+  chatTask: {
+    fontSize: 13,
+    color: "#16A34A",
+    fontWeight: "500",
+    marginBottom: 2,
+  },
+  chatPreview: {
+    fontSize: 14,
+    color: "#888",
+    lineHeight: 18,
+  },
+});

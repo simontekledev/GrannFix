@@ -2,6 +2,7 @@ package com.example.grannfix.chat.api;
 
 import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
+import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
 import com.example.grannfix.chat.application.ChatService;
 import jakarta.validation.Valid;
@@ -18,6 +19,11 @@ import java.util.UUID;
 public class ChatController {
 
     private final ChatService chatService;
+
+    @GetMapping("/chats")
+    public List<ChatSummaryResponse> getMyChats(@AuthenticationPrincipal UUID userId) {
+        return chatService.getMyChats(userId);
+    }
 
     @GetMapping("/tasks/{taskId}/chat")
     public ChatResponse getOrCreateChat(@PathVariable UUID taskId,

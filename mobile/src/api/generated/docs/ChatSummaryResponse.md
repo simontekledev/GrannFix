@@ -1,32 +1,32 @@
 
-# PageableObject
+# ChatSummaryResponse
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`pageSize` | number
-`pageNumber` | number
-`paged` | boolean
-`unpaged` | boolean
-`offset` | number
-`sort` | [SortObject](SortObject.md)
+`id` | string
+`taskId` | string
+`taskTitle` | string
+`otherPartyName` | string
+`lastMessage` | string
+`lastMessageAt` | Date
 
 ## Example
 
 ```typescript
-import type { PageableObject } from ''
+import type { ChatSummaryResponse } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "pageSize": null,
-  "pageNumber": null,
-  "paged": null,
-  "unpaged": null,
-  "offset": null,
-  "sort": null,
-} satisfies PageableObject
+  "id": null,
+  "taskId": null,
+  "taskTitle": null,
+  "otherPartyName": null,
+  "lastMessage": null,
+  "lastMessageAt": null,
+} satisfies ChatSummaryResponse
 
 console.log(example)
 
@@ -35,7 +35,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageableObject
+const exampleParsed = JSON.parse(exampleJSON) as ChatSummaryResponse
 console.log(exampleParsed)
 ```
 

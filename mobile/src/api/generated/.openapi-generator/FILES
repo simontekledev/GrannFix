@@ -17,6 +17,7 @@ docs/ChangePasswordRequest.md
 docs/ChatControllerApi.md
 docs/ChatMessageResponse.md
 docs/ChatResponse.md
+docs/ChatSummaryResponse.md
 docs/CreateOfferRequest.md
 docs/CreateTaskRequest.md
 docs/CursorPageResponseTaskResponse.md
@@ -52,6 +53,7 @@ models/AuthUserDto.ts
 models/ChangePasswordRequest.ts
 models/ChatMessageResponse.ts
 models/ChatResponse.ts
+models/ChatSummaryResponse.ts
 models/CreateOfferRequest.ts
 models/CreateTaskRequest.ts
 models/CursorPageResponseTaskResponse.ts

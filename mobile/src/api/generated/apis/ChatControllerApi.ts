@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   ChatMessageResponse,
   ChatResponse,
+  ChatSummaryResponse,
   SendMessageRequest,
 } from '../models/index';
 import {
@@ -24,6 +25,8 @@ import {
     ChatMessageResponseToJSON,
     ChatResponseFromJSON,
     ChatResponseToJSON,
+    ChatSummaryResponseFromJSON,
+    ChatSummaryResponseToJSON,
     SendMessageRequestFromJSON,
     SendMessageRequestToJSON,
 } from '../models/index';
@@ -99,6 +102,49 @@ export class ChatControllerApi extends runtime.BaseAPI {
      */
     async getMessages(requestParameters: GetMessagesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ChatMessageResponse>> {
         const response = await this.getMessagesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getMyChats without sending the request
+     */
+    async getMyChatsRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/chats`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async getMyChatsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ChatSummaryResponse>>> {
+        const requestOptions = await this.getMyChatsRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ChatSummaryResponseFromJSON));
+    }
+
+    /**
+     */
+    async getMyChats(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ChatSummaryResponse>> {
+        const response = await this.getMyChatsRaw(initOverrides);
         return await response.value();
     }
 

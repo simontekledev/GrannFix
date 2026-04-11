@@ -18,7 +18,7 @@ import { useRouter } from "expo-router";
 import { userApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
-import { formStyles } from "@/src/styles/form";
+import { createFormStyles } from "@/src/styles/form";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 
 export default function EditProfileScreen() {
@@ -26,6 +26,7 @@ export default function EditProfileScreen() {
   const { user, setUser } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const formStyles = useMemo(() => createFormStyles(colors), [colors]);
   const [loading, setLoading] = useState(!user);
   const [submitting, setSubmitting] = useState(false);
 

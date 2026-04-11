@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -19,9 +19,10 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { taskApi, chatApi, taskOfferApi, offerApi } from "@/src/api/client";
 import type { OfferResponse } from "@/src/api/generated/models/OfferResponse";
 import { useUser } from "@/src/context/UserContext";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { timeAgo } from "@/src/helpers/time";
-import { modalStyles } from "@/src/styles/modal";
-import { formStyles } from "@/src/styles/form";
+import { createModalStyles } from "@/src/styles/modal";
+import { createFormStyles } from "@/src/styles/form";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
 
 
@@ -43,6 +44,10 @@ export default function TaskDetailScreen() {
   const router = useRouter();
   const { id, offer } = useLocalSearchParams<{ id: string; offer?: string }>();
   const { user } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const modalStyles = useMemo(() => createModalStyles(colors), [colors]);
+  const formStyles = useMemo(() => createFormStyles(colors), [colors]);
   const [task, setTask] = useState<TaskDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
@@ -220,7 +225,7 @@ export default function TaskDetailScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#16A34A" />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </SafeAreaView>
     );
@@ -303,7 +308,7 @@ export default function TaskDetailScreen() {
             {showOffers && (
               <View style={styles.offersList}>
                 {offers.length === 0 ? (
-                  <ActivityIndicator color="#16A34A" style={{ paddingVertical: 12 }} />
+                  <ActivityIndicator color={colors.accent} style={{ paddingVertical: 12 }} />
                 ) : (
                   offers.filter((o) => o.status === "PENDING").map((offer) => (
                     <View key={offer.id} style={styles.offerItem}>
@@ -497,7 +502,7 @@ export default function TaskDetailScreen() {
                   value={offerPrice}
                   onChangeText={setOfferPrice}
                   placeholder={task?.offeredPrice ? `Föreslaget: ${task.offeredPrice} kr` : "Ditt pris i kr"}
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="number-pad"
                   style={formStyles.input}
                 />
@@ -507,7 +512,7 @@ export default function TaskDetailScreen() {
                   value={offerMessage}
                   onChangeText={setOfferMessage}
                   placeholder="Berätta varför du kan hjälpa..."
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={[formStyles.input, formStyles.textArea]}
                   multiline
                 />
@@ -517,6 +522,7 @@ export default function TaskDetailScreen() {
                   disabled={sendingOffer}
                   style={({ pressed }) => [
                     styles.primaryButton,
+                    { marginTop: 24 },
                     sendingOffer && { opacity: 0.35 },
                     pressed && !sendingOffer && styles.primaryButtonPressed,
                   ]}
@@ -558,7 +564,7 @@ export default function TaskDetailScreen() {
                   value={editTitle}
                   onChangeText={setEditTitle}
                   placeholder="Titel"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={formStyles.input}
                 />
 
@@ -567,7 +573,7 @@ export default function TaskDetailScreen() {
                   value={editDescription}
                   onChangeText={setEditDescription}
                   placeholder="Beskrivning"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={[formStyles.input, formStyles.textArea]}
                   multiline
                 />
@@ -577,7 +583,7 @@ export default function TaskDetailScreen() {
                   value={editPrice}
                   onChangeText={setEditPrice}
                   placeholder="Ersättning i kr"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="number-pad"
                   style={formStyles.input}
                 />
@@ -587,7 +593,7 @@ export default function TaskDetailScreen() {
                   value={editStreet}
                   onChangeText={setEditStreet}
                   placeholder="Gatuadress"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={formStyles.input}
                 />
 
@@ -615,354 +621,357 @@ export default function TaskDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#888",
-    marginBottom: 16,
-  },
-  backLink: {
-    padding: 8,
-  },
-  backLinkText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  chatIconButton: {
-    padding: 4,
-  },
-  chatIconText: {
-    fontSize: 22,
-  },
-  backButton: {
-    alignSelf: "flex-start",
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 12,
-  },
-  priceBadge: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  priceText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#16A34A",
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 20,
-  },
-  statusBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  statusText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  areaBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "#f0fdf4",
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  areaBadgeText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#16A34A",
-  },
-  locationIcon: {
-    width: 14,
-    height: 14,
-  },
-  dateText: {
-    fontSize: 12,
-    color: "#aaa",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardChatActive: {
-    borderWidth: 1,
-    borderColor: "#dcfce7",
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#999",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 15,
-    color: "#333",
-    lineHeight: 22,
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#888",
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-  },
-  userRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  userAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#1a1a1a",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  userAvatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  userName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#222",
-    flex: 1,
-  },
-  userArrow: {
-    fontSize: 20,
-    color: "#ccc",
-  },
-  actions: {
-    marginTop: 12,
-    gap: 12,
-  },
-  primaryButton: {
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    shadowColor: "#16A34A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  primaryButtonHovered: {
-    backgroundColor: "#15913F",
-    transform: [{ scale: 1.015 }],
-  },
-  primaryButtonPressed: {
-    opacity: 0.85,
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  chatRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    gap: 8,
-    backgroundColor: "#f0fdf4",
-    borderRadius: 10,
-    marginTop: 8,
-  },
-  chatBubble: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 10,
-    padding: 8,
-  },
-  chatBubbleIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#16A34A",
-  },
-  chatRowText: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#16A34A",
-    flex: 1,
-  },
-  dangerButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#DC2626",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  dangerButtonHovered: {
-    backgroundColor: "#fef2f2",
-    transform: [{ scale: 1.015 }],
-  },
-  dangerButtonPressed: {
-    opacity: 0.8,
-  },
-  dangerButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#DC2626",
-  },
-  outlineButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#6B7280",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  outlineButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#6B7280",
-  },
-  offerHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
-  },
-  offersCountRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  offersCountBadge: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    minWidth: 24,
-    alignItems: "center",
-  },
-  offersCountText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#16A34A",
-  },
-  expandArrow: {
-    fontSize: 10,
-    color: "#aaa",
-  },
-  offersList: {
-    marginTop: 8,
-    gap: 8,
-  },
-  offerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f9faf8",
-    borderRadius: 10,
-    padding: 12,
-  },
-  offerInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  offerPrice: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#16A34A",
-  },
-  offerMessage: {
-    fontSize: 13,
-    color: "#555",
-    lineHeight: 18,
-  },
-  offerDate: {
-    fontSize: 11,
-    color: "#aaa",
-  },
-  acceptButton: {
-    backgroundColor: "#16A34A",
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginLeft: 10,
-  },
-  acceptButtonText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  saveButton: {
-    marginTop: 24,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  saveButtonDisabled: {
-    opacity: 0.35,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.textMuted,
+      marginBottom: 16,
+    },
+    backLink: {
+      padding: 8,
+    },
+    backLinkText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 12,
+    },
+    chatIconButton: {
+      padding: 4,
+    },
+    chatIconText: {
+      fontSize: 22,
+    },
+    backButton: {
+      alignSelf: "flex-start",
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 12,
+    },
+    priceBadge: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    priceText: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colors.accent,
+    },
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 20,
+    },
+    statusBadge: {
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    statusText: {
+      fontSize: 13,
+      fontWeight: "600",
+    },
+    areaBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.accentMuted,
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    areaBadgeText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.accent,
+    },
+    locationIcon: {
+      width: 14,
+      height: 14,
+    },
+    dateText: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 16,
+      marginBottom: 12,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    cardChatActive: {
+      borderWidth: 1,
+      borderColor: colors.accentMuted,
+    },
+    sectionTitle: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 10,
+    },
+    description: {
+      fontSize: 15,
+      color: colors.textPrimary,
+      lineHeight: 22,
+    },
+    detailRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 8,
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontWeight: "400",
+      color: colors.textMuted,
+    },
+    detailValue: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.textPrimary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+    },
+    userRow: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    userAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 12,
+    },
+    userAvatarText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: "#fff",
+    },
+    userName: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    userArrow: {
+      fontSize: 20,
+      color: colors.textMuted,
+    },
+    actions: {
+      marginTop: 12,
+      gap: 12,
+    },
+    primaryButton: {
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      shadowColor: colors.accent,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    primaryButtonHovered: {
+      backgroundColor: colors.accent,
+      opacity: 0.92,
+      transform: [{ scale: 1.015 }],
+    },
+    primaryButtonPressed: {
+      opacity: 0.85,
+    },
+    primaryButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    chatRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      gap: 8,
+      backgroundColor: colors.accentMuted,
+      borderRadius: 10,
+      marginTop: 8,
+    },
+    chatBubble: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 10,
+      padding: 8,
+    },
+    chatBubbleIcon: {
+      width: 20,
+      height: 20,
+      tintColor: colors.accent,
+    },
+    chatRowText: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.accent,
+      flex: 1,
+    },
+    dangerButton: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: colors.danger,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+    },
+    dangerButtonHovered: {
+      backgroundColor: colors.accentMuted,
+      transform: [{ scale: 1.015 }],
+    },
+    dangerButtonPressed: {
+      opacity: 0.8,
+    },
+    dangerButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.danger,
+    },
+    outlineButton: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: colors.textSecondary,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+    },
+    outlineButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textSecondary,
+    },
+    offerHeaderRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 4,
+    },
+    offersCountRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    offersCountBadge: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 10,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      minWidth: 24,
+      alignItems: "center",
+    },
+    offersCountText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.accent,
+    },
+    expandArrow: {
+      fontSize: 10,
+      color: colors.textMuted,
+    },
+    offersList: {
+      marginTop: 8,
+      gap: 8,
+    },
+    offerItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      borderRadius: 10,
+      padding: 12,
+    },
+    offerInfo: {
+      flex: 1,
+      gap: 2,
+    },
+    offerPrice: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.accent,
+    },
+    offerMessage: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      lineHeight: 18,
+    },
+    offerDate: {
+      fontSize: 11,
+      color: colors.textMuted,
+    },
+    acceptButton: {
+      backgroundColor: colors.accent,
+      borderRadius: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      marginLeft: 10,
+    },
+    acceptButtonText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    saveButton: {
+      marginTop: 24,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    saveButtonDisabled: {
+      opacity: 0.35,
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
@@ -26,8 +26,9 @@ import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { EmptyState } from "@/src/components/EmptyState";
 import { timeAgo } from "@/src/helpers/time";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
-import { modalStyles } from "@/src/styles/modal";
-import { formStyles } from "@/src/styles/form";
+import { createModalStyles } from "@/src/styles/modal";
+import { createFormStyles } from "@/src/styles/form";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 const STATUS_ORDER: Record<string, number> = {
   ASSIGNED: 0,
@@ -52,6 +53,10 @@ const STATUS_COLORS = {
 
 export default function TasksScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const modalStyles = useMemo(() => createModalStyles(colors), [colors]);
+  const formStyles = useMemo(() => createFormStyles(colors), [colors]);
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -172,7 +177,7 @@ export default function TasksScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#16A34A" />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </SafeAreaView>
     );
@@ -267,8 +272,8 @@ export default function TasksScreen() {
 
   return (
     <View style={styles.safe}>
-      <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
+      <SafeAreaView style={{ backgroundColor: colors.headerGradient[0] }} edges={["top"]}>
+        <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
           <Text style={styles.title}>Uppdrag</Text>
         </LinearGradient>
       </SafeAreaView>
@@ -289,7 +294,7 @@ export default function TasksScreen() {
           )}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
           }
           stickySectionHeadersEnabled={false}
         />
@@ -329,7 +334,7 @@ export default function TasksScreen() {
                   value={newTitle}
                   onChangeText={setNewTitle}
                   placeholder="Vad behöver du hjälp med?"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={formStyles.input}
                 />
 
@@ -338,7 +343,7 @@ export default function TasksScreen() {
                   value={newDescription}
                   onChangeText={setNewDescription}
                   placeholder="Beskriv uppdraget..."
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={[formStyles.input, formStyles.textArea]}
                   multiline
                 />
@@ -350,7 +355,7 @@ export default function TasksScreen() {
                       value={areaSearch}
                       onChangeText={setAreaSearch}
                       placeholder="Sök område..."
-                      placeholderTextColor="#a0a0a0"
+                      placeholderTextColor={colors.textMuted}
                       style={formStyles.input}
                       autoFocus
                     />
@@ -389,7 +394,7 @@ export default function TasksScreen() {
                   value={newStreet}
                   onChangeText={setNewStreet}
                   placeholder="Gatuadress"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   style={formStyles.input}
                 />
 
@@ -398,7 +403,7 @@ export default function TasksScreen() {
                   value={newPrice}
                   onChangeText={setNewPrice}
                   placeholder="Ersättning i kr"
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="number-pad"
                   style={formStyles.input}
                 />
@@ -427,296 +432,299 @@ export default function TasksScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-  },
-  headerRow: {
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 23,
-    fontWeight: "700",
-    color: "#111",
-    marginLeft: -2,
-    letterSpacing: -1.0,
-  },
-  subtitle: {
-    alignSelf: "flex-start",
-    fontSize: 15,
-    color: "#666",
-    marginTop: 14,
-  },
-  sectionHeader: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#999",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 8,
-    marginTop: 16,
-  },
-  list: {
-    paddingHorizontal: 24,
-    paddingBottom: 90,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#111",
-    flex: 1,
-    marginRight: 12,
-  },
-  cardHeaderRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  cardChevron: {
-    fontSize: 20,
-    color: "#ccc",
-  },
-  priceBadge: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  cardPrice: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#16A34A",
-  },
-  cardMeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 8,
-  },
-  statusBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginLeft: -2,
-  },
-  statusText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  offerBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  offerDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#16A34A",
-  },
-  offerBadgeText: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#16A34A",
-  },
-  areaBadge: {
-    backgroundColor: "#f0fdf4",
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  areaBadgeText: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#16A34A",
-  },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 6,
-  },
-  cardDate: {
-    fontSize: 12,
-    color: "#aaa",
-  },
-  cardFooterRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  chatButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "#f0fdf4",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  chatButtonIcon: {
-    width: 14,
-    height: 14,
-    tintColor: "#16A34A",
-  },
-  chatButtonText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#16A34A",
-  },
-  cardDetailLink: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#16A34A",
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 20,
-  },
-  centeredColumn: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: 60,
-  },
-  loginContent: {
-    alignItems: "center",
-    paddingHorizontal: 32,
-  },
-  loginIcon: {
-    width: 70,
-    height: 70,
-    tintColor: "#999999",
-    marginBottom: 16,
-  },
-  loginTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#111",
-    textAlign: "center",
-    marginBottom: 6,
-  },
-  loginSubtitle: {
-    fontSize: 15,
-    color: "#888",
-    textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 20,
-  },
-  loginButtonHovered: {
-    backgroundColor: "#15913F",
-    transform: [{ scale: 1.015 }],
-  },
-  loginButton: {
-    marginTop: 6,
-    backgroundColor: "#16A34A",
-    borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-  },
-  loginButtonPressed: {
-    opacity: 0.8,
-  },
-  loginButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  areaList: {
-    maxHeight: 150,
-    backgroundColor: "#f5faf2",
-    borderRadius: 12,
-    marginTop: 4,
-  },
-  areaItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  areaItemText: {
-    fontSize: 15,
-    color: "#111",
-  },
-  areaSelectedText: {
-    fontSize: 15,
-    color: "#111",
-  },
-  areaPlaceholderText: {
-    fontSize: 15,
-    color: "#a0a0a0",
-  },
-  createButton: {
-    marginTop: 24,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#16A34A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  createButtonDisabled: {
-    opacity: 0.35,
-  },
-  createButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#16A34A",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#16A34A",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  fabPressed: {
-    opacity: 0.85,
-  },
-  fabText: {
-    fontSize: 28,
-    fontWeight: "400",
-    color: "#fff",
-    marginTop: -2,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 32,
+    },
+    headerRow: {
+      alignItems: "center",
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      paddingBottom: 12,
+    },
+    title: {
+      fontSize: 23,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginLeft: -2,
+      letterSpacing: -1.0,
+    },
+    subtitle: {
+      alignSelf: "flex-start",
+      fontSize: 15,
+      color: colors.textSecondary,
+      marginTop: 14,
+    },
+    sectionHeader: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 8,
+      marginTop: 16,
+    },
+    list: {
+      paddingHorizontal: 24,
+      paddingBottom: 90,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 18,
+      marginBottom: 14,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8,
+    },
+    cardTitle: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      flex: 1,
+      marginRight: 12,
+    },
+    cardHeaderRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    cardChevron: {
+      fontSize: 20,
+      color: colors.textMuted,
+    },
+    priceBadge: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    cardPrice: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: colors.accent,
+    },
+    cardMeta: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 8,
+    },
+    statusBadge: {
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      marginLeft: -2,
+    },
+    statusText: {
+      fontSize: 13,
+      fontWeight: "600",
+    },
+    offerBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    offerDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: colors.accent,
+    },
+    offerBadgeText: {
+      fontSize: 12,
+      fontWeight: "500",
+      color: colors.accent,
+    },
+    areaBadge: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+    },
+    areaBadgeText: {
+      fontSize: 12,
+      fontWeight: "500",
+      color: colors.accent,
+    },
+    cardFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 6,
+    },
+    cardDate: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    cardFooterRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    chatButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.accentMuted,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    chatButtonIcon: {
+      width: 14,
+      height: 14,
+      tintColor: colors.accent,
+    },
+    chatButtonText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.accent,
+    },
+    cardDetailLink: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.accent,
+    },
+    cardDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    centeredColumn: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingBottom: 60,
+    },
+    loginContent: {
+      alignItems: "center",
+      paddingHorizontal: 32,
+    },
+    loginIcon: {
+      width: 70,
+      height: 70,
+      tintColor: colors.textMuted,
+      marginBottom: 16,
+    },
+    loginTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      textAlign: "center",
+      marginBottom: 6,
+    },
+    loginSubtitle: {
+      fontSize: 15,
+      color: colors.textMuted,
+      textAlign: "center",
+      lineHeight: 20,
+      marginBottom: 20,
+    },
+    loginButtonHovered: {
+      backgroundColor: colors.accent,
+      opacity: 0.92,
+      transform: [{ scale: 1.015 }],
+    },
+    loginButton: {
+      marginTop: 6,
+      backgroundColor: colors.accent,
+      borderRadius: 10,
+      paddingVertical: 14,
+      paddingHorizontal: 40,
+    },
+    loginButtonPressed: {
+      opacity: 0.8,
+    },
+    loginButtonText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    areaList: {
+      maxHeight: 150,
+      backgroundColor: colors.background,
+      borderRadius: 12,
+      marginTop: 4,
+    },
+    areaItem: {
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.divider,
+    },
+    areaItemText: {
+      fontSize: 15,
+      color: colors.textPrimary,
+    },
+    areaSelectedText: {
+      fontSize: 15,
+      color: colors.textPrimary,
+    },
+    areaPlaceholderText: {
+      fontSize: 15,
+      color: colors.textMuted,
+    },
+    createButton: {
+      marginTop: 24,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: colors.accent,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    createButtonDisabled: {
+      opacity: 0.35,
+    },
+    createButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    fab: {
+      position: "absolute",
+      bottom: 24,
+      right: 24,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: colors.accent,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.35,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    fabPressed: {
+      opacity: 0.85,
+    },
+    fabText: {
+      fontSize: 28,
+      fontWeight: "400",
+      color: "#fff",
+      marginTop: -2,
+    },
+  });
+}

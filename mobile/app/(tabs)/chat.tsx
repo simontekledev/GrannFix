@@ -111,7 +111,7 @@ export default function ChatListScreen() {
     return (
       <Pressable
         style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
-        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&name=${encodeURIComponent(item.otherPartyName)}&taskTitle=${encodeURIComponent(item.taskTitle)}` as any)}
+        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName)}&taskTitle=${encodeURIComponent(item.taskTitle)}` as any)}
       >
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{initial}</Text>

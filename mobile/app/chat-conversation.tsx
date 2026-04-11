@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,20 +11,64 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { chatApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
 
+type ListItem =
+  | { type: "date"; key: string; label: string }
+  | {
+      type: "message";
+      key: string;
+      message: ChatMessageResponse;
+      isMe: boolean;
+      isFirstInGroup: boolean;
+      isLastInGroup: boolean;
+      showTime: boolean;
+    };
+
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function dayLabel(date: Date): string {
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return "Idag";
+  if (isSameDay(date, yesterday)) return "Igår";
+
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 7) {
+    return date.toLocaleDateString("sv-SE", { weekday: "long" });
+  }
+  if (date.getFullYear() === now.getFullYear()) {
+    return date.toLocaleDateString("sv-SE", { day: "numeric", month: "long" });
+  }
+  return date.toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function timeLabel(date: Date): string {
+  return date.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
+}
+
 export default function ChatConversationScreen() {
   const router = useRouter();
-  const { chatId, name, taskTitle } = useLocalSearchParams<{
+  const { chatId, taskId, name, taskTitle } = useLocalSearchParams<{
     chatId: string;
+    taskId?: string;
     name?: string;
     taskTitle?: string;
   }>();
   const { user } = useUser();
+  const insets = useSafeAreaInsets();
 
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,17 +131,101 @@ export default function ChatConversationScreen() {
     }
   }
 
-  function renderMessage({ item }: { item: ChatMessageResponse }) {
-    const isMe = item.senderId === user?.id;
+  const listItems = useMemo<ListItem[]>(() => {
+    const items: ListItem[] = [];
+    let lastDate: Date | null = null;
+
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      if (!msg.createdAt) continue;
+      const msgDate = msg.createdAt;
+      const isMe = msg.senderId === user?.id;
+
+      if (!lastDate || !isSameDay(lastDate, msgDate)) {
+        items.push({
+          type: "date",
+          key: `date-${msgDate.toISOString()}`,
+          label: dayLabel(msgDate),
+        });
+      }
+      lastDate = msgDate;
+
+      const prev = messages[i - 1];
+      const next = messages[i + 1];
+
+      const prevSameSender =
+        prev && prev.senderId === msg.senderId && prev.createdAt && isSameDay(prev.createdAt, msgDate);
+      const nextSameSender =
+        next && next.senderId === msg.senderId && next.createdAt && isSameDay(next.createdAt, msgDate);
+
+      const isFirstInGroup = !prevSameSender;
+      const isLastInGroup = !nextSameSender;
+
+      // Show time only when there's a significant gap (15+ min) to the next message,
+      // or it's the very last message in the conversation
+      let showTime = !next;
+      if (!showTime && next && next.createdAt) {
+        const gap = (next.createdAt.getTime() - msgDate.getTime()) / 60000;
+        if (gap >= 15) showTime = true;
+      }
+
+      items.push({
+        type: "message",
+        key: msg.id ?? `m-${i}`,
+        message: msg,
+        isMe,
+        isFirstInGroup,
+        isLastInGroup,
+        showTime,
+      });
+    }
+
+    return items;
+  }, [messages, user?.id]);
+
+  const lastMyMessageId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].senderId === user?.id) return messages[i].id;
+    }
+    return null;
+  }, [messages, user?.id]);
+
+  function renderItem({ item }: { item: ListItem }) {
+    if (item.type === "date") {
+      return (
+        <View style={styles.dateSeparator}>
+          <Text style={styles.dateSeparatorText}>{item.label}</Text>
+        </View>
+      );
+    }
+
+    const { message, isMe, isFirstInGroup, isLastInGroup, showTime } = item;
+
+    const bubbleStyle = [
+      styles.bubble,
+      isMe ? styles.bubbleMe : styles.bubbleThem,
+      isMe
+        ? {
+            borderTopRightRadius: isFirstInGroup ? 18 : 6,
+            borderBottomRightRadius: isLastInGroup ? 18 : 6,
+          }
+        : {
+            borderTopLeftRadius: isFirstInGroup ? 18 : 6,
+            borderBottomLeftRadius: isLastInGroup ? 18 : 6,
+          },
+      { marginTop: isFirstInGroup ? 6 : 2 },
+    ];
 
     return (
-      <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleThem]}>
-        <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextThem]}>
-          {item.content}
-        </Text>
-        {item.createdAt && (
-          <Text style={[styles.bubbleTime, isMe ? styles.bubbleTimeMe : styles.bubbleTimeThem]}>
-            {item.createdAt.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
+      <View style={isMe ? styles.rowMe : styles.rowThem}>
+        <View style={bubbleStyle}>
+          <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextThem]}>
+            {message.content}
+          </Text>
+        </View>
+        {showTime && message.createdAt && (
+          <Text style={[styles.timeBelow, isMe ? styles.timeBelowMe : styles.timeBelowThem]}>
+            {timeLabel(message.createdAt)}
           </Text>
         )}
       </View>
@@ -117,12 +246,19 @@ export default function ChatConversationScreen() {
             {(name ?? "?").charAt(0).toUpperCase()}
           </Text>
         </View>
-        <View style={styles.headerInfo}>
+        <Pressable
+          style={styles.headerInfo}
+          onPress={() => taskId && router.push(`/task-detail?id=${taskId}` as any)}
+          disabled={!taskId}
+        >
           <Text style={styles.headerName} numberOfLines={1}>{name ?? "Chatt"}</Text>
           {taskTitle && (
             <Text style={styles.headerTask} numberOfLines={1}>{taskTitle}</Text>
           )}
-        </View>
+        </Pressable>
+        {taskId && (
+          <Text style={styles.headerChevron}>›</Text>
+        )}
       </View>
 
       <KeyboardAvoidingView
@@ -137,9 +273,9 @@ export default function ChatConversationScreen() {
         ) : (
           <FlatList
             ref={flatListRef}
-            data={messages}
-            keyExtractor={(item) => item.id ?? Math.random().toString()}
-            renderItem={renderMessage}
+            data={listItems}
+            keyExtractor={(item) => item.key}
+            renderItem={renderItem}
             contentContainerStyle={styles.messageList}
             onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
             ListEmptyComponent={
@@ -151,30 +287,34 @@ export default function ChatConversationScreen() {
           />
         )}
 
-        <View style={styles.inputRow}>
-          <TextInput
-            value={text}
-            onChangeText={setText}
-            placeholder="Skriv ett meddelande..."
-            placeholderTextColor="#999"
-            style={styles.input}
-            multiline
-            maxLength={1000}
-            editable={!sending}
-            onSubmitEditing={handleSend}
-            blurOnSubmit={false}
-          />
-          <Pressable
-            onPress={handleSend}
-            disabled={!text.trim() || sending}
-            style={({ pressed }) => [
-              styles.sendButton,
-              (!text.trim() || sending) && styles.sendButtonDisabled,
-              pressed && text.trim() && !sending && { opacity: 0.7 },
-            ]}
-          >
-            <Text style={styles.sendButtonText}>Skicka</Text>
-          </Pressable>
+        <View style={[styles.inputRow, { paddingBottom: Math.max(insets.bottom, 12) + 8 }]}>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              value={text}
+              onChangeText={setText}
+              placeholder="Skicka ett meddelande"
+              placeholderTextColor="#9ca3af"
+              style={styles.input}
+              multiline
+              maxLength={1000}
+              editable={!sending}
+              onSubmitEditing={handleSend}
+              blurOnSubmit={false}
+            />
+          </View>
+          {text.trim().length > 0 && (
+            <Pressable
+              onPress={handleSend}
+              disabled={sending}
+              style={({ pressed }) => [
+                styles.sendButton,
+                sending && { opacity: 0.4 },
+                pressed && !sending && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={styles.sendArrow}>↑</Text>
+            </Pressable>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -238,27 +378,49 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginTop: 1,
   },
+  headerChevron: {
+    fontSize: 26,
+    color: "#ccc",
+    marginLeft: 8,
+    marginRight: 4,
+  },
   messageList: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexGrow: 1,
   },
+  dateSeparator: {
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  dateSeparatorText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#999",
+    backgroundColor: "rgba(255,255,255,0.6)",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 10,
+    overflow: "hidden",
+    textTransform: "capitalize",
+  },
+  rowMe: {
+    alignItems: "flex-end",
+  },
+  rowThem: {
+    alignItems: "flex-start",
+  },
   bubble: {
     maxWidth: "78%",
-    borderRadius: 16,
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginBottom: 8,
+    paddingVertical: 9,
+    borderRadius: 18,
   },
   bubbleMe: {
-    alignSelf: "flex-end",
     backgroundColor: "#16A34A",
-    borderBottomRightRadius: 4,
   },
   bubbleThem: {
-    alignSelf: "flex-start",
     backgroundColor: "#fff",
-    borderBottomLeftRadius: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
@@ -275,16 +437,17 @@ const styles = StyleSheet.create({
   bubbleTextThem: {
     color: "#222",
   },
-  bubbleTime: {
-    fontSize: 11,
-    marginTop: 4,
-  },
-  bubbleTimeMe: {
-    color: "rgba(255,255,255,0.7)",
-    textAlign: "right",
-  },
-  bubbleTimeThem: {
+  timeBelow: {
+    fontSize: 10,
     color: "#aaa",
+    marginTop: 3,
+    marginBottom: 4,
+  },
+  timeBelowMe: {
+    marginRight: 4,
+  },
+  timeBelowThem: {
+    marginLeft: 4,
   },
   emptyText: {
     fontSize: 16,
@@ -299,36 +462,43 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingTop: 12,
+    paddingBottom: 18,
     borderTopWidth: 1,
     borderTopColor: "#eee",
     backgroundColor: "#fff",
     gap: 8,
   },
-  input: {
+  inputWrapper: {
     flex: 1,
-    backgroundColor: "#f5faf2",
-    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    minHeight: 44,
+    justifyContent: "center",
+  },
+  input: {
     fontSize: 15,
     color: "#111",
     maxHeight: 100,
+    paddingVertical: Platform.OS === "ios" ? 10 : 6,
   },
   sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: "#16A34A",
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  sendButtonDisabled: {
-    opacity: 0.35,
-  },
-  sendButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
+  sendArrow: {
+    fontSize: 18,
     color: "#fff",
+    fontWeight: "700",
+    marginTop: -2,
   },
 });

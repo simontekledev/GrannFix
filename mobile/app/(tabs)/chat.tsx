@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -14,6 +14,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EmptyState } from "@/src/components/EmptyState";
 import { timeAgo } from "@/src/helpers/time";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 interface ChatSummary {
   id: string;
@@ -28,6 +29,8 @@ const BASE_URL = "http://192.168.1.164:8080";
 
 export default function ChatListScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [chats, setChats] = useState<ChatSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -82,7 +85,7 @@ export default function ChatListScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#16A34A" />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </SafeAreaView>
     );
@@ -91,7 +94,7 @@ export default function ChatListScreen() {
   if (!loggedIn) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
-        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
+        <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
           <Text style={styles.title}>Chatt</Text>
         </LinearGradient>
         <View style={styles.centered}>
@@ -133,8 +136,8 @@ export default function ChatListScreen() {
 
   return (
     <View style={styles.safe}>
-      <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-        <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.headerRow}>
+      <SafeAreaView style={{ backgroundColor: colors.headerGradient[0] }} edges={["top"]}>
+        <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
           <Text style={styles.title}>Chatt</Text>
         </LinearGradient>
       </SafeAreaView>
@@ -145,7 +148,7 @@ export default function ChatListScreen() {
         renderItem={renderChat}
         contentContainerStyle={chats.length === 0 ? styles.emptyList : styles.list}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
         }
         ListEmptyComponent={
           <View style={{ paddingTop: 140 }}>
@@ -161,91 +164,93 @@ export default function ChatListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerRow: {
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 23,
-    fontWeight: "700",
-    color: "#111",
-    letterSpacing: -1.0,
-  },
-  list: {
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-  },
-  emptyList: {
-    flex: 1,
-  },
-  chatRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#16A34A",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  avatarText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  chatContent: {
-    flex: 1,
-  },
-  chatTopRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  chatName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
-    flex: 1,
-    marginRight: 8,
-  },
-  chatTime: {
-    fontSize: 12,
-    color: "#aaa",
-  },
-  chatTask: {
-    fontSize: 13,
-    color: "#16A34A",
-    fontWeight: "500",
-    marginBottom: 2,
-  },
-  chatPreview: {
-    fontSize: 14,
-    color: "#888",
-    lineHeight: 18,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerRow: {
+      alignItems: "center",
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      paddingBottom: 12,
+    },
+    title: {
+      fontSize: 23,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      letterSpacing: -1.0,
+    },
+    list: {
+      paddingHorizontal: 24,
+      paddingBottom: 24,
+    },
+    emptyList: {
+      flex: 1,
+    },
+    chatRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 14,
+      marginBottom: 10,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    avatar: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 12,
+    },
+    avatarText: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: "#fff",
+    },
+    chatContent: {
+      flex: 1,
+    },
+    chatTopRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 2,
+    },
+    chatName: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      flex: 1,
+      marginRight: 8,
+    },
+    chatTime: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    chatTask: {
+      fontSize: 13,
+      color: colors.accent,
+      fontWeight: "500",
+      marginBottom: 2,
+    },
+    chatPreview: {
+      fontSize: 14,
+      color: colors.textMuted,
+      lineHeight: 18,
+    },
+  });
+}

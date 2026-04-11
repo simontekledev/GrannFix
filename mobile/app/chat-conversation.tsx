@@ -17,6 +17,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { chatApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
 
 type ListItem =
@@ -70,6 +71,8 @@ export default function ChatConversationScreen() {
     taskTitle?: string;
   }>();
   const { user } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
 
 
@@ -271,7 +274,7 @@ export default function ChatConversationScreen() {
       >
         {loading ? (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#16A34A" />
+            <ActivityIndicator size="large" color={colors.accent} />
           </View>
         ) : (
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -302,7 +305,7 @@ export default function ChatConversationScreen() {
               value={text}
               onChangeText={setText}
               placeholder="Skicka ett meddelande"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.textMuted}
               style={styles.input}
               multiline
               maxLength={1000}
@@ -330,184 +333,186 @@ export default function ChatConversationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    backgroundColor: "#fff",
-  },
-  backButton: {
-    padding: 4,
-    marginRight: 8,
-  },
-  backArrow: {
-    fontSize: 22,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#1a1a1a",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  headerAvatarText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#fff",
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  headerName: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#111",
-  },
-  headerTask: {
-    fontSize: 13,
-    color: "#16A34A",
-    fontWeight: "500",
-    marginTop: 1,
-  },
-  headerChevron: {
-    fontSize: 26,
-    color: "#ccc",
-    marginLeft: 8,
-    marginRight: 4,
-  },
-  messageList: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexGrow: 1,
-  },
-  dateSeparator: {
-    alignItems: "center",
-    marginVertical: 12,
-  },
-  dateSeparatorText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#999",
-    backgroundColor: "rgba(255,255,255,0.6)",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 10,
-    overflow: "hidden",
-    textTransform: "capitalize",
-  },
-  rowMe: {
-    alignItems: "flex-end",
-  },
-  rowThem: {
-    alignItems: "flex-start",
-  },
-  bubble: {
-    maxWidth: "78%",
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 18,
-  },
-  bubbleMe: {
-    backgroundColor: "#16A34A",
-  },
-  bubbleThem: {
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  bubbleText: {
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  bubbleTextMe: {
-    color: "#fff",
-  },
-  bubbleTextThem: {
-    color: "#222",
-  },
-  timeBelow: {
-    fontSize: 10,
-    color: "#aaa",
-    marginTop: 3,
-    marginBottom: 4,
-  },
-  timeBelowMe: {
-    marginRight: 4,
-  },
-  timeBelowThem: {
-    marginLeft: 4,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#888",
-    marginBottom: 4,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: "#aaa",
-    textAlign: "center",
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    paddingBottom: 18,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    backgroundColor: "#fff",
-    gap: 8,
-  },
-  inputWrapper: {
-    flex: 1,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    paddingHorizontal: 16,
-    minHeight: 44,
-    justifyContent: "center",
-  },
-  input: {
-    fontSize: 15,
-    color: "#111",
-    maxHeight: 100,
-    paddingVertical: Platform.OS === "ios" ? 10 : 6,
-  },
-  sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "#16A34A",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sendArrow: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "700",
-    marginTop: -2,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 32,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.divider,
+      backgroundColor: colors.card,
+    },
+    backButton: {
+      padding: 4,
+      marginRight: 8,
+    },
+    backArrow: {
+      fontSize: 22,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    headerAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+    },
+    headerAvatarText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: "#fff",
+    },
+    headerInfo: {
+      flex: 1,
+    },
+    headerName: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    headerTask: {
+      fontSize: 13,
+      color: colors.accent,
+      fontWeight: "500",
+      marginTop: 1,
+    },
+    headerChevron: {
+      fontSize: 26,
+      color: colors.textMuted,
+      marginLeft: 8,
+      marginRight: 4,
+    },
+    messageList: {
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      flexGrow: 1,
+    },
+    dateSeparator: {
+      alignItems: "center",
+      marginVertical: 12,
+    },
+    dateSeparatorText: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textMuted,
+      backgroundColor: colors.cardElevated,
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+      borderRadius: 10,
+      overflow: "hidden",
+      textTransform: "capitalize",
+    },
+    rowMe: {
+      alignItems: "flex-end",
+    },
+    rowThem: {
+      alignItems: "flex-start",
+    },
+    bubble: {
+      maxWidth: "78%",
+      paddingHorizontal: 14,
+      paddingVertical: 9,
+      borderRadius: 18,
+    },
+    bubbleMe: {
+      backgroundColor: colors.accent,
+    },
+    bubbleThem: {
+      backgroundColor: colors.card,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    bubbleText: {
+      fontSize: 15,
+      lineHeight: 21,
+    },
+    bubbleTextMe: {
+      color: "#fff",
+    },
+    bubbleTextThem: {
+      color: colors.textPrimary,
+    },
+    timeBelow: {
+      fontSize: 10,
+      color: colors.textMuted,
+      marginTop: 3,
+      marginBottom: 4,
+    },
+    timeBelowMe: {
+      marginRight: 4,
+    },
+    timeBelowThem: {
+      marginLeft: 4,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textSecondary,
+      marginBottom: 4,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: "center",
+    },
+    inputRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 12,
+      paddingTop: 12,
+      paddingBottom: 18,
+      borderTopWidth: 1,
+      borderTopColor: colors.divider,
+      backgroundColor: colors.card,
+      gap: 8,
+    },
+    inputWrapper: {
+      flex: 1,
+      backgroundColor: colors.background,
+      borderRadius: 22,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 16,
+      minHeight: 44,
+      justifyContent: "center",
+    },
+    input: {
+      fontSize: 15,
+      color: colors.textPrimary,
+      maxHeight: 100,
+      paddingVertical: Platform.OS === "ios" ? 10 : 6,
+    },
+    sendButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    sendArrow: {
+      fontSize: 18,
+      color: "#fff",
+      fontWeight: "700",
+      marginTop: -2,
+    },
+  });
+}

@@ -19,8 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,18 +38,30 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ChatSummaryResponse> getMyChats(UUID userId) {
         var chats = chatRepository.findByOwnerIdOrHelperIdOrderByCreatedAtDesc(userId, userId);
+        if (chats.isEmpty()) return List.of();
+
+        Set<UUID> chatIds = new HashSet<>();
+        Set<UUID> taskIds = new HashSet<>();
+        Set<UUID> userIds = new HashSet<>();
+        for (Chat chat : chats) {
+            chatIds.add(chat.getId());
+            taskIds.add(chat.getTaskId());
+            userIds.add(chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId());
+        }
+
+        Map<UUID, String> titles = taskChatPort.taskTitles(taskIds);
+        Map<UUID, String> names = userLookupPort.displayNames(userIds);
+        Map<UUID, ChatMessage> lastMessages = messageRepository.findLastMessagesByChatIds(chatIds).stream()
+                .collect(Collectors.toMap(ChatMessage::getChatId, m -> m));
 
         return chats.stream().map(chat -> {
-            String taskTitle = taskChatPort.taskTitle(chat.getTaskId());
             UUID otherPartyId = chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId();
-            String otherPartyName = userLookupPort.displayName(otherPartyId);
-            var lastMsg = messageRepository.findFirstByChatIdOrderByCreatedAtDesc(chat.getId()).orElse(null);
-
+            ChatMessage lastMsg = lastMessages.get(chat.getId());
             return new ChatSummaryResponse(
                     chat.getId(),
                     chat.getTaskId(),
-                    taskTitle,
-                    otherPartyName,
+                    titles.getOrDefault(chat.getTaskId(), "Uppdrag"),
+                    names.get(otherPartyId),
                     lastMsg != null ? lastMsg.getContent() : null,
                     lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt()
             );

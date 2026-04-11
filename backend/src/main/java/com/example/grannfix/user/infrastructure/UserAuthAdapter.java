@@ -9,8 +9,11 @@ import com.example.grannfix.user.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -87,6 +90,13 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort {
         return userRepository.findById(userId)
                 .map(User::getName)
                 .orElse(null);
+    }
+
+    @Override
+    public Map<UUID, String> displayNames(Collection<UUID> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        return userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getId, User::getName));
     }
     private UserAuthView toView(User u) {
         return new UserAuthView(

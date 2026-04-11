@@ -12,9 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -82,5 +85,13 @@ public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort, Task
         return taskRepository.findById(taskId)
                 .map(Task::getTitle)
                 .orElse("Uppdrag");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, String> taskTitles(Collection<UUID> taskIds) {
+        if (taskIds.isEmpty()) return Map.of();
+        return taskRepository.findAllById(taskIds).stream()
+                .collect(Collectors.toMap(Task::getId, Task::getTitle));
     }
 }

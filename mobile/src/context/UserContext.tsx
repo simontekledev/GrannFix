@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { userApi } from "@/src/api/client";
 import type { MeUserDto } from "@/src/api/generated/models/MeUserDto";
@@ -46,6 +46,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     }
   }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   const logout = useCallback(async () => {
     await AsyncStorage.removeItem("access_token");

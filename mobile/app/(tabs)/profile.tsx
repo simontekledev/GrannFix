@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -36,11 +36,6 @@ export default function ProfilScreen() {
   const canSubmit = useMemo(() => {
     return email.trim().length > 0 && password.length > 0 && !submitting;
   }, [email, password, submitting]);
-
-  // Load profile on mount
-  useEffect(() => {
-    if (loggedIn === null) loadProfile();
-  }, [loggedIn, loadProfile]);
 
   async function handleLogin() {
     if (!canSubmit) return;

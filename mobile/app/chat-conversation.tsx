@@ -3,12 +3,14 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -69,6 +71,7 @@ export default function ChatConversationScreen() {
   }>();
   const { user } = useUser();
   const insets = useSafeAreaInsets();
+
 
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -271,20 +274,26 @@ export default function ChatConversationScreen() {
             <ActivityIndicator size="large" color="#16A34A" />
           </View>
         ) : (
-          <FlatList
-            ref={flatListRef}
-            data={listItems}
-            keyExtractor={(item) => item.key}
-            renderItem={renderItem}
-            contentContainerStyle={styles.messageList}
-            onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
-            ListEmptyComponent={
-              <View style={styles.centered}>
-                <Text style={styles.emptyText}>Inga meddelanden ännu</Text>
-                <Text style={styles.emptySubtext}>Skriv ett meddelande för att starta konversationen</Text>
-              </View>
-            }
-          />
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={{ flex: 1 }}>
+              <FlatList
+                ref={flatListRef}
+                data={listItems}
+                keyExtractor={(item) => item.key}
+                renderItem={renderItem}
+                contentContainerStyle={styles.messageList}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={styles.centered}>
+                    <Text style={styles.emptyText}>Inga meddelanden ännu</Text>
+                    <Text style={styles.emptySubtext}>Skriv ett meddelande för att starta konversationen</Text>
+                  </View>
+                }
+              />
+            </View>
+          </TouchableWithoutFeedback>
         )}
 
         <View style={[styles.inputRow, { paddingBottom: Math.max(insets.bottom, 12) + 8 }]}>
@@ -299,7 +308,7 @@ export default function ChatConversationScreen() {
               maxLength={1000}
               editable={!sending}
               onSubmitEditing={handleSend}
-              blurOnSubmit={false}
+              submitBehavior="submit"
             />
           </View>
           {text.trim().length > 0 && (

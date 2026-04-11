@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
@@ -37,6 +38,7 @@ export default function RootLayout() {
   }, [appReady]);
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <UserProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {appReady && (
@@ -72,6 +74,7 @@ export default function RootLayout() {
       )}
     </ThemeProvider>
     </UserProvider>
+    </GestureHandlerRootView>
   );
 }
 

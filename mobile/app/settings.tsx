@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -7,17 +7,21 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "@/src/context/UserContext";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { userApi } from "@/src/api/client";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { logout } = useUser();
+  const { mode, colors, setMode } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [deleting, setDeleting] = useState(false);
 
   async function handleLogout() {
@@ -115,6 +119,19 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>APP</Text>
         <View style={styles.card}>
           {APP_ROWS.map((item, i) => renderRow(item, i, i === APP_ROWS.length - 1))}
+          <View style={styles.divider} />
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <Image source={require("@/assets/images/theme-icon.png")} style={styles.rowIcon} resizeMode="contain" />
+              <Text style={styles.rowText}>Mörkt tema</Text>
+            </View>
+            <Switch
+              value={mode === "dark"}
+              onValueChange={(v) => setMode(v ? "dark" : "light")}
+              trackColor={{ false: "#d1d5db", true: colors.accent }}
+              thumbColor="#ffffff"
+            />
+          </View>
         </View>
 
         <Pressable
@@ -137,7 +154,7 @@ export default function SettingsScreen() {
           ]}
         >
           {deleting ? (
-            <ActivityIndicator color="#DC2626" />
+            <ActivityIndicator color={colors.danger} />
           ) : (
             <Text style={styles.deleteButtonText}>Radera konto</Text>
           )}
@@ -149,124 +166,127 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 20,
-  },
-  backButton: {
-    marginBottom: 12,
-    alignSelf: "flex-start",
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#999",
-    marginBottom: 8,
-    marginTop: 20,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  rowPressed: {
-    backgroundColor: "#f5f5f5",
-  },
-  rowLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  rowIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#4B5563",
-    marginTop: 1,
-  },
-  rowText: {
-    fontSize: 16,
-    color: "#222",
-  },
-  rowArrow: {
-    fontSize: 20,
-    color: "#4B5563",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-    marginHorizontal: 16,
-  },
-  logoutButton: {
-    marginTop: 36,
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#DC2626",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoutButtonHovered: {
-    backgroundColor: "#fef2f2",
-    transform: [{ scale: 1.015 }],
-  },
-  logoutButtonPressed: {
-    opacity: 0.8,
-  },
-  logoutButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#DC2626",
-  },
-  deleteButton: {
-    marginTop: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#999",
-    textDecorationLine: "underline",
-  },
-  versionText: {
-    textAlign: "center",
-    fontSize: 12,
-    color: "#bbb",
-    marginTop: 24,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 20,
+    },
+    backButton: {
+      marginBottom: 12,
+      alignSelf: "flex-start",
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+      marginBottom: 8,
+      marginTop: 20,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+    },
+    rowPressed: {
+      backgroundColor: colors.divider,
+    },
+    rowLeft: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+    },
+    rowIcon: {
+      width: 20,
+      height: 20,
+      tintColor: colors.textSecondary,
+      marginTop: 1,
+    },
+    rowText: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    rowArrow: {
+      fontSize: 20,
+      color: colors.textSecondary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+      marginHorizontal: 16,
+    },
+    logoutButton: {
+      marginTop: 36,
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: colors.danger,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    logoutButtonHovered: {
+      backgroundColor: colors.accentMuted,
+      transform: [{ scale: 1.015 }],
+    },
+    logoutButtonPressed: {
+      opacity: 0.8,
+    },
+    logoutButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.danger,
+    },
+    deleteButton: {
+      marginTop: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    deleteButtonText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.textMuted,
+      textDecorationLine: "underline",
+    },
+    versionText: {
+      textAlign: "center",
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 24,
+      opacity: 0.6,
+    },
+  });
+}

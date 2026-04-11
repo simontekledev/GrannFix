@@ -15,9 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { userApi } from "@/src/api/client";
 import { validatePassword } from "@/src/helpers/password";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const newPasswordRef = useRef<TextInput>(null);
   const confirmRef = useRef<TextInput>(null);
 
@@ -107,7 +110,7 @@ export default function ChangePasswordScreen() {
             onChangeText={setCurrentPassword}
             secureTextEntry
             placeholder="Ange nuvarande lösenord"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             returnKeyType="next"
             onSubmitEditing={() => newPasswordRef.current?.focus()}
@@ -120,7 +123,7 @@ export default function ChangePasswordScreen() {
             onChangeText={setNewPassword}
             secureTextEntry
             placeholder="Minst 8 tecken"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             maxLength={64}
             returnKeyType="next"
@@ -137,7 +140,7 @@ export default function ChangePasswordScreen() {
             onChangeText={setConfirmPassword}
             secureTextEntry
             placeholder="Skriv nya lösenordet igen"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             returnKeyType="done"
             onSubmitEditing={handleChangePassword}
@@ -172,82 +175,85 @@ export default function ChangePasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 20,
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 12,
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: "#111",
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  errorText: {
-    color: "#e53e3e",
-    fontSize: 13,
-    marginTop: 4,
-  },
-  successText: {
-    color: "#16A34A",
-    fontSize: 13,
-    marginTop: 4,
-  },
-  button: {
-    marginTop: 28,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonHovered: {
-    backgroundColor: "#15913F",
-    transform: [{ scale: 1.015 }],
-  },
-  buttonDisabled: {
-    opacity: 0.35,
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 20,
+    },
+    backButton: {
+      alignSelf: "flex-start",
+      marginBottom: 12,
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 6,
+      marginTop: 16,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.textPrimary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    errorText: {
+      color: colors.danger,
+      fontSize: 13,
+      marginTop: 4,
+    },
+    successText: {
+      color: colors.accent,
+      fontSize: 13,
+      marginTop: 4,
+    },
+    button: {
+      marginTop: 28,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    buttonHovered: {
+      backgroundColor: colors.accent,
+      opacity: 0.92,
+      transform: [{ scale: 1.015 }],
+    },
+    buttonDisabled: {
+      opacity: 0.35,
+    },
+    buttonPressed: {
+      opacity: 0.8,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+  });
+}

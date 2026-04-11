@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -17,12 +17,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { userApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { formStyles } from "@/src/styles/form";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const { user, setUser } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [loading, setLoading] = useState(!user);
   const [submitting, setSubmitting] = useState(false);
 
@@ -109,7 +112,7 @@ export default function EditProfileScreen() {
             onChangeText={setName}
             style={styles.input}
             placeholder="Ditt namn"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Text style={styles.label}>Bio <Text style={formStyles.optional}>(valfritt)</Text></Text>
@@ -118,7 +121,7 @@ export default function EditProfileScreen() {
             onChangeText={setBio}
             style={[styles.input, styles.bioInput]}
             placeholder="Berätta om dig själv"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             multiline
           />
 
@@ -128,7 +131,7 @@ export default function EditProfileScreen() {
             onChangeText={setEmail}
             style={styles.input}
             placeholder="din@email.com"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -154,7 +157,7 @@ export default function EditProfileScreen() {
             onChangeText={setStreet}
             style={styles.input}
             placeholder="Gatuadress (valfritt)"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
           />
 
           <Pressable
@@ -196,7 +199,7 @@ export default function EditProfileScreen() {
               value={areaSearch}
               onChangeText={setAreaSearch}
               placeholder="Sök..."
-              placeholderTextColor="#a0a0a0"
+              placeholderTextColor={colors.textMuted}
               autoCorrect={false}
               style={styles.searchInput}
             />
@@ -229,162 +232,165 @@ export default function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 20,
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 12,
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: "#111",
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  bioInput: {
-    minHeight: 80,
-    textAlignVertical: "top",
-  },
-  disabledInput: {
-    backgroundColor: "#f0f0f0",
-  },
-  disabledText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#999",
-  },
-  areaText: {
-    fontSize: 16,
-    color: "#111",
-  },
-  areaPlaceholder: {
-    fontSize: 16,
-    color: "#a0a0a0",
-  },
-  saveButton: {
-    marginTop: 28,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  saveButtonDisabled: {
-    opacity: 0.35,
-  },
-  saveButtonHovered: {
-    backgroundColor: "#15913F",
-    transform: [{ scale: 1.015 }],
-  },
-  saveButtonPressed: {
-    opacity: 0.8,
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "60%",
-    paddingBottom: 32,
-  },
-  modalHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: "#ddd",
-    borderRadius: 2,
-    alignSelf: "center",
-    position: "absolute",
-    top: 8,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#111",
-    textAlign: "center",
-    paddingTop: 20,
-    paddingBottom: 12,
-  },
-  searchInput: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#111",
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  modalItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  modalItemSelected: {
-    backgroundColor: "#f0fdf4",
-  },
-  modalItemPressed: {
-    backgroundColor: "#f5f5f5",
-  },
-  modalItemText: {
-    fontSize: 16,
-    color: "#111",
-  },
-  modalCheck: {
-    fontSize: 16,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 20,
+    },
+    backButton: {
+      alignSelf: "flex-start",
+      marginBottom: 12,
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 6,
+      marginTop: 16,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.textPrimary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    bioInput: {
+      minHeight: 80,
+      textAlignVertical: "top",
+    },
+    disabledInput: {
+      backgroundColor: colors.divider,
+    },
+    disabledText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    areaText: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    areaPlaceholder: {
+      fontSize: 16,
+      color: colors.textMuted,
+    },
+    saveButton: {
+      marginTop: 28,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    saveButtonDisabled: {
+      opacity: 0.35,
+    },
+    saveButtonHovered: {
+      backgroundColor: colors.accent,
+      opacity: 0.92,
+      transform: [{ scale: 1.015 }],
+    },
+    saveButtonPressed: {
+      opacity: 0.8,
+    },
+    saveButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.4)",
+      justifyContent: "flex-end",
+    },
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: "60%",
+      paddingBottom: 32,
+    },
+    modalHandle: {
+      width: 36,
+      height: 4,
+      backgroundColor: colors.border,
+      borderRadius: 2,
+      alignSelf: "center",
+      position: "absolute",
+      top: 8,
+    },
+    modalTitle: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      textAlign: "center",
+      paddingTop: 20,
+      paddingBottom: 12,
+    },
+    searchInput: {
+      backgroundColor: colors.background,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: colors.textPrimary,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    modalItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.divider,
+    },
+    modalItemSelected: {
+      backgroundColor: colors.accentMuted,
+    },
+    modalItemPressed: {
+      backgroundColor: colors.divider,
+    },
+    modalItemText: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    modalCheck: {
+      fontSize: 16,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+  });
+}

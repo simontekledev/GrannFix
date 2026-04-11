@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Pressable,
   ScrollView,
@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 const SECTIONS = [
   {
@@ -46,6 +47,8 @@ const SECTIONS = [
 
 export default function TermsScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -72,65 +75,61 @@ export default function TermsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 12,
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-  },
-  updated: {
-    fontSize: 13,
-    color: "#999",
-    marginTop: 4,
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardNumber: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#16A34A",
-    marginBottom: 4,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 8,
-  },
-  cardBody: {
-    fontSize: 14,
-    color: "#555",
-    lineHeight: 22,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 16,
+    },
+    backButton: {
+      alignSelf: "flex-start",
+      marginBottom: 12,
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    updated: {
+      fontSize: 13,
+      color: colors.textMuted,
+      marginTop: 4,
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 18,
+      marginBottom: 12,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    cardBody: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
+  });
+}

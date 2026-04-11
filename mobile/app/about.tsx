@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Image,
   Linking,
@@ -10,9 +10,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function AboutScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -87,98 +90,101 @@ export default function AboutScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  backButton: {
-    alignSelf: "flex-start",
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 48,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: -20,
-  },
-  logo: {
-    width: 240,
-    height: 240,
-  },
-  description: {
-    fontSize: 15,
-    color: "#555",
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 8,
-    paddingHorizontal: 8,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#999",
-    marginBottom: 6,
-    marginTop: 16,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  rowPressed: {
-    backgroundColor: "#f5f5f5",
-  },
-  rowLabel: {
-    fontSize: 16,
-    color: "#222",
-  },
-  rowValue: {
-    fontSize: 15,
-    color: "#888",
-  },
-  rowLink: {
-    fontSize: 15,
-    color: "#3B82F6",
-    fontWeight: "500",
-  },
-  rowArrow: {
-    fontSize: 20,
-    color: "#4B5563",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-    marginHorizontal: 16,
-  },
-  footer: {
-    textAlign: "center",
-    fontSize: 13,
-    color: "#bbb",
-    marginTop: 32,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 12,
+    },
+    backButton: {
+      alignSelf: "flex-start",
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingBottom: 48,
+    },
+    logoContainer: {
+      alignItems: "center",
+      marginBottom: -20,
+    },
+    logo: {
+      width: 240,
+      height: 240,
+    },
+    description: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      marginBottom: 8,
+      paddingHorizontal: 8,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+      marginBottom: 6,
+      marginTop: 16,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    row: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+    },
+    rowPressed: {
+      backgroundColor: colors.divider,
+    },
+    rowLabel: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    rowValue: {
+      fontSize: 15,
+      color: colors.textMuted,
+    },
+    rowLink: {
+      fontSize: 15,
+      color: "#3B82F6",
+      fontWeight: "500",
+    },
+    rowArrow: {
+      fontSize: 20,
+      color: colors.textSecondary,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.divider,
+      marginHorizontal: 16,
+    },
+    footer: {
+      textAlign: "center",
+      fontSize: 13,
+      color: colors.textMuted,
+      marginTop: 32,
+      opacity: 0.6,
+    },
+  });
+}

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Platform,
@@ -12,10 +13,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "@/src/context/UserContext";
+import { userApi } from "@/src/api/client";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { logout } = useUser();
+  const [deleting, setDeleting] = useState(false);
 
   async function handleLogout() {
     await logout();
@@ -29,6 +32,36 @@ export default function SettingsScreen() {
       Alert.alert("Logga ut", "Vill du logga ut?", [
         { text: "Avbryt", style: "cancel" },
         { text: "Logga ut", style: "destructive", onPress: handleLogout },
+      ]);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true);
+    try {
+      await userApi.removeMe();
+      await logout();
+      router.replace("/(tabs)" as any);
+    } catch (e) {
+      console.log("Delete account error:", e);
+      const msg = "Kunde inte radera kontot. Försök igen.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function confirmDeleteAccount() {
+    const title = "Radera konto";
+    const message =
+      "Är du säker på att du vill radera ditt konto? Detta går inte att ångra. Dina öppna uppdrag kommer att avbrytas och din personliga information tas bort.";
+    if (Platform.OS === "web") {
+      if (window.confirm(`${title}\n\n${message}`)) handleDeleteAccount();
+    } else {
+      Alert.alert(title, message, [
+        { text: "Avbryt", style: "cancel" },
+        { text: "Radera konto", style: "destructive", onPress: handleDeleteAccount },
       ]);
     }
   }
@@ -93,6 +126,21 @@ export default function SettingsScreen() {
           ]}
         >
           <Text style={styles.logoutButtonText}>Logga ut</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={confirmDeleteAccount}
+          disabled={deleting}
+          style={({ pressed }) => [
+            styles.deleteButton,
+            pressed && !deleting && { opacity: 0.7 },
+          ]}
+        >
+          {deleting ? (
+            <ActivityIndicator color="#DC2626" />
+          ) : (
+            <Text style={styles.deleteButtonText}>Radera konto</Text>
+          )}
         </Pressable>
 
         <Text style={styles.versionText}>Grannfix v1.0.0</Text>
@@ -202,6 +250,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#DC2626",
+  },
+  deleteButton: {
+    marginTop: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#999",
+    textDecorationLine: "underline",
   },
   versionText: {
     textAlign: "center",

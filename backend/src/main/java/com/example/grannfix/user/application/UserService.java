@@ -67,6 +67,13 @@ public class UserService {
     public void removeMe(UUID userId){
         User u = getActiveUserOrThrow(userId);
         u.setActive(false);
+        u.setEmail(null);
+        u.setPhoneNumber(null);
+        u.setName("Borttagen användare");
+        u.setBio(null);
+        u.setStreet(null);
+        u.setPassword("DELETED");
+        u.setVerified(false);
         taskAdminPort.cancelOpenOrAssignedTasksCreatedBy(u.getId());
     }
 

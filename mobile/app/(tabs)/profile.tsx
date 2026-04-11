@@ -19,11 +19,14 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { authApi } from "@/src/api/client";
 import { StarRating } from "@/src/components/StarRating";
 import { useUser } from "@/src/context/UserContext";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function ProfilScreen() {
   const router = useRouter();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { user, loggedIn, loadProfile } = useUser();
+  const { mode, colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
 
@@ -105,8 +108,8 @@ export default function ProfilScreen() {
   if (loggedIn) {
     return (
       <View style={styles.safe}>
-        <SafeAreaView style={{ backgroundColor: "#e8f5e9" }} edges={["top"]}>
-          <LinearGradient colors={["#e8f5e9", "#f5faf2"]} style={styles.profileGradientHeader}>
+        <SafeAreaView style={{ backgroundColor: colors.headerGradient[0] }} edges={["top"]}>
+          <LinearGradient colors={colors.headerGradient} style={styles.profileGradientHeader}>
             <Pressable
               onPress={() => router.push("/settings")}
               style={styles.settingsButton}
@@ -252,7 +255,7 @@ export default function ProfilScreen() {
             keyboardType="email-address"
             textContentType="username"
             placeholder="din@email.com"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             returnKeyType="next"
@@ -267,7 +270,7 @@ export default function ProfilScreen() {
             secureTextEntry
             textContentType="password"
             placeholder="Ange ditt lösenord"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             returnKeyType="done"
@@ -313,272 +316,276 @@ export default function ProfilScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  safeLogin: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingTop: 0,
-    paddingBottom: 48,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: -16,
-  },
-  logo: {
-    width: 260,
-    height: 260,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#666",
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  profileGradientHeader: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  profileScroll: {
-    paddingHorizontal: 24,
-    paddingTop: 0,
-    paddingBottom: 48,
-  },
-  settingsButton: {
-    padding: 6,
-  },
-  settingsIcon: {
-    width: 26,
-    height: 26,
-    opacity: 0.7,
-  },
-  profileHero: {
-    alignItems: "center",
-    marginBottom: 28,
-    marginTop: 4,
-  },
-  profileIconWrapper: {
-    position: "relative",
-    marginBottom: 14,
-  },
-  profileIcon: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-  },
-  nameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  profileName: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 6,
-  },
-  bioText: {
-    fontSize: 15,
-    color: "#555",
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 10,
-    paddingHorizontal: 12,
-  },
-  verifiedText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#3B82F6",
-    marginTop: 2,
-    marginBottom: 4,
-  },
-  verifiedPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    backgroundColor: "#E0ECFF",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    marginTop: 4,
-  },
-  verifiedIconWrapper: {
-    position: "absolute",
-    bottom: 8,
-    right: 8,
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 2,
-  },
-  verifiedIcon: {
-    width: 24,
-    height: 24,
-  },
-  tooltip: {
-    backgroundColor: "#E0ECFF",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginTop: -4,
-    marginBottom: -2,
-  },
-  tooltipText: {
-    fontSize: 11,
-    color: "#3B82F6",
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-  verifiedPillText: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#3B82F6",
-    opacity: 0.85,
-  },
-  unverifiedPill: {
-    backgroundColor: "#fef2f2",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    marginTop: 4,
-  },
-  unverifiedPillText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#999",
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#999",
-    marginBottom: 8,
-    marginTop: 4,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  detailCard: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#888",
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
-    textAlign: "right",
-    flex: 1,
-    marginLeft: 16,
-  },
-  detailDivider: {
-    height: 1,
-    backgroundColor: "#eee",
-  },
-  section: {
-    marginTop: 32,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: "#111",
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  button: {
-    marginTop: 28,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonHovered: {
-    backgroundColor: "#15913F",
-    transform: [{ scale: 1.015 }],
-  },
-  buttonDisabled: { opacity: 0.35 },
-  buttonPressed: { opacity: 0.8 },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#e8e8e8",
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 13,
-    color: "#999",
-  },
-  registerButton: {
-    borderWidth: 1,
-    borderColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  registerButtonHovered: {
-    backgroundColor: "#f0fdf4",
-    transform: [{ scale: 1.015 }],
-  },
-  registerButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#16A34A",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    safeLogin: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingTop: 0,
+      paddingBottom: 48,
+    },
+    logoContainer: {
+      alignItems: "center",
+      marginTop: 10,
+      marginBottom: -16,
+    },
+    logo: {
+      width: 260,
+      height: 260,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      marginBottom: 24,
+      textAlign: "center",
+    },
+    profileGradientHeader: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      paddingBottom: 4,
+    },
+    profileScroll: {
+      paddingHorizontal: 24,
+      paddingTop: 0,
+      paddingBottom: 48,
+    },
+    settingsButton: {
+      padding: 6,
+    },
+    settingsIcon: {
+      width: 26,
+      height: 26,
+      opacity: 0.7,
+      tintColor: colors.textPrimary,
+    },
+    profileHero: {
+      alignItems: "center",
+      marginBottom: 28,
+      marginTop: 4,
+    },
+    profileIconWrapper: {
+      position: "relative",
+      marginBottom: 14,
+    },
+    profileIcon: {
+      width: 140,
+      height: 140,
+      borderRadius: 70,
+    },
+    nameRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    profileName: {
+      fontSize: 26,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 6,
+    },
+    bioText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      marginBottom: 10,
+      paddingHorizontal: 12,
+    },
+    verifiedText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: "#3B82F6",
+      marginTop: 2,
+      marginBottom: 4,
+    },
+    verifiedPill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 7,
+      backgroundColor: "#E0ECFF",
+      borderRadius: 20,
+      paddingHorizontal: 14,
+      paddingVertical: 5,
+      marginTop: 4,
+    },
+    verifiedIconWrapper: {
+      position: "absolute",
+      bottom: 8,
+      right: 8,
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 2,
+    },
+    verifiedIcon: {
+      width: 24,
+      height: 24,
+    },
+    tooltip: {
+      backgroundColor: "#E0ECFF",
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      marginTop: -4,
+      marginBottom: -2,
+    },
+    tooltipText: {
+      fontSize: 11,
+      color: "#3B82F6",
+      fontWeight: "500",
+      letterSpacing: 0.3,
+    },
+    verifiedPillText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: "#3B82F6",
+      opacity: 0.85,
+    },
+    unverifiedPill: {
+      backgroundColor: "#fef2f2",
+      borderRadius: 20,
+      paddingHorizontal: 14,
+      paddingVertical: 5,
+      marginTop: 4,
+    },
+    unverifiedPillText: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+      marginBottom: 8,
+      marginTop: 4,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    detailCard: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 16,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    detailRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 10,
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.textMuted,
+    },
+    detailValue: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.textPrimary,
+      textAlign: "right",
+      flex: 1,
+      marginLeft: 16,
+    },
+    detailDivider: {
+      height: 1,
+      backgroundColor: colors.divider,
+    },
+    section: {
+      marginTop: 32,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 6,
+      marginTop: 16,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.textPrimary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    button: {
+      marginTop: 28,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    buttonHovered: {
+      backgroundColor: colors.accent,
+      opacity: 0.92,
+      transform: [{ scale: 1.015 }],
+    },
+    buttonDisabled: { opacity: 0.35 },
+    buttonPressed: { opacity: 0.8 },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    divider: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginVertical: 24,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    dividerText: {
+      marginHorizontal: 16,
+      fontSize: 13,
+      color: colors.textMuted,
+    },
+    registerButton: {
+      borderWidth: 1,
+      borderColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    registerButtonHovered: {
+      backgroundColor: colors.accentMuted,
+      transform: [{ scale: 1.015 }],
+    },
+    registerButtonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.accent,
+    },
+  });
+}

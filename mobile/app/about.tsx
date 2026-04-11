@@ -14,7 +14,7 @@ import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function AboutScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { mode, colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
@@ -31,7 +31,11 @@ export default function AboutScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/grannfix-primary-transparent-logo.png")}
+            source={
+              mode === "dark"
+                ? require("@/assets/images/grannfix-primary-transparent-logo-dark.png")
+                : require("@/assets/images/grannfix-primary-transparent-logo.png")
+            }
             style={styles.logo}
             resizeMode="contain"
           />

@@ -75,6 +75,12 @@ export interface MeUserDto {
     verified?: boolean;
     /**
      * 
+     * @type {string}
+     * @memberof MeUserDto
+     */
+    role?: string;
+    /**
+     * 
      * @type {number}
      * @memberof MeUserDto
      */
@@ -119,6 +125,7 @@ export function MeUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
         'verified': json['verified'] == null ? undefined : json['verified'],
+        'role': json['role'] == null ? undefined : json['role'],
         'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
         'ratingCount': json['ratingCount'] == null ? undefined : json['ratingCount'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
@@ -145,6 +152,7 @@ export function MeUserDtoToJSONTyped(value?: MeUserDto | null, ignoreDiscriminat
         'area': value['area'],
         'street': value['street'],
         'verified': value['verified'],
+        'role': value['role'],
         'ratingAverage': value['ratingAverage'],
         'ratingCount': value['ratingCount'],
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),

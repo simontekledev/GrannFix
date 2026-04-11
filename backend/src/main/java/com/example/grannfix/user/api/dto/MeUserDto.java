@@ -13,6 +13,7 @@ public record MeUserDto(
         String area,
         String street,
         boolean verified,
+        String role,
         Double ratingAverage,
         Integer ratingCount,
         Instant createdAt

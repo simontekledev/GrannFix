@@ -6,9 +6,9 @@
 
 Name | Type
 ------------ | -------------
+`empty` | boolean
 `sorted` | boolean
 `unsorted` | boolean
-`empty` | boolean
 
 ## Example
 
@@ -17,9 +17,9 @@ import type { SortObject } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "empty": null,
   "sorted": null,
   "unsorted": null,
-  "empty": null,
 } satisfies SortObject
 
 console.log(example)

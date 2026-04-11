@@ -123,7 +123,11 @@ export default function ProfilScreen() {
           <View style={styles.profileHero}>
             <View style={styles.profileIconWrapper}>
               <Image
-                source={require("@/assets/images/user-profile1-icon.png")}
+                source={
+                  (user as any)?.role === "ADMIN"
+                    ? require("@/assets/images/grannfix-icon.png")
+                    : require("@/assets/images/user-profile1-icon.png")
+                }
                 style={styles.profileIcon}
               />
               {user?.verified && (

@@ -21,6 +21,7 @@ public class UserMapper {
                 user.getArea(),
                 user.getStreet(),
                 user.isVerified(),
+                user.getRole() != null ? user.getRole().name() : "USER",
                 safeDouble(user.getRatingAverage()),
                 safeInt(user.getRatingCount()),
                 user.getCreatedAt()

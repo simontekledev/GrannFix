@@ -58,18 +58,6 @@ export interface PageAdminUserDto {
      * @type {number}
      * @memberof PageAdminUserDto
      */
-    numberOfElements?: number;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageAdminUserDto
-     */
-    pageable?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAdminUserDto
-     */
     size?: number;
     /**
      * 
@@ -103,6 +91,18 @@ export interface PageAdminUserDto {
     last?: boolean;
     /**
      * 
+     * @type {number}
+     * @memberof PageAdminUserDto
+     */
+    numberOfElements?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageAdminUserDto
+     */
+    pageable?: PageableObject;
+    /**
+     * 
      * @type {boolean}
      * @memberof PageAdminUserDto
      */
@@ -128,14 +128,14 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
         'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
-        'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
-        'pageable': json['pageable'] == null ? undefined : PageableObjectFromJSON(json['pageable']),
         'size': json['size'] == null ? undefined : json['size'],
         'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminUserDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
         'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
         'first': json['first'] == null ? undefined : json['first'],
         'last': json['last'] == null ? undefined : json['last'],
+        'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
+        'pageable': json['pageable'] == null ? undefined : PageableObjectFromJSON(json['pageable']),
         'empty': json['empty'] == null ? undefined : json['empty'],
     };
 }
@@ -153,14 +153,14 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
         
         'totalPages': value['totalPages'],
         'totalElements': value['totalElements'],
-        'numberOfElements': value['numberOfElements'],
-        'pageable': PageableObjectToJSON(value['pageable']),
         'size': value['size'],
         'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminUserDtoToJSON)),
         'number': value['number'],
         'sort': SortObjectToJSON(value['sort']),
         'first': value['first'],
         'last': value['last'],
+        'numberOfElements': value['numberOfElements'],
+        'pageable': PageableObjectToJSON(value['pageable']),
         'empty': value['empty'],
     };
 }

@@ -15,6 +15,7 @@ Name | Type
 `area` | string
 `street` | string
 `verified` | boolean
+`role` | string
 `ratingAverage` | number
 `ratingCount` | number
 `createdAt` | Date
@@ -35,6 +36,7 @@ const example = {
   "area": null,
   "street": null,
   "verified": null,
+  "role": null,
   "ratingAverage": null,
   "ratingCount": null,
   "createdAt": null,

@@ -21,6 +21,7 @@ import { authApi } from "@/src/api/client";
 import { StarRating } from "@/src/components/StarRating";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { ProfileSkeleton } from "@/src/components/Skeleton";
 
 export default function ProfilScreen() {
   const router = useRouter();
@@ -105,9 +106,7 @@ export default function ProfilScreen() {
   if (loggedIn === null) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#111" />
-        </View>
+        <ProfileSkeleton />
       </SafeAreaView>
     );
   }

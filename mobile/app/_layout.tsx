@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
 import { ThemeProvider as AppThemeProvider } from '@/src/context/ThemeContext';
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +41,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+    <ErrorBoundary>
     <AppThemeProvider>
     <UserProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -77,6 +79,7 @@ export default function RootLayout() {
     </ThemeProvider>
     </UserProvider>
     </AppThemeProvider>
+    </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

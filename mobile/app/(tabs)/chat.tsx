@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -11,68 +10,44 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUser } from "@/src/context/UserContext";
 import { EmptyState } from "@/src/components/EmptyState";
+import { chatApi } from "@/src/api/client";
+import type { ChatSummaryResponse } from "@/src/api/generated/models/ChatSummaryResponse";
 import { timeAgo } from "@/src/helpers/time";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
-
-interface ChatSummary {
-  id: string;
-  taskId: string;
-  taskTitle: string;
-  otherPartyName: string;
-  lastMessage: string | null;
-  lastMessageAt: string | null;
-}
-
-const BASE_URL = "http://192.168.1.164:8080";
+import { ChatListSkeleton } from "@/src/components/Skeleton";
 
 export default function ChatListScreen() {
   const router = useRouter();
+  const { loggedIn } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [chats, setChats] = useState<ChatSummary[]>([]);
+  const [chats, setChats] = useState<ChatSummaryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
   const fetchChats = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem("access_token");
-      if (!token) return;
-      const res = await fetch(`${BASE_URL}/chats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed");
-      const data: ChatSummary[] = await res.json();
+      const data = await chatApi.getMyChats();
       setChats(data);
     } catch (e) {
       console.log("Failed to load chats:", e);
     }
   }, []);
 
-  const checkAuth = useCallback(async () => {
-    const token = await AsyncStorage.getItem("access_token");
-    setLoggedIn(!!token);
-    return !!token;
-  }, []);
-
   useEffect(() => {
-    checkAuth().then((isLoggedIn) => {
-      if (isLoggedIn) {
-        fetchChats().finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
-  }, [checkAuth, fetchChats]);
+    if (loggedIn) {
+      fetchChats().finally(() => setLoading(false));
+    } else if (loggedIn === false) {
+      setLoading(false);
+    }
+  }, [loggedIn, fetchChats]);
 
   useFocusEffect(
     useCallback(() => {
-      checkAuth().then((isLoggedIn) => {
-        if (isLoggedIn) fetchChats();
-      });
-    }, [checkAuth, fetchChats])
+      if (loggedIn) fetchChats();
+    }, [loggedIn, fetchChats])
   );
 
   async function onRefresh() {
@@ -84,9 +59,7 @@ export default function ChatListScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.accent} />
-        </View>
+        <ChatListSkeleton />
       </SafeAreaView>
     );
   }
@@ -108,13 +81,13 @@ export default function ChatListScreen() {
     );
   }
 
-  function renderChat({ item }: { item: ChatSummary }) {
+  function renderChat({ item }: { item: ChatSummaryResponse }) {
     const initial = (item.otherPartyName ?? "?").charAt(0).toUpperCase();
 
     return (
       <Pressable
         style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
-        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName)}&taskTitle=${encodeURIComponent(item.taskTitle)}` as any)}
+        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}` as any)}
       >
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{initial}</Text>
@@ -123,7 +96,7 @@ export default function ChatListScreen() {
           <View style={styles.chatTopRow}>
             <Text style={styles.chatName} numberOfLines={1}>{item.otherPartyName}</Text>
             {item.lastMessageAt && (
-              <Text style={styles.chatTime}>{timeAgo(new Date(item.lastMessageAt))}</Text>
+              <Text style={styles.chatTime}>{timeAgo(item.lastMessageAt)}</Text>
             )}
           </View>
           {item.lastMessage && (
@@ -144,7 +117,7 @@ export default function ChatListScreen() {
 
       <FlatList
         data={chats}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id ?? Math.random().toString()}
         renderItem={renderChat}
         contentContainerStyle={chats.length === 0 ? styles.emptyList : styles.list}
         refreshControl={

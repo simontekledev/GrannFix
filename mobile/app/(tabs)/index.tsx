@@ -265,6 +265,8 @@ export default function UpptäckScreen() {
         keyExtractor={(item) => item.id ?? Math.random().toString()}
         renderItem={renderTask}
         contentContainerStyle={tasks.length === 0 ? styles.emptyList : styles.list}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textPrimary} />
         }

@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,6 +28,13 @@ export default function ProfilScreen() {
   const { user, loggedIn, loadProfile } = useUser();
   const { mode, colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await loadProfile();
+    setRefreshing(false);
+  }
 
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
 
@@ -122,7 +130,12 @@ export default function ProfilScreen() {
             </Pressable>
           </LinearGradient>
         </SafeAreaView>
-        <ScrollView contentContainerStyle={styles.profileScroll}>
+        <ScrollView
+          contentContainerStyle={styles.profileScroll}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+          }
+        >
           <View style={styles.profileHero}>
             <View style={styles.profileIconWrapper}>
               <Image

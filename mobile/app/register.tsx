@@ -19,9 +19,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { authApi } from "@/src/api/client";
 import { validatePassword } from "@/src/helpers/password";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -44,7 +47,6 @@ export default function RegisterScreen() {
   const [submitting, setSubmitting] = useState(false);
 
   const passwordsMatch = password === confirmPassword;
-
   const passwordError = password.length > 0 ? validatePassword(password) : null;
 
   const phoneDigits = phoneLocal.replace(/\D/g, "");
@@ -149,7 +151,7 @@ export default function RegisterScreen() {
             value={name}
             onChangeText={setName}
             placeholder="Ange ditt fullständiga namn"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             returnKeyType="next"
@@ -165,7 +167,7 @@ export default function RegisterScreen() {
             autoCorrect={false}
             keyboardType="email-address"
             placeholder="din@email.com"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             returnKeyType="next"
@@ -179,7 +181,7 @@ export default function RegisterScreen() {
             onChangeText={setPassword}
             secureTextEntry
             placeholder="Minst 8 tecken"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             maxLength={64}
@@ -197,7 +199,7 @@ export default function RegisterScreen() {
             onChangeText={setConfirmPassword}
             secureTextEntry
             placeholder="Skriv lösenordet igen"
-            placeholderTextColor="#a0a0a0"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             editable={!submitting}
             returnKeyType="next"
@@ -215,7 +217,7 @@ export default function RegisterScreen() {
           <Text style={styles.label}>Telefonnummer</Text>
           <View style={styles.phoneRow}>
             <View style={styles.phonePrefix}>
-              <Text style={styles.phonePrefixText}>🇸🇪 +46</Text>
+              <Text style={styles.phonePrefixText}>+46</Text>
             </View>
             <TextInput
               ref={phoneRef}
@@ -223,7 +225,7 @@ export default function RegisterScreen() {
               onChangeText={handlePhoneChange}
               keyboardType="number-pad"
               placeholder="7X XXX XX XX"
-              placeholderTextColor="#a0a0a0"
+              placeholderTextColor={colors.textMuted}
               style={[styles.input, styles.phoneInput]}
               editable={!submitting}
               maxLength={12}
@@ -266,7 +268,7 @@ export default function RegisterScreen() {
                   value={areaSearch}
                   onChangeText={setAreaSearch}
                   placeholder="Sök..."
-                  placeholderTextColor="#a0a0a0"
+                  placeholderTextColor={colors.textMuted}
                   autoCorrect={false}
                   style={styles.searchInput}
                 />
@@ -323,181 +325,183 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 48,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: "#666",
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 6,
-    marginTop: 16,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: "#111",
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  disabledInput: {
-    backgroundColor: "#efefef",
-  },
-  disabledText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  phoneRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  phonePrefix: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  phonePrefixText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  phoneInput: {
-    flex: 1,
-  },
-  button: {
-    marginTop: 28,
-    backgroundColor: "#16A34A",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonDisabled: { opacity: 0.35 },
-  buttonPressed: { opacity: 0.8 },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  linkButton: {
-    marginTop: 16,
-    alignItems: "center",
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  linkTextBold: {
-    fontWeight: "600",
-    color: "#16A34A",
-  },
-  errorText: {
-    color: "#e53e3e",
-    fontSize: 13,
-    marginTop: 4,
-  },
-  successText: {
-    color: "#16A34A",
-    fontSize: 13,
-    marginTop: 4,
-  },
-  areaSelectedText: {
-    fontSize: 16,
-    color: "#111",
-  },
-  areaPlaceholderText: {
-    fontSize: 16,
-    color: "#a0a0a0",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "60%",
-    paddingBottom: 32,
-  },
-  modalHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: "#ddd",
-    borderRadius: 2,
-    alignSelf: "center",
-    position: "absolute",
-    top: 8,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#111",
-    textAlign: "center",
-    paddingTop: 20,
-    paddingBottom: 12,
-  },
-  searchInput: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#111",
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#e8e8e8",
-  },
-  modalItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#eee",
-  },
-  modalItemSelected: {
-    backgroundColor: "#f0fdf4",
-  },
-  modalItemPressed: {
-    backgroundColor: "#f5f5f5",
-  },
-  modalItemText: {
-    fontSize: 16,
-    color: "#111",
-  },
-  modalCheck: {
-    fontSize: 16,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scroll: {
+      paddingHorizontal: 24,
+      paddingTop: 24,
+      paddingBottom: 48,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      marginBottom: 24,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 6,
+      marginTop: 16,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      fontSize: 16,
+      color: colors.textPrimary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    disabledInput: {
+      backgroundColor: colors.divider,
+    },
+    disabledText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    phoneRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    phonePrefix: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    phonePrefixText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    phoneInput: {
+      flex: 1,
+    },
+    button: {
+      marginTop: 28,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    buttonDisabled: { opacity: 0.35 },
+    buttonPressed: { opacity: 0.8 },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    linkButton: {
+      marginTop: 16,
+      alignItems: "center",
+    },
+    linkText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    linkTextBold: {
+      fontWeight: "600",
+      color: colors.accent,
+    },
+    errorText: {
+      color: colors.danger,
+      fontSize: 13,
+      marginTop: 4,
+    },
+    successText: {
+      color: colors.accent,
+      fontSize: 13,
+      marginTop: 4,
+    },
+    areaSelectedText: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    areaPlaceholderText: {
+      fontSize: 16,
+      color: colors.textMuted,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "flex-end",
+    },
+    modalContent: {
+      backgroundColor: colors.card,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: "60%",
+      paddingBottom: 32,
+    },
+    modalHandle: {
+      width: 36,
+      height: 4,
+      backgroundColor: colors.border,
+      borderRadius: 2,
+      alignSelf: "center",
+      position: "absolute",
+      top: 8,
+    },
+    modalTitle: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      textAlign: "center",
+      paddingTop: 20,
+      paddingBottom: 12,
+    },
+    searchInput: {
+      backgroundColor: colors.background,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: colors.textPrimary,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    modalItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.divider,
+    },
+    modalItemSelected: {
+      backgroundColor: colors.accentMuted,
+    },
+    modalItemPressed: {
+      backgroundColor: colors.divider,
+    },
+    modalItemText: {
+      fontSize: 16,
+      color: colors.textPrimary,
+    },
+    modalCheck: {
+      fontSize: 16,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -13,17 +13,16 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { userApi } from "@/src/api/client";
 import type { PublicUserDto } from "@/src/api/generated/models/PublicUserDto";
 import { StarRating } from "@/src/components/StarRating";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 export default function PublicUserScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [user, setUser] = useState<PublicUserDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
-
-  function goBack() {
-    router.back();
-  }
 
   useEffect(() => {
     if (!id) return;
@@ -45,7 +44,7 @@ export default function PublicUserScreen() {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#16A34A" />
+          <ActivityIndicator size="large" color={colors.accent} />
         </View>
       </SafeAreaView>
     );
@@ -56,7 +55,7 @@ export default function PublicUserScreen() {
       <SafeAreaView style={styles.safe} edges={["top"]}>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Användaren kunde inte hittas</Text>
-          <Pressable onPress={() => goBack()} style={styles.backLink}>
+          <Pressable onPress={() => router.back()} style={styles.backLink}>
             <Text style={styles.backLinkText}>← Tillbaka</Text>
           </Pressable>
         </View>
@@ -68,7 +67,7 @@ export default function PublicUserScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Pressable
-          onPress={() => goBack()}
+          onPress={() => router.back()}
           style={({ pressed }) => [pressed && { opacity: 0.6 }]}
         >
           <Text style={styles.backText}>← Tillbaka</Text>
@@ -143,139 +142,141 @@ export default function PublicUserScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#f5faf2",
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#888",
-    marginBottom: 16,
-  },
-  backLink: {
-    padding: 8,
-  },
-  backLinkText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  backText: {
-    fontSize: 15,
-    color: "#16A34A",
-    fontWeight: "600",
-  },
-  profileScroll: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 48,
-  },
-  profileHero: {
-    alignItems: "center",
-    marginBottom: 28,
-    marginTop: 20,
-  },
-  profileIconWrapper: {
-    position: "relative",
-    marginBottom: 14,
-  },
-  profileIcon: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-  },
-  verifiedIconWrapper: {
-    position: "absolute",
-    bottom: 8,
-    right: 8,
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 2,
-  },
-  verifiedIcon: {
-    width: 24,
-    height: 24,
-  },
-  tooltip: {
-    backgroundColor: "#E0ECFF",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginTop: -4,
-    marginBottom: -2,
-  },
-  tooltipText: {
-    fontSize: 11,
-    color: "#3B82F6",
-    fontWeight: "500",
-    letterSpacing: 0.3,
-  },
-  profileName: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: 6,
-  },
-  bioText: {
-    fontSize: 15,
-    color: "#555",
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 10,
-    paddingHorizontal: 12,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#999",
-    marginBottom: 8,
-    marginTop: 4,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  detailCard: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#888",
-  },
-  detailValue: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
-    textAlign: "right",
-    flex: 1,
-    marginLeft: 16,
-  },
-  detailDivider: {
-    height: 1,
-    backgroundColor: "#eee",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.textMuted,
+      marginBottom: 16,
+    },
+    backLink: {
+      padding: 8,
+    },
+    backLinkText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 12,
+    },
+    backText: {
+      fontSize: 15,
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    profileScroll: {
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      paddingBottom: 48,
+    },
+    profileHero: {
+      alignItems: "center",
+      marginBottom: 28,
+      marginTop: 20,
+    },
+    profileIconWrapper: {
+      position: "relative",
+      marginBottom: 14,
+    },
+    profileIcon: {
+      width: 140,
+      height: 140,
+      borderRadius: 70,
+    },
+    verifiedIconWrapper: {
+      position: "absolute",
+      bottom: 8,
+      right: 8,
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 2,
+    },
+    verifiedIcon: {
+      width: 24,
+      height: 24,
+    },
+    tooltip: {
+      backgroundColor: "#E0ECFF",
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      marginTop: -4,
+      marginBottom: -2,
+    },
+    tooltipText: {
+      fontSize: 11,
+      color: "#3B82F6",
+      fontWeight: "500",
+      letterSpacing: 0.3,
+    },
+    profileName: {
+      fontSize: 26,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      marginBottom: 6,
+    },
+    bioText: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      marginBottom: 10,
+      paddingHorizontal: 12,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+      marginBottom: 8,
+      marginTop: 4,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    detailCard: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      padding: 16,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    detailRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 10,
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontWeight: "400",
+      color: colors.textMuted,
+    },
+    detailValue: {
+      fontSize: 15,
+      fontWeight: "500",
+      color: colors.textPrimary,
+      textAlign: "right",
+      flex: 1,
+      marginLeft: 16,
+    },
+    detailDivider: {
+      height: 1,
+      backgroundColor: colors.divider,
+    },
+  });
+}

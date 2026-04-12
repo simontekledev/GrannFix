@@ -70,6 +70,20 @@ GrannFix/
 - Chat list shows task title, other party's name, and last message preview
 - Participant validation on every message endpoint
 
+### Notifications
+
+- Device token registration for push notifications (FCM)
+- Per-device token storage with platform type (iOS/Android)
+- Upsert logic: same device ID updates the existing token
+- Secure removal: only the token owner can unregister a device
+
+### Account Management
+
+- Account deletion with GDPR-compliant anonymization
+- Soft delete: sets account inactive, anonymizes personal data (name, email, phone)
+- Cancels all open/assigned tasks on deletion
+- Dark mode toggle with persistent theme preference
+
 ### API Documentation
 
 - Swagger UI available at `/swagger-ui.html`
@@ -144,6 +158,9 @@ npm run generate-api
 | Chat   | `GET /tasks/{taskId}/chat`        | Get or create chat for task    |
 | Chat   | `GET /chats/{chatId}/messages`    | Get messages (with `after`)    |
 | Chat   | `POST /chats/{chatId}/messages`   | Send a message                 |
+| Notif. | `PUT /notifications/devices/{id}` | Register/update device token   |
+| Notif. | `DELETE /notifications/devices/{id}` | Unregister device           |
+| Users  | `DELETE /users/me`                | Delete account (anonymize)     |
 | Admin  | `GET /admin/users`                | List all users (paginated)     |
 | Health | `GET /ping`                       | Health check                   |
 
@@ -158,6 +175,7 @@ backend/src/main/java/com/example/grannfix/
 ├── task/          # Task CRUD, search, status transitions
 ├── offer/         # Offer lifecycle, acceptance, completion
 ├── chat/          # Chats, messages, task-scoped conversations
+├── notification/  # Device tokens, push notification registration
 └── common/        # Security config, error handling, shared contracts
 ```
 
@@ -171,7 +189,7 @@ mobile/
 │   ├── settings.tsx           # Account & app settings
 │   └── public-user.tsx        # Public profile view
 ├── src/api/       # Auto-generated API clients and config
-├── src/context/   # React contexts (UserContext)
+├── src/context/   # React contexts (UserContext, ThemeContext)
 ├── src/helpers/   # Utilities (time formatting, distance, areas)
 ├── src/styles/    # Shared styles (modal, form)
 ├── components/    # Reusable UI components

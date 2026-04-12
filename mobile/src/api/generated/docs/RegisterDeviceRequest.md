@@ -1,32 +1,24 @@
 
-# PageableObject
+# RegisterDeviceRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`offset` | number
-`sort` | [SortObject](SortObject.md)
-`paged` | boolean
-`pageSize` | number
-`pageNumber` | number
-`unpaged` | boolean
+`fcmToken` | string
+`platform` | string
 
 ## Example
 
 ```typescript
-import type { PageableObject } from ''
+import type { RegisterDeviceRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "offset": null,
-  "sort": null,
-  "paged": null,
-  "pageSize": null,
-  "pageNumber": null,
-  "unpaged": null,
-} satisfies PageableObject
+  "fcmToken": null,
+  "platform": null,
+} satisfies RegisterDeviceRequest
 
 console.log(example)
 
@@ -35,7 +27,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageableObject
+const exampleParsed = JSON.parse(exampleJSON) as RegisterDeviceRequest
 console.log(exampleParsed)
 ```
 

@@ -1,6 +1,7 @@
 apis/AdminUserControllerApi.ts
 apis/AuthControllerApi.ts
 apis/ChatControllerApi.ts
+apis/NotificationControllerApi.ts
 apis/OfferControllerApi.ts
 apis/PingControllerApi.ts
 apis/TaskControllerApi.ts
@@ -24,6 +25,7 @@ docs/CursorPageResponseTaskResponse.md
 docs/ForgotPasswordRequest.md
 docs/LoginRequest.md
 docs/MeUserDto.md
+docs/NotificationControllerApi.md
 docs/OfferControllerApi.md
 docs/OfferResponse.md
 docs/PageAdminUserDto.md
@@ -32,6 +34,7 @@ docs/PageableObject.md
 docs/Permissions.md
 docs/PingControllerApi.md
 docs/PublicUserDto.md
+docs/RegisterDeviceRequest.md
 docs/RegisterRequest.md
 docs/ResetPasswordRequest.md
 docs/SendMessageRequest.md
@@ -66,6 +69,7 @@ models/Pageable.ts
 models/PageableObject.ts
 models/Permissions.ts
 models/PublicUserDto.ts
+models/RegisterDeviceRequest.ts
 models/RegisterRequest.ts
 models/ResetPasswordRequest.ts
 models/SendMessageRequest.ts

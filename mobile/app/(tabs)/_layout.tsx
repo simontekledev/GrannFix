@@ -40,7 +40,7 @@ export default function TabLayout() {
         name="chat"
         options={{
           title: 'Chatt',
-          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/test.png")} style={{ width: 32, height: 32, tintColor: color }} resizeMode="contain" />,
+          tabBarIcon: ({ color }) => <Image source={require("@/assets/images/chat-tab-icon.png")} style={{ width: 32, height: 32, tintColor: color }} resizeMode="contain" />,
         }}
       />
       <Tabs.Screen

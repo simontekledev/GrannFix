@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 interface EmptyStateProps {
   icon?: string;
@@ -9,6 +10,9 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, iconImage, title, subtitle }: EmptyStateProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.centered}>
       <View style={styles.circle}>
@@ -24,41 +28,43 @@ export function EmptyState({ icon, iconImage, title, subtitle }: EmptyStateProps
   );
 }
 
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    paddingBottom: 150,
-  },
-  circle: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    backgroundColor: "#f0fdf4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  icon: {
-    fontSize: 36,
-  },
-  iconImage: {
-    width: 120,
-    height: 120,
-    tintColor: "#16A34A",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#aaa",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 32,
+      paddingBottom: 150,
+    },
+    circle: {
+      width: 130,
+      height: 130,
+      borderRadius: 65,
+      backgroundColor: colors.accentMuted,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 16,
+    },
+    icon: {
+      fontSize: 36,
+    },
+    iconImage: {
+      width: 120,
+      height: 120,
+      tintColor: colors.accent,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.textPrimary,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: "center",
+      lineHeight: 20,
+    },
+  });
+}

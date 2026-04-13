@@ -4,13 +4,19 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet } from 'react-native';
+import { Asset } from 'expo-asset';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
-import { ThemeProvider as AppThemeProvider } from '@/src/context/ThemeContext';
+import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+
+function ThemedStatusBar() {
+  const { mode } = useTheme();
+  return <StatusBar style={mode === "dark" ? "light" : "dark"} />;
+}
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,7 +31,27 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function prepare() {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await Promise.all([
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+        Asset.loadAsync([
+          require("@/assets/images/pen-icon.png"),
+          require("@/assets/images/keylock-icon.png"),
+          require("@/assets/images/notification-icon.png"),
+          require("@/assets/images/info-icon.png"),
+          require("@/assets/images/theme-icon.png"),
+          require("@/assets/images/settings-icon- black-transparent.png"),
+          require("@/assets/images/chat-tab-icon.png"),
+          require("@/assets/images/explore-icon.png"),
+          require("@/assets/images/activity-icon.png"),
+          require("@/assets/images/profile-icon.png"),
+          require("@/assets/images/user-profile1-icon.png"),
+          require("@/assets/images/verified-icon.png"),
+          require("@/assets/images/search-icon.png"),
+          require("@/assets/images/location-icon-transparent.png"),
+          require("@/assets/images/chat-icon.png"),
+          require("@/assets/images/empty-inbox-icon.png"),
+        ]),
+      ]);
       await SplashScreen.hideAsync();
       setAppReady(true);
     }
@@ -61,7 +87,7 @@ export default function RootLayout() {
             <Stack.Screen name="chat-conversation" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
-          <StatusBar style="dark" />
+          <ThemedStatusBar />
         </>
       )}
       {showSplash && (

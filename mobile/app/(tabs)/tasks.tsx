@@ -24,6 +24,7 @@ import { useUser } from "@/src/context/UserContext";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { EmptyState } from "@/src/components/EmptyState";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
+import { TASK_CATEGORIES } from "@/src/helpers/categories";
 import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { createModalStyles } from "@/src/styles/modal";
@@ -53,6 +54,7 @@ export default function TasksScreen() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newCategory, setNewCategory] = useState("");
   const [newArea, setNewArea] = useState("");
   const [newStreet, setNewStreet] = useState("");
   const [newPrice, setNewPrice] = useState("");
@@ -65,11 +67,12 @@ export default function TasksScreen() {
     a.toLowerCase().includes(areaSearch.toLowerCase())
   );
 
-  const canCreate = newTitle.trim().length > 0 && newDescription.trim().length > 0 && newArea.length > 0 && !creating;
+  const canCreate = newTitle.trim().length > 0 && newDescription.trim().length > 0 && newCategory.length > 0 && newArea.length > 0 && !creating;
 
   function resetCreateForm() {
     setNewTitle("");
     setNewDescription("");
+    setNewCategory("");
     setNewArea("");
     setNewStreet("");
     setNewPrice("");
@@ -84,6 +87,7 @@ export default function TasksScreen() {
         createTaskRequest: {
           title: newTitle.trim(),
           description: newDescription.trim(),
+          category: newCategory,
           city: "Stockholm",
           area: newArea,
           street: newStreet.trim() || undefined,
@@ -177,6 +181,7 @@ export default function TasksScreen() {
         task={item}
         showStatus
         showOffers
+        showCategory={false}
         navigateParams="&from=activity"
       />
     );
@@ -267,6 +272,28 @@ export default function TasksScreen() {
                   style={[formStyles.input, formStyles.textArea]}
                   multiline
                 />
+
+                <Text style={formStyles.label}>Kategori <Text style={formStyles.required}>*</Text></Text>
+                <View style={styles.categoryGrid}>
+                  {TASK_CATEGORIES.map((cat) => (
+                    <Pressable
+                      key={cat.key}
+                      onPress={() => setNewCategory(cat.key)}
+                      style={[
+                        styles.categoryChip,
+                        newCategory === cat.key && styles.categoryChipActive,
+                      ]}
+                    >
+                      <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+                      <Text style={[
+                        styles.categoryChipText,
+                        newCategory === cat.key && styles.categoryChipTextActive,
+                      ]}>
+                        {cat.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
 
                 <Text style={formStyles.label}>Område <Text style={formStyles.required}>*</Text></Text>
                 {areaPickerOpen ? (

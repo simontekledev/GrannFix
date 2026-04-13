@@ -164,5 +164,38 @@ export function createTasksStyles(colors: ThemeColors) {
       color: "#fff",
       marginTop: -2,
     },
+    categoryGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 4,
+    },
+    categoryChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: colors.card,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    categoryChipActive: {
+      backgroundColor: colors.accentMuted,
+      borderColor: colors.accent,
+    },
+    categoryEmoji: {
+      fontSize: 16,
+    },
+    categoryChipText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textSecondary,
+    },
+    categoryChipTextActive: {
+      color: colors.accent,
+      fontWeight: "600",
+    },
   });
 }

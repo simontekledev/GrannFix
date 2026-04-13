@@ -31,6 +31,10 @@ public class Task {
     @Column(nullable = false, length = 1000)
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskCategory category;
+
     @Column(nullable = false, length = 100)
     private String city;
 

@@ -5,6 +5,7 @@ import com.example.grannfix.task.api.dto.TaskCursor;
 import com.example.grannfix.task.api.dto.TaskResponse;
 import com.example.grannfix.task.mapper.TaskMapper;
 import com.example.grannfix.task.domain.Task;
+import com.example.grannfix.task.domain.TaskCategory;
 import com.example.grannfix.task.domain.TaskStatus;
 import com.example.grannfix.task.persistence.TaskRepository;
 import com.example.grannfix.task.application.pagination.CursorCodec;
@@ -28,9 +29,17 @@ public class TaskQueryService {
             int limit,
             TaskStatus status,
             String city,
-            String area
+            String area,
+            String category
     ) {
         int safeLimit = Math.min(Math.max(limit, 1), 50);
+
+        TaskCategory cat = null;
+        if (category != null && !category.isBlank()) {
+            try {
+                cat = TaskCategory.valueOf(category.toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
 
         TaskCursor decoded = null;
         if (cursor != null && !cursor.isBlank()) {
@@ -40,12 +49,13 @@ public class TaskQueryService {
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
         List<Task> rows;
         if (decoded == null) {
-            rows = taskRepository.findActive(status, blankToNull(city), blankToNull(area), pageable);
+            rows = taskRepository.findActive(status, blankToNull(city), blankToNull(area), cat, pageable);
         } else {
             rows = taskRepository.findActiveAfterCursor(
                     status,
                     blankToNull(city),
                     blankToNull(area),
+                    cat,
                     decoded.createdAt(),
                     decoded.id(),
                     pageable

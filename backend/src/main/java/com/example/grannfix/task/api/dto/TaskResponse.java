@@ -9,6 +9,7 @@ public record TaskResponse(
         UUID id,
         String title,
         String description,
+        String category,
         String city,
         String area,
         String street,

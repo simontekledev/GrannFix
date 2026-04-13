@@ -6,8 +6,8 @@
 
 Name | Type
 ------------ | -------------
-`totalElements` | number
 `totalPages` | number
+`totalElements` | number
 `size` | number
 `content` | [Array&lt;AdminUserDto&gt;](AdminUserDto.md)
 `number` | number
@@ -25,8 +25,8 @@ import type { PageAdminUserDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "totalElements": null,
   "totalPages": null,
+  "totalElements": null,
   "size": null,
   "content": null,
   "number": null,

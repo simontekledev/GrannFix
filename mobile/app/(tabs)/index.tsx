@@ -22,6 +22,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createDiscoverStyles } from "@/src/styles/screens/discover";
+import { TASK_CATEGORIES } from "@/src/helpers/categories";
 
 
 export default function UpptäckScreen() {
@@ -38,6 +39,7 @@ export default function UpptäckScreen() {
   const userId = user?.id ?? null;
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortNearest, setSortNearest] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
@@ -60,6 +62,7 @@ export default function UpptäckScreen() {
         status: "OPEN",
         city: undefined,
         area: undefined,
+        category: selectedCategory ?? undefined,
       });
 
       if (cursor) {
@@ -72,7 +75,7 @@ export default function UpptäckScreen() {
     } catch (e: any) {
       console.log("Failed to load tasks:", e);
     }
-  }, []);
+  }, [selectedCategory]);
 
   useEffect(() => {
     fetchTasks().finally(() => setLoading(false));
@@ -196,7 +199,27 @@ export default function UpptäckScreen() {
         onEndReachedThreshold={0.3}
         ListHeaderComponent={
           <>
-            <Text style={styles.listTitle}>Tillgängliga uppdrag</Text>
+            <Text style={styles.listTitle}>Tillgängliga småjobb</Text>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={TASK_CATEGORIES}
+              keyExtractor={(item) => item.key}
+              style={styles.categoryScroll}
+              contentContainerStyle={styles.categoryScrollContent}
+              renderItem={({ item: cat }) => {
+                const isActive = selectedCategory === cat.key;
+                return (
+                  <Pressable
+                    onPress={() => setSelectedCategory(isActive ? null : cat.key)}
+                    style={[styles.categoryChip, isActive && styles.categoryChipActive]}
+                  >
+                    <Text style={styles.categoryChipEmoji}>{cat.emoji}</Text>
+                    <Text style={[styles.categoryChipText, isActive && styles.categoryChipTextActive]}>{cat.label}</Text>
+                  </Pressable>
+                );
+              }}
+            />
             <View style={styles.searchRow}>
               <TextInput
                 style={styles.searchInput}

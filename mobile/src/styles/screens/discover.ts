@@ -165,5 +165,40 @@ export function createDiscoverStyles(colors: ThemeColors) {
     emptyList: {
       flex: 1,
     },
+    categoryScroll: {
+      marginBottom: 12,
+      marginHorizontal: -24,
+    },
+    categoryScrollContent: {
+      paddingHorizontal: 24,
+      gap: 10,
+    },
+    categoryChip: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    categoryChipActive: {
+      backgroundColor: colors.accent,
+      borderColor: colors.accent,
+    },
+    categoryChipEmoji: {
+      fontSize: 16,
+    },
+    categoryChipText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textSecondary,
+    },
+    categoryChipTextActive: {
+      color: "#fff",
+      fontWeight: "600",
+    },
   });
 }

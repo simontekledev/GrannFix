@@ -57,6 +57,12 @@ export interface TaskDetailResponse {
      * @type {string}
      * @memberof TaskDetailResponse
      */
+    category?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TaskDetailResponse
+     */
     city?: string;
     /**
      * 
@@ -171,6 +177,7 @@ export function TaskDetailResponseFromJSONTyped(json: any, ignoreDiscriminator: 
         'id': json['id'] == null ? undefined : json['id'],
         'title': json['title'] == null ? undefined : json['title'],
         'description': json['description'] == null ? undefined : json['description'],
+        'category': json['category'] == null ? undefined : json['category'],
         'city': json['city'] == null ? undefined : json['city'],
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
@@ -202,6 +209,7 @@ export function TaskDetailResponseToJSONTyped(value?: TaskDetailResponse | null,
         'id': value['id'],
         'title': value['title'],
         'description': value['description'],
+        'category': value['category'],
         'city': value['city'],
         'area': value['area'],
         'street': value['street'],

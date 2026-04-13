@@ -46,13 +46,13 @@ export interface PageAdminUserDto {
      * @type {number}
      * @memberof PageAdminUserDto
      */
-    totalElements?: number;
+    totalPages?: number;
     /**
      * 
      * @type {number}
      * @memberof PageAdminUserDto
      */
-    totalPages?: number;
+    totalElements?: number;
     /**
      * 
      * @type {number}
@@ -126,8 +126,8 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
+        'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'size': json['size'] == null ? undefined : json['size'],
         'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminUserDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
@@ -151,8 +151,8 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
 
     return {
         
-        'totalElements': value['totalElements'],
         'totalPages': value['totalPages'],
+        'totalElements': value['totalElements'],
         'size': value['size'],
         'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminUserDtoToJSON)),
         'number': value['number'],

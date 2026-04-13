@@ -28,6 +28,7 @@ export interface ListTasksRequest {
     status?: ListTasksStatusEnum;
     city?: string;
     area?: string;
+    category?: string;
 }
 
 /**
@@ -59,6 +60,10 @@ export class TaskQueryControllerApi extends runtime.BaseAPI {
 
         if (requestParameters['area'] != null) {
             queryParameters['area'] = requestParameters['area'];
+        }
+
+        if (requestParameters['category'] != null) {
+            queryParameters['category'] = requestParameters['category'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

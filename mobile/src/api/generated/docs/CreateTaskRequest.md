@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `title` | string
 `description` | string
+`category` | string
 `city` | string
 `area` | string
 `street` | string
@@ -22,6 +23,7 @@ import type { CreateTaskRequest } from ''
 const example = {
   "title": null,
   "description": null,
+  "category": null,
   "city": null,
   "area": null,
   "street": null,

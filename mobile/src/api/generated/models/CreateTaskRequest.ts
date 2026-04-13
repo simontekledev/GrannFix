@@ -36,6 +36,12 @@ export interface CreateTaskRequest {
      * @type {string}
      * @memberof CreateTaskRequest
      */
+    category: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateTaskRequest
+     */
     city: string;
     /**
      * 
@@ -63,6 +69,7 @@ export interface CreateTaskRequest {
 export function instanceOfCreateTaskRequest(value: object): value is CreateTaskRequest {
     if (!('title' in value) || value['title'] === undefined) return false;
     if (!('description' in value) || value['description'] === undefined) return false;
+    if (!('category' in value) || value['category'] === undefined) return false;
     if (!('city' in value) || value['city'] === undefined) return false;
     if (!('area' in value) || value['area'] === undefined) return false;
     return true;
@@ -80,6 +87,7 @@ export function CreateTaskRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'title': json['title'],
         'description': json['description'],
+        'category': json['category'],
         'city': json['city'],
         'area': json['area'],
         'street': json['street'] == null ? undefined : json['street'],
@@ -100,6 +108,7 @@ export function CreateTaskRequestToJSONTyped(value?: CreateTaskRequest | null, i
         
         'title': value['title'],
         'description': value['description'],
+        'category': value['category'],
         'city': value['city'],
         'area': value['area'],
         'street': value['street'],

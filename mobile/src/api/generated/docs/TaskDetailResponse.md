@@ -9,6 +9,7 @@ Name | Type
 `id` | string
 `title` | string
 `description` | string
+`category` | string
 `city` | string
 `area` | string
 `street` | string
@@ -34,6 +35,7 @@ const example = {
   "id": null,
   "title": null,
   "description": null,
+  "category": null,
   "city": null,
   "area": null,
   "street": null,

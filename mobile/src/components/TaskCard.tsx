@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { timeAgo } from "@/src/helpers/time";
+import { getCategoryEmoji } from "@/src/helpers/categories";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -29,6 +30,8 @@ interface TaskCardProps {
   showStatus?: boolean;
   /** Show pending offers count badge */
   showOffers?: boolean;
+  /** Show category emoji */
+  showCategory?: boolean;
   /** Show a primary action button at the bottom */
   actionButton?: {
     label: string;
@@ -44,6 +47,7 @@ export function TaskCard({
   distanceText,
   showStatus = false,
   showOffers = false,
+  showCategory = true,
   actionButton,
   navigateParams = "",
 }: TaskCardProps) {
@@ -53,7 +57,7 @@ export function TaskCard({
 
   const status = task.status ?? "OPEN";
   const statusColor = STATUS_COLORS[status] ?? "#888";
-  const offersCount = (task as any).pendingOffersCount;
+  const offersCount = task.pendingOffersCount;
 
   return (
     <Pressable
@@ -98,6 +102,9 @@ export function TaskCard({
         )}
         {distanceText && (
           <Text style={styles.cardDistance}>· {distanceText}</Text>
+        )}
+        {showCategory && task.category && (
+          <Text style={styles.categoryEmoji}>{getCategoryEmoji(task.category)}</Text>
         )}
       </View>
 
@@ -172,6 +179,25 @@ function createStyles(colors: ThemeColors) {
       alignItems: "center",
       gap: 8,
       marginBottom: 4,
+      flexWrap: "wrap",
+    },
+    categoryBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.cardElevated,
+      borderRadius: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      marginLeft: "auto",
+    },
+    categoryEmoji: {
+      fontSize: 12,
+    },
+    categoryText: {
+      fontSize: 12,
+      fontWeight: "500",
+      color: colors.textSecondary,
     },
     statusBadge: {
       borderRadius: 6,
@@ -222,7 +248,6 @@ function createStyles(colors: ThemeColors) {
     cardDistance: {
       fontSize: 12,
       color: colors.textMuted,
-      marginTop: -7,
     },
     cardDescription: {
       fontSize: 14,
@@ -235,6 +260,11 @@ function createStyles(colors: ThemeColors) {
       justifyContent: "space-between",
       alignItems: "center",
       marginTop: 6,
+    },
+    cardFooterRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
     },
     cardDate: {
       fontSize: 12,

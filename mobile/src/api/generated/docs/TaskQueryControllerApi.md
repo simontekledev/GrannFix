@@ -10,7 +10,7 @@ All URIs are relative to *http://localhost:8080*
 
 ## listTasks
 
-> CursorPageResponseTaskResponse listTasks(cursor, limit, status, city, area)
+> CursorPageResponseTaskResponse listTasks(cursor, limit, status, city, area, category)
 
 
 
@@ -42,6 +42,8 @@ async function example() {
     city: city_example,
     // string (optional)
     area: area_example,
+    // string (optional)
+    category: category_example,
   } satisfies ListTasksRequest;
 
   try {
@@ -66,6 +68,7 @@ example().catch(console.error);
 | **status** | `OPEN`, `ASSIGNED`, `COMPLETED`, `CANCELLED` |  | [Optional] [Defaults to `undefined`] [Enum: OPEN, ASSIGNED, COMPLETED, CANCELLED] |
 | **city** | `string` |  | [Optional] [Defaults to `undefined`] |
 | **area** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **category** | `string` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

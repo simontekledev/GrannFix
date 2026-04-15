@@ -245,9 +245,7 @@ export default function UpptäckScreen() {
         }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null}
         ListEmptyComponent={
-          <View style={{ paddingTop: 140 }}>
-            <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
-          </View>
+          <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
         }
       />
 

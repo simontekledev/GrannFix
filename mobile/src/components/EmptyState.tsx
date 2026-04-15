@@ -35,7 +35,7 @@ function createStyles(colors: ThemeColors) {
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 32,
-      paddingBottom: 150,
+      paddingVertical: 60,
     },
     circle: {
       width: 130,

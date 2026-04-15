@@ -151,15 +151,19 @@ export default function TasksScreen() {
 
   if (!loggedIn) {
     return (
-      <SafeAreaView style={[styles.safe, styles.centeredColumn]} edges={["top"]}>
-        <View style={styles.loginContent}>
+      <View style={styles.safe}>
+        <SafeAreaView style={{ backgroundColor: colors.headerGradient[0] }} edges={["top"]}>
+          <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
+            <Text style={styles.title}>Uppdrag</Text>
+          </LinearGradient>
+        </SafeAreaView>
+        <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
           <Image
             source={require("@/assets/images/keylock-icon.png")}
             style={styles.loginIcon}
             resizeMode="contain"
           />
-          <Text style={styles.loginTitle}>Dina uppdrag</Text>
-          <Text style={styles.loginSubtitle}>Logga in för att se och hantera dina uppdrag</Text>
+          <Text style={styles.loginSubtitle}>Skapa och hantera dina småjobb</Text>
           <Pressable
             onPress={() => router.push("/(tabs)/profile?returnTo=tasks")}
             style={({ pressed, hovered }: any) => [
@@ -171,7 +175,7 @@ export default function TasksScreen() {
             <Text style={styles.loginButtonText}>Logga in</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 

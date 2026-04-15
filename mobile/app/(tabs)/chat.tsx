@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -66,18 +67,35 @@ export default function ChatListScreen() {
 
   if (!loggedIn) {
     return (
-      <SafeAreaView style={styles.safe} edges={["top"]}>
-        <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
-          <Text style={styles.title}>Chatt</Text>
-        </LinearGradient>
-        <View style={styles.centered}>
-          <EmptyState
-            iconImage={require("@/assets/images/chat-icon.png")}
-            title="Logga in"
-            subtitle="Logga in för att se dina chattar"
+      <View style={styles.safe}>
+        <SafeAreaView style={{ backgroundColor: colors.headerGradient[0] }} edges={["top"]}>
+          <LinearGradient colors={colors.headerGradient} style={styles.headerRow}>
+            <Text style={styles.title}>Chatt</Text>
+          </LinearGradient>
+        </SafeAreaView>
+        <View style={[styles.centered, { paddingBottom: 80 }]}>
+          <Image
+            source={require("@/assets/images/chat-tab-icon.png")}
+            style={{ width: 70, height: 70, tintColor: colors.accent, marginBottom: 16 }}
+            resizeMode="contain"
           />
+          <Text style={{ fontSize: 15, color: colors.textMuted, textAlign: "center", lineHeight: 20, marginBottom: 20 }}>
+            Se dina konversationer
+          </Text>
+          <Pressable
+            onPress={() => router.push("/(tabs)/profile?returnTo=chat" as any)}
+            style={({ pressed }) => [{
+              backgroundColor: colors.accent,
+              borderRadius: 12,
+              paddingVertical: 14,
+              paddingHorizontal: 48,
+              alignItems: "center" as const,
+            }, pressed && { opacity: 0.8 }]}
+          >
+            <Text style={{ fontSize: 15, fontWeight: "600", color: "#fff" }}>Logga in</Text>
+          </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 

@@ -251,7 +251,11 @@ export default function ProfilScreen() {
         >
           <View style={styles.logoContainer}>
             <Image
-              source={require("@/assets/images/grannfix-primary-transparent-logo.png")}
+              source={
+                mode === "dark"
+                  ? require("@/assets/images/grannfix-primary-transparent-logo-dark.png")
+                  : require("@/assets/images/grannfix-primary-transparent-logo.png")
+              }
               style={styles.logo}
               resizeMode="contain"
             />

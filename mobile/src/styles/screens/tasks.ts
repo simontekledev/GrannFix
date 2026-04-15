@@ -57,7 +57,7 @@ export function createTasksStyles(colors: ThemeColors) {
     loginIcon: {
       width: 70,
       height: 70,
-      tintColor: colors.textMuted,
+      tintColor: colors.accent,
       marginBottom: 16,
     },
     loginTitle: {
@@ -80,11 +80,12 @@ export function createTasksStyles(colors: ThemeColors) {
       transform: [{ scale: 1.015 }],
     },
     loginButton: {
-      marginTop: 6,
+      marginTop: 16,
       backgroundColor: colors.accent,
-      borderRadius: 10,
+      borderRadius: 12,
       paddingVertical: 14,
-      paddingHorizontal: 40,
+      paddingHorizontal: 48,
+      alignItems: "center",
     },
     loginButtonPressed: {
       opacity: 0.8,

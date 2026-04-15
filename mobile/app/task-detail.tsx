@@ -57,6 +57,12 @@ export default function TaskDetailScreen() {
   const [showOffers, setShowOffers] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
+  // Rating
+  const [ratingValue, setRatingValue] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+
   async function loadOffers() {
     if (!id) return;
     try {
@@ -64,6 +70,31 @@ export default function TaskDetailScreen() {
       setOffers(res);
     } catch (e) {
       console.log("Failed to load offers:", e);
+    }
+  }
+
+  async function handleSubmitRating() {
+    const completedOffer = offers.find((o) => (o as any).status === "COMPLETED");
+    if (!completedOffer?.id || ratingValue === 0) return;
+    setSubmittingRating(true);
+    try {
+      await offerApi.rateHelper({
+        offerId: completedOffer.id,
+        rateHelperRequest: {
+          rating: ratingValue,
+          comment: ratingComment.trim() || undefined,
+        },
+      });
+      setRatingSubmitted(true);
+      const updated = await taskApi.getTask({ id: id! });
+      setTask(updated);
+      loadOffers();
+    } catch (e) {
+      console.log("Rating error:", e);
+      if (Platform.OS === "web") window.alert("Kunde inte skicka betyg");
+      else Alert.alert("Fel", "Kunde inte skicka betyg");
+    } finally {
+      setSubmittingRating(false);
     }
   }
 
@@ -173,6 +204,9 @@ export default function TaskDetailScreen() {
         setTask(res);
         if (offer === "true" && res.permissions?.canOffer) {
           setShowOfferModal(true);
+        }
+        if (res.status === "COMPLETED" && res.createdBy?.id === user?.id) {
+          loadOffers();
         }
       } catch (e) {
         console.log("Failed to load task:", e);
@@ -434,6 +468,66 @@ export default function TaskDetailScreen() {
             </View>
           </View>
         )}
+
+        {status === "COMPLETED" && task.createdBy?.id === user?.id && (() => {
+          const completedOffer = offers.find((o) => (o as any).status === "COMPLETED");
+          const alreadyRated = ratingSubmitted || (completedOffer && (completedOffer as any).rating != null);
+
+          if (!completedOffer) return null;
+
+          if (alreadyRated) {
+            const r = (completedOffer as any).rating ?? ratingValue;
+            return (
+              <View style={styles.card}>
+                <Text style={styles.sectionTitle}>DITT BETYG</Text>
+                <View style={styles.ratingStars}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Text key={star} style={[styles.ratingStar, star <= r && styles.ratingStarFilled]}>★</Text>
+                  ))}
+                </View>
+                <Text style={styles.ratingThanks}>Tack för ditt betyg!</Text>
+              </View>
+            );
+          }
+
+          return (
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>BETYGSÄTT HJÄLPAREN</Text>
+              <View style={styles.ratingStars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Pressable key={star} onPress={() => setRatingValue(star)}>
+                    <Text style={[styles.ratingStar, star <= ratingValue && styles.ratingStarFilled]}>★</Text>
+                  </Pressable>
+                ))}
+              </View>
+              <TextInput
+                value={ratingComment}
+                onChangeText={setRatingComment}
+                placeholder="Valfri kommentar..."
+                placeholderTextColor={colors.textMuted}
+                style={[formStyles.input, { marginTop: 12 }]}
+                multiline
+                maxLength={500}
+              />
+              <Pressable
+                onPress={handleSubmitRating}
+                disabled={ratingValue === 0 || submittingRating}
+                style={({ pressed }) => [
+                  styles.primaryButton,
+                  { marginTop: 16 },
+                  (ratingValue === 0 || submittingRating) && { opacity: 0.35 },
+                  pressed && ratingValue > 0 && !submittingRating && styles.primaryButtonPressed,
+                ]}
+              >
+                {submittingRating ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.primaryButtonText}>Skicka betyg</Text>
+                )}
+              </Pressable>
+            </View>
+          );
+        })()}
 
         <View style={styles.actions}>
           {perms?.canOffer && (

@@ -1,38 +1,24 @@
 
-# OfferResponse
+# RateHelperRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`id` | string
-`helperId` | string
-`proposedPrice` | number
-`message` | string
-`status` | string
-`createdAt` | Date
-`completedAt` | Date
 `rating` | number
-`ratingComment` | string
+`comment` | string
 
 ## Example
 
 ```typescript
-import type { OfferResponse } from ''
+import type { RateHelperRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "id": null,
-  "helperId": null,
-  "proposedPrice": null,
-  "message": null,
-  "status": null,
-  "createdAt": null,
-  "completedAt": null,
   "rating": null,
-  "ratingComment": null,
-} satisfies OfferResponse
+  "comment": null,
+} satisfies RateHelperRequest
 
 console.log(example)
 
@@ -41,7 +27,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as OfferResponse
+const exampleParsed = JSON.parse(exampleJSON) as RateHelperRequest
 console.log(exampleParsed)
 ```
 

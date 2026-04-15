@@ -19,6 +19,7 @@ export * from './Pageable';
 export * from './PageableObject';
 export * from './Permissions';
 export * from './PublicUserDto';
+export * from './RateHelperRequest';
 export * from './RegisterDeviceRequest';
 export * from './RegisterRequest';
 export * from './ResetPasswordRequest';

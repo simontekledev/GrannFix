@@ -34,6 +34,7 @@ docs/PageableObject.md
 docs/Permissions.md
 docs/PingControllerApi.md
 docs/PublicUserDto.md
+docs/RateHelperRequest.md
 docs/RegisterDeviceRequest.md
 docs/RegisterRequest.md
 docs/ResetPasswordRequest.md
@@ -69,6 +70,7 @@ models/Pageable.ts
 models/PageableObject.ts
 models/Permissions.ts
 models/PublicUserDto.ts
+models/RateHelperRequest.ts
 models/RegisterDeviceRequest.ts
 models/RegisterRequest.ts
 models/ResetPasswordRequest.ts

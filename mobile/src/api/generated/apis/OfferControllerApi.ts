@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   OfferResponse,
+  RateHelperRequest,
 } from '../models/index';
 import {
     OfferResponseFromJSON,
     OfferResponseToJSON,
+    RateHelperRequestFromJSON,
+    RateHelperRequestToJSON,
 } from '../models/index';
 
 export interface AcceptOfferRequest {
@@ -36,6 +39,11 @@ export interface ConfirmDoneOfferRequest {
 
 export interface MarkDoneOfferRequest {
     offerId: string;
+}
+
+export interface RateHelperOperationRequest {
+    offerId: string;
+    rateHelperRequest: RateHelperRequest;
 }
 
 /**
@@ -244,6 +252,67 @@ export class OfferControllerApi extends runtime.BaseAPI {
      */
     async markDoneOffer(requestParameters: MarkDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
         const response = await this.markDoneOfferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for rateHelper without sending the request
+     */
+    async rateHelperRequestOpts(requestParameters: RateHelperOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['offerId'] == null) {
+            throw new runtime.RequiredError(
+                'offerId',
+                'Required parameter "offerId" was null or undefined when calling rateHelper().'
+            );
+        }
+
+        if (requestParameters['rateHelperRequest'] == null) {
+            throw new runtime.RequiredError(
+                'rateHelperRequest',
+                'Required parameter "rateHelperRequest" was null or undefined when calling rateHelper().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/offers/{offerId}/rate`;
+        urlPath = urlPath.replace(`{${"offerId"}}`, encodeURIComponent(String(requestParameters['offerId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RateHelperRequestToJSON(requestParameters['rateHelperRequest']),
+        };
+    }
+
+    /**
+     */
+    async rateHelperRaw(requestParameters: RateHelperOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OfferResponse>> {
+        const requestOptions = await this.rateHelperRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OfferResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async rateHelper(requestParameters: RateHelperOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
+        const response = await this.rateHelperRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

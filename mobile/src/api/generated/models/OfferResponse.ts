@@ -61,6 +61,18 @@ export interface OfferResponse {
      * @memberof OfferResponse
      */
     completedAt?: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferResponse
+     */
+    rating?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof OfferResponse
+     */
+    ratingComment?: string;
 }
 
 
@@ -102,6 +114,8 @@ export function OfferResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'status': json['status'] == null ? undefined : json['status'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'completedAt': json['completedAt'] == null ? undefined : (new Date(json['completedAt'])),
+        'rating': json['rating'] == null ? undefined : json['rating'],
+        'ratingComment': json['ratingComment'] == null ? undefined : json['ratingComment'],
     };
 }
 
@@ -123,6 +137,8 @@ export function OfferResponseToJSONTyped(value?: OfferResponse | null, ignoreDis
         'status': value['status'],
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),
         'completedAt': value['completedAt'] == null ? value['completedAt'] : value['completedAt'].toISOString(),
+        'rating': value['rating'],
+        'ratingComment': value['ratingComment'],
     };
 }
 

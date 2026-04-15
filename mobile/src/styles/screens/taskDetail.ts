@@ -353,5 +353,25 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       fontWeight: "600",
       color: "#fff",
     },
+    ratingStars: {
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: 8,
+      marginTop: 4,
+    },
+    ratingStar: {
+      fontSize: 32,
+      color: colors.border,
+    },
+    ratingStarFilled: {
+      color: "#F59E0B",
+    },
+    ratingThanks: {
+      fontSize: 14,
+      color: colors.accent,
+      fontWeight: "500",
+      textAlign: "center",
+      marginTop: 8,
+    },
   });
 }

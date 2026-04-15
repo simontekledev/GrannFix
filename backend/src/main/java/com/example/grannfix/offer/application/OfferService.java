@@ -7,7 +7,9 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.offer.api.dto.CreateOfferRequest;
 import com.example.grannfix.offer.api.dto.OfferResponse;
+import com.example.grannfix.offer.api.dto.RateHelperRequest;
 import com.example.grannfix.offer.application.port.out.TaskAssignmentPort;
+import com.example.grannfix.offer.application.port.out.UserRatingPort;
 import com.example.grannfix.offer.application.port.out.TaskOfferView;
 import com.example.grannfix.offer.domain.Offer;
 import com.example.grannfix.offer.domain.OfferStatus;
@@ -29,6 +31,7 @@ public class OfferService {
     private final OfferRepository offerRepository;
     private final TaskAssignmentPort taskOfferPort;
     private final UserLookupPort userLookupPort;
+    private final UserRatingPort userRatingPort;
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
         if (!userLookupPort.isVerified(helperId)) {
@@ -167,6 +170,33 @@ public class OfferService {
         offer.setCompletedAt(now);
         Offer saved = offerRepository.save(offer);
         taskOfferPort.completeTask(saved.getTaskId(), now);
+        return OfferMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public OfferResponse rateHelper(UUID offerId, UUID userId, RateHelperRequest req) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new NotFoundException("Offer not found: " + offerId));
+
+        TaskOfferView task = taskOfferPort.findById(offer.getTaskId())
+                .orElseThrow(() -> new NotFoundException("Task not found: " + offer.getTaskId()));
+
+        if (!task.createdById().equals(userId)) {
+            throw new ForbiddenException("Only the task owner can rate the helper");
+        }
+        if (offer.getStatus() != OfferStatus.COMPLETED) {
+            throw new BadRequestException("Can only rate completed offers");
+        }
+        if (offer.getRating() != null) {
+            throw new ConflictException("Helper has already been rated for this offer");
+        }
+
+        offer.setRating(req.rating());
+        offer.setRatingComment(req.comment() != null ? req.comment().trim() : null);
+        Offer saved = offerRepository.save(offer);
+
+        userRatingPort.updateRating(offer.getHelperId(), req.rating());
+
         return OfferMapper.toResponse(saved);
     }
 }

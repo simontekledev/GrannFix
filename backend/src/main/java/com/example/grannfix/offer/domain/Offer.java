@@ -48,6 +48,11 @@ public class Offer {
 
     private Instant completedAt;
 
+    private Integer rating;
+
+    @Column(length = 500)
+    private String ratingComment;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();

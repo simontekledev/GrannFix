@@ -1,13 +1,12 @@
 package com.example.grannfix.offer.api;
 
 import com.example.grannfix.offer.api.dto.OfferResponse;
+import com.example.grannfix.offer.api.dto.RateHelperRequest;
 import com.example.grannfix.offer.application.OfferService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
@@ -46,5 +45,14 @@ public class OfferController {
             @AuthenticationPrincipal UUID userId
     ){
         return offerService.confirmDoneOffer(offerId, userId);
+    }
+
+    @PostMapping("/{offerId}/rate")
+    public OfferResponse rateHelper(
+            @PathVariable UUID offerId,
+            @AuthenticationPrincipal UUID userId,
+            @Valid @RequestBody RateHelperRequest request
+    ) {
+        return offerService.rateHelper(offerId, userId, request);
     }
 }

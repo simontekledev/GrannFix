@@ -4,6 +4,7 @@ import com.example.grannfix.auth.application.ports.out.CreateUserCommand;
 import com.example.grannfix.auth.application.ports.out.UserAuthPort;
 import com.example.grannfix.auth.application.ports.out.UserAuthView;
 import com.example.grannfix.common.contracts.UserLookupPort;
+import com.example.grannfix.offer.application.port.out.UserRatingPort;
 import com.example.grannfix.user.domain.User;
 import com.example.grannfix.user.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class UserAuthAdapter implements UserAuthPort, UserLookupPort {
+public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRatingPort {
 
     private final UserRepository userRepository;
 
@@ -90,6 +91,17 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort {
         return userRepository.findById(userId)
                 .map(User::getName)
                 .orElse(null);
+    }
+
+    @Override
+    public void updateRating(UUID userId, int newRating) {
+        userRepository.findById(userId).ifPresent(user -> {
+            int count = user.getRatingCount() != null ? user.getRatingCount() : 0;
+            double avg = user.getRatingAverage() != null ? user.getRatingAverage() : 0.0;
+            double newAvg = ((avg * count) + newRating) / (count + 1);
+            user.setRatingAverage(Math.round(newAvg * 100.0) / 100.0);
+            user.setRatingCount(count + 1);
+        });
     }
 
     @Override

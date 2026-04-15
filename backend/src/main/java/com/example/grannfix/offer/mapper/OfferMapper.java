@@ -16,7 +16,9 @@ public class OfferMapper {
                 o.getMessage(),
                 o.getStatus(),
                 o.getCreatedAt(),
-                o.getCompletedAt()
+                o.getCompletedAt(),
+                o.getRating(),
+                o.getRatingComment()
         );
     }
 }

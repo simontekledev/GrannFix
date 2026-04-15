@@ -12,5 +12,7 @@ public record OfferResponse(
         String message,
         OfferStatus status,
         Instant createdAt,
-        Instant completedAt
+        Instant completedAt,
+        Integer rating,
+        String ratingComment
 ) {}

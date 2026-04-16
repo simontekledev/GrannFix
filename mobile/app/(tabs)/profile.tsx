@@ -282,6 +282,13 @@ export default function ProfilScreen() {
           />
 
           <Pressable
+            onPress={() => router.push("/forgot-password")}
+            style={({ pressed }) => [styles.forgotButton, pressed && { opacity: 0.6 }]}
+          >
+            <Text style={styles.forgotText}>Glömt lösenord?</Text>
+          </Pressable>
+
+          <Pressable
             onPress={handleLogin}
             disabled={!canSubmit}
             style={({ pressed, hovered }: any) => [
@@ -342,7 +349,7 @@ function createStyles(colors: ThemeColors) {
     },
     logoContainer: {
       alignItems: "center",
-      marginTop: 40,
+      marginTop: 16,
       marginBottom: -16,
     },
     logo: {
@@ -356,8 +363,9 @@ function createStyles(colors: ThemeColors) {
       marginBottom: 4,
     },
     subtitle: {
-      fontSize: 15,
-      color: colors.textSecondary,
+      fontSize: 13,
+      color: colors.textMuted,
+      opacity: 0.7,
       marginBottom: 24,
       textAlign: "center",
     },
@@ -539,6 +547,15 @@ function createStyles(colors: ThemeColors) {
       transform: [{ scale: 1.015 }],
     },
     buttonDisabled: { opacity: 0.35 },
+    forgotButton: {
+      alignSelf: "center",
+      marginTop: 12,
+    },
+    forgotText: {
+      fontSize: 14,
+      color: colors.accent,
+      fontWeight: "500",
+    },
     buttonPressed: { opacity: 0.8 },
     buttonText: {
       fontSize: 16,

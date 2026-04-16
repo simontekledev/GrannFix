@@ -50,6 +50,10 @@ export default function RootLayout() {
           require("@/assets/images/location-icon-transparent.png"),
           require("@/assets/images/chat-icon.png"),
           require("@/assets/images/empty-inbox-icon.png"),
+          require("@/assets/images/grannfix-primary-transparent-logo.png"),
+          require("@/assets/images/grannfix-primary-transparent-logo-dark.png"),
+          require("@/assets/images/grannfix-wordmark-transparent.png"),
+          require("@/assets/images/grannfix-wordmark-transparent-dark.png"),
         ]),
       ]);
       await SplashScreen.hideAsync();
@@ -85,6 +89,9 @@ export default function RootLayout() {
             <Stack.Screen name="public-user" options={{ headerShown: false }} />
             <Stack.Screen name="register" options={{ headerShown: false }} />
             <Stack.Screen name="chat-conversation" options={{ headerShown: false }} />
+            <Stack.Screen name="notifications" options={{ headerShown: false }} />
+            <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+            <Stack.Screen name="reset-password" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <ThemedStatusBar />

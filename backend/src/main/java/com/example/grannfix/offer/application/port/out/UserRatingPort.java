@@ -4,4 +4,5 @@ import java.util.UUID;
 
 public interface UserRatingPort {
     void updateRating(UUID userId, int newRating);
+    void incrementCompletedCount(UUID userId);
 }

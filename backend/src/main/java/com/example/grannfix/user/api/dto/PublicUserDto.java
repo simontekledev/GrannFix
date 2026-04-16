@@ -10,5 +10,6 @@ public record PublicUserDto(
         String area,
         double ratingAverage,
         int ratingCount,
+        int completedOffersCount,
         boolean verified
 ) {}

@@ -105,6 +105,14 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
     }
 
     @Override
+    public void incrementCompletedCount(UUID userId) {
+        userRepository.findById(userId).ifPresent(user -> {
+            int current = user.getCompletedOffersCount() != null ? user.getCompletedOffersCount() : 0;
+            user.setCompletedOffersCount(current + 1);
+        });
+    }
+
+    @Override
     public Map<UUID, String> displayNames(Collection<UUID> userIds) {
         if (userIds.isEmpty()) return Map.of();
         return userRepository.findAllById(userIds).stream()

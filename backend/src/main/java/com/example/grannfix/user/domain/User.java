@@ -71,6 +71,10 @@ public class User {
     @Column(nullable = false)
     private Integer ratingCount = 0;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Integer completedOffersCount = 0;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();

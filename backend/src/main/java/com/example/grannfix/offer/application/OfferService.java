@@ -71,9 +71,11 @@ public class OfferService {
         if (!task.createdById().equals(userId)) {
             throw new ForbiddenException("Not your task");
         }
-        return offerRepository.findByTaskIdOrderByCreatedAtDesc(taskId)
-                .stream()
-                .map(OfferMapper::toResponse)
+        var offers = offerRepository.findByTaskIdOrderByCreatedAtDesc(taskId);
+        var helperIds = offers.stream().map(Offer::getHelperId).collect(java.util.stream.Collectors.toSet());
+        var names = userLookupPort.displayNames(helperIds);
+        return offers.stream()
+                .map(o -> OfferMapper.toResponse(o, names.get(o.getHelperId())))
                 .toList();
     }
 
@@ -170,6 +172,7 @@ public class OfferService {
         offer.setCompletedAt(now);
         Offer saved = offerRepository.save(offer);
         taskOfferPort.completeTask(saved.getTaskId(), now);
+        userRatingPort.incrementCompletedCount(offer.getHelperId());
         return OfferMapper.toResponse(saved);
     }
 

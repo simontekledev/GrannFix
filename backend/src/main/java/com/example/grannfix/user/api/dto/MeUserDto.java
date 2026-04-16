@@ -16,5 +16,6 @@ public record MeUserDto(
         String role,
         Double ratingAverage,
         Integer ratingCount,
+        Integer completedOffersCount,
         Instant createdAt
 ) {}

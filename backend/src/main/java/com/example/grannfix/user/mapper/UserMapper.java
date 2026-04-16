@@ -24,6 +24,7 @@ public class UserMapper {
                 user.getRole() != null ? user.getRole().name() : "USER",
                 safeDouble(user.getRatingAverage()),
                 safeInt(user.getRatingCount()),
+                safeInt(user.getCompletedOffersCount()),
                 user.getCreatedAt()
         );
     }
@@ -39,6 +40,7 @@ public class UserMapper {
                 user.getArea(),
                 safeDouble(user.getRatingAverage()),
                 safeInt(user.getRatingCount()),
+                safeInt(user.getCompletedOffersCount()),
                 user.isVerified()
         );
     }

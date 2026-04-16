@@ -64,7 +64,10 @@ export default function RegisterScreen() {
   const phoneDisplay = formatPhoneDisplay(phoneDigits);
 
   function handlePhoneChange(text: string) {
-    const digits = text.replace(/\D/g, "").replace(/^0+/, "");
+    let digits = text.replace(/\D/g, "").replace(/^0+/, "");
+    if (digits.length > 0 && digits[0] !== "7") {
+      digits = "";
+    }
     setPhoneLocal(digits);
   }
 

@@ -136,16 +136,21 @@ public class AuthService {
             passwordResetTokenRepository.save(prt);
 
             String body = """
-                    Hej!
+                    Hej %s!
 
-                    Här är din återställningskod (token):
-                    %s
+                    Du har begärt att återställa ditt lösenord på GrannFix.
 
-                    Använd den i /auth/reset-password tillsammans med ditt nya lösenord.
-                    Token är giltig i 30 minuter. Om du inte begärde detta kan du ignorera mailet.
-                    """.formatted(token);
+                    Din kod: %s
 
-            emailSender.send(user.email(), "Återställ lösenord – GrannFix", body);
+                    Öppna appen, tryck på "Jag har koden" och klistra in koden ovan.
+                    Koden är giltig i 30 minuter.
+
+                    Om du inte begärde detta kan du ignorera det här mailet.
+
+                    / GrannFix
+                    """.formatted(user.name(), token);
+
+            emailSender.send(user.email(), "Din återställningskod – GrannFix", body);
         });
     }
 

@@ -12,6 +12,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+import { usePushNotifications } from '@/src/hooks/usePushNotifications';
 
 function ThemedStatusBar() {
   const { mode } = useTheme();
@@ -28,6 +29,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [appReady, setAppReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
+  usePushNotifications();
 
   useEffect(() => {
     async function prepare() {

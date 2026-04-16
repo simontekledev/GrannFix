@@ -5,6 +5,8 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 backend/.env
 backend/src/main/resources/application-local.properties
+backend/src/main/resources/firebase-service-account.json
+mobile/google-services.json
 
 ############################
 # Mobile - Expo / React Native

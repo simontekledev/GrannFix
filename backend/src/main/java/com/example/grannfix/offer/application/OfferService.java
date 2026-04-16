@@ -1,5 +1,6 @@
 package com.example.grannfix.offer.application;
 
+import com.example.grannfix.common.contracts.PushPort;
 import com.example.grannfix.common.contracts.UserLookupPort;
 import com.example.grannfix.common.errors.BadRequestException;
 import com.example.grannfix.common.errors.ConflictException;
@@ -32,6 +33,7 @@ public class OfferService {
     private final TaskAssignmentPort taskOfferPort;
     private final UserLookupPort userLookupPort;
     private final UserRatingPort userRatingPort;
+    private final PushPort pushPort;
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
         if (!userLookupPort.isVerified(helperId)) {
@@ -57,6 +59,8 @@ public class OfferService {
                 .build();
         try {
             Offer saved = offerRepository.save(offer);
+            String helperName = userLookupPort.displayName(helperId);
+            pushPort.sendToUser(task.createdById(), "Nytt erbjudande", helperName + " vill hjälpa till med ditt uppdrag");
             return OfferMapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("You already have an offer for this task.");
@@ -121,6 +125,7 @@ public class OfferService {
             Offer saved = offerRepository.saveAndFlush(offer);
             offerRepository.rejectOtherPendingOffers(saved.getTaskId(), saved.getId());
             taskOfferPort.assignTask(saved.getTaskId(), saved.getHelperId());
+            pushPort.sendToUser(saved.getHelperId(), "Bud accepterat!", "Ditt erbjudande har accepterats");
 
             return OfferMapper.toResponse(saved);
         } catch (DataIntegrityViolationException e) {

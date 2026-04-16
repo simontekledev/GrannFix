@@ -4,6 +4,7 @@ import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
 import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
+import com.example.grannfix.common.contracts.PushPort;
 import com.example.grannfix.chat.application.port.out.TaskChatPort;
 import com.example.grannfix.chat.application.port.out.TaskChatPort.TaskChatView;
 import com.example.grannfix.chat.domain.Chat;
@@ -34,6 +35,7 @@ public class ChatService {
     private final ChatMessageRepository messageRepository;
     private final TaskChatPort taskChatPort;
     private final UserLookupPort userLookupPort;
+    private final PushPort pushPort;
 
     @Transactional(readOnly = true)
     public List<ChatSummaryResponse> getMyChats(UUID userId) {
@@ -127,6 +129,10 @@ public class ChatService {
                         .content(req.content().trim())
                         .build()
         );
+
+        UUID recipientId = chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId();
+        String senderName = userLookupPort.displayName(userId);
+        pushPort.sendToUser(recipientId, senderName, req.content().trim());
 
         return ChatMapper.toMessageResponse(message);
     }

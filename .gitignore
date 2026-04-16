@@ -4,6 +4,7 @@
 target/
 .mvn/wrapper/maven-wrapper.jar
 backend/.env
+backend/src/main/resources/application-local.properties
 
 ############################
 # Mobile - Expo / React Native

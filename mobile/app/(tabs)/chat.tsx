@@ -110,6 +110,9 @@ export default function ChatListScreen() {
               <Text style={styles.chatTime}>{timeAgo(item.lastMessageAt)}</Text>
             )}
           </View>
+          {item.taskTitle && (
+            <Text style={styles.chatTask} numberOfLines={1}>{item.taskTitle}</Text>
+          )}
           {item.lastMessage && (
             <Text style={styles.chatPreview} numberOfLines={1}>{item.lastMessage}</Text>
           )}

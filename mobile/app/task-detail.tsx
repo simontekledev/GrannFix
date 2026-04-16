@@ -345,8 +345,20 @@ export default function TaskDetailScreen() {
                   <ActivityIndicator color={colors.accent} style={{ paddingVertical: 12 }} />
                 ) : (
                   offers.filter((o) => o.status === "PENDING").map((offer) => (
-                    <View key={offer.id} style={styles.offerItem}>
+                    <Pressable
+                      key={offer.id}
+                      style={styles.offerItem}
+                      onPress={() => offer.helperId && router.push(`/public-user?id=${offer.helperId}` as any)}
+                    >
+                      <View style={[styles.userAvatar, { marginRight: 10 }]}>
+                        <Text style={styles.userAvatarText}>
+                          {(offer.helperName ?? "?").charAt(0).toUpperCase()}
+                        </Text>
+                      </View>
                       <View style={styles.offerInfo}>
+                        <Text style={styles.userName} numberOfLines={1}>
+                          {offer.helperName ?? "Hjälpare"}
+                        </Text>
                         {offer.proposedPrice != null && (
                           <Text style={styles.offerPrice}>{offer.proposedPrice} kr</Text>
                         )}
@@ -370,7 +382,7 @@ export default function TaskDetailScreen() {
                           {acceptingId === offer.id ? "..." : "Acceptera"}
                         </Text>
                       </Pressable>
-                    </View>
+                    </Pressable>
                   ))
                 )}
               </View>

@@ -73,26 +73,19 @@ export default function ChatListScreen() {
             <Text style={styles.title}>Chatt</Text>
           </LinearGradient>
         </SafeAreaView>
-        <View style={[styles.centered, { paddingBottom: 80 }]}>
+        <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
           <Image
             source={require("@/assets/images/chat-tab-icon.png")}
-            style={{ width: 70, height: 70, tintColor: colors.accent, marginBottom: 16 }}
+            style={styles.loginIcon}
             resizeMode="contain"
           />
-          <Text style={{ fontSize: 15, color: colors.textMuted, textAlign: "center", lineHeight: 20, marginBottom: 20 }}>
-            Se dina konversationer
-          </Text>
+          <Text style={styles.loginTitle}>Dina chattar</Text>
+          <Text style={styles.loginSubtitle}>Se dina konversationer</Text>
           <Pressable
             onPress={() => router.push("/(tabs)/profile?returnTo=chat" as any)}
-            style={({ pressed }) => [{
-              backgroundColor: colors.accent,
-              borderRadius: 12,
-              paddingVertical: 14,
-              paddingHorizontal: 48,
-              alignItems: "center" as const,
-            }, pressed && { opacity: 0.8 }]}
+            style={({ pressed }) => [styles.loginButton, pressed && { opacity: 0.8 }]}
           >
-            <Text style={{ fontSize: 15, fontWeight: "600", color: "#fff" }}>Logga in</Text>
+            <Text style={styles.loginButtonText}>Logga in</Text>
           </Pressable>
         </View>
       </View>
@@ -177,6 +170,39 @@ function createStyles(colors: ThemeColors) {
       fontWeight: "700",
       color: colors.textPrimary,
       letterSpacing: -1.0,
+    },
+    loginIcon: {
+      width: 70,
+      height: 70,
+      tintColor: colors.accent,
+      marginBottom: 16,
+    },
+    loginTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      textAlign: "center",
+      marginBottom: 6,
+    },
+    loginSubtitle: {
+      fontSize: 15,
+      color: colors.textMuted,
+      textAlign: "center",
+      lineHeight: 20,
+      marginBottom: 20,
+    },
+    loginButton: {
+      marginTop: 16,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 48,
+      alignItems: "center",
+    },
+    loginButtonText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: "#fff",
     },
     list: {
       paddingHorizontal: 24,

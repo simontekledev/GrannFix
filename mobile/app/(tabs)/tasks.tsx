@@ -159,10 +159,11 @@ export default function TasksScreen() {
         </SafeAreaView>
         <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
           <Image
-            source={require("@/assets/images/keylock-icon.png")}
+            source={require("@/assets/images/activity-icon.png")}
             style={styles.loginIcon}
             resizeMode="contain"
           />
+          <Text style={styles.loginTitle}>Dina uppdrag</Text>
           <Text style={styles.loginSubtitle}>Skapa och hantera dina småjobb</Text>
           <Pressable
             onPress={() => router.push("/(tabs)/profile?returnTo=tasks")}

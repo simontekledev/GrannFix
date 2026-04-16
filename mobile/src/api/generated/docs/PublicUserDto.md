@@ -13,6 +13,7 @@ Name | Type
 `area` | string
 `ratingAverage` | number
 `ratingCount` | number
+`completedOffersCount` | number
 `verified` | boolean
 
 ## Example
@@ -29,6 +30,7 @@ const example = {
   "area": null,
   "ratingAverage": null,
   "ratingCount": null,
+  "completedOffersCount": null,
   "verified": null,
 } satisfies PublicUserDto
 

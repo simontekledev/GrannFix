@@ -163,7 +163,29 @@ export function createDiscoverStyles(colors: ThemeColors) {
       paddingBottom: 8,
     },
     emptyList: {
-      flex: 1,
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingBottom: 8,
+    },
+    loginIcon: {
+      width: 70,
+      height: 70,
+      tintColor: colors.accent,
+      marginBottom: 16,
+    },
+    loginTitle: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.textPrimary,
+      textAlign: "center",
+      marginBottom: 6,
+    },
+    loginSubtitle: {
+      fontSize: 15,
+      color: colors.textMuted,
+      textAlign: "center",
+      lineHeight: 20,
+      marginBottom: 20,
     },
     categoryScroll: {
       marginBottom: 12,

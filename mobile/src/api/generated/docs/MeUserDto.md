@@ -18,6 +18,7 @@ Name | Type
 `role` | string
 `ratingAverage` | number
 `ratingCount` | number
+`completedOffersCount` | number
 `createdAt` | Date
 
 ## Example
@@ -39,6 +40,7 @@ const example = {
   "role": null,
   "ratingAverage": null,
   "ratingCount": null,
+  "completedOffersCount": null,
   "createdAt": null,
 } satisfies MeUserDto
 

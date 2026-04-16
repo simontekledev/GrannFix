@@ -8,6 +8,7 @@ Name | Type
 ------------ | -------------
 `id` | string
 `helperId` | string
+`helperName` | string
 `proposedPrice` | number
 `message` | string
 `status` | string
@@ -25,6 +26,7 @@ import type { OfferResponse } from ''
 const example = {
   "id": null,
   "helperId": null,
+  "helperName": null,
   "proposedPrice": null,
   "message": null,
   "status": null,

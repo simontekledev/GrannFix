@@ -1,6 +1,5 @@
 import { taskQueryApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
-import { EmptyState } from "@/src/components/EmptyState";
 import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { formatDistance, getDistanceKm, AREA_COORDS } from "@/src/helpers/distance";
@@ -245,7 +244,16 @@ export default function UpptäckScreen() {
         }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null}
         ListEmptyComponent={
-          <EmptyState iconImage={require("@/assets/images/empty-inbox-icon.png")} title="Inga uppdrag just nu" subtitle="Dra nedåt för att uppdatera" />
+          <View style={[styles.centered, { flex: 1, paddingBottom: 120 }]}>
+            <Image
+              source={require("@/assets/images/empty-inbox-icon.png")}
+              style={{ width: 130, height: 130, tintColor: colors.accent, marginBottom: -15 }}
+            />
+            <Text style={styles.loginTitle}>Inga uppdrag just nu</Text>
+            <Text style={styles.loginSubtitle}>
+              {selectedCategory ? "Prova att ändra filter" : "Kom tillbaka senare för nya uppdrag"}
+            </Text>
+          </View>
         }
       />
 

@@ -63,6 +63,12 @@ export interface PublicUserDto {
     ratingCount?: number;
     /**
      * 
+     * @type {number}
+     * @memberof PublicUserDto
+     */
+    completedOffersCount?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof PublicUserDto
      */
@@ -93,6 +99,7 @@ export function PublicUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         'area': json['area'] == null ? undefined : json['area'],
         'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
         'ratingCount': json['ratingCount'] == null ? undefined : json['ratingCount'],
+        'completedOffersCount': json['completedOffersCount'] == null ? undefined : json['completedOffersCount'],
         'verified': json['verified'] == null ? undefined : json['verified'],
     };
 }
@@ -115,6 +122,7 @@ export function PublicUserDtoToJSONTyped(value?: PublicUserDto | null, ignoreDis
         'area': value['area'],
         'ratingAverage': value['ratingAverage'],
         'ratingCount': value['ratingCount'],
+        'completedOffersCount': value['completedOffersCount'],
         'verified': value['verified'],
     };
 }

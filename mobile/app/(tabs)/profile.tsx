@@ -37,7 +37,6 @@ export default function ProfilScreen() {
     setRefreshing(false);
   }
 
-  const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
 
   // Login form
   const passwordRef = useRef<TextInput>(null);
@@ -146,26 +145,15 @@ export default function ProfilScreen() {
                 style={styles.profileIcon}
               />
               {user?.verified && (
-                <Pressable
-                  onPress={() => {
-                    setShowVerifiedTooltip(true);
-                    setTimeout(() => setShowVerifiedTooltip(false), 1300);
-                  }}
-                  style={styles.verifiedIconWrapper}
-                >
+                <View style={styles.verifiedIconWrapper}>
                   <Image
                     source={require("@/assets/images/verified-icon.png")}
                     style={styles.verifiedIcon}
                     resizeMode="contain"
                   />
-                </Pressable>
+                </View>
               )}
             </View>
-            {showVerifiedTooltip && (
-              <View style={styles.tooltip}>
-                <Text style={styles.tooltipText}>Verifierad</Text>
-              </View>
-            )}
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
             <StarRating rating={user?.ratingAverage ?? 0} color="green" />
@@ -224,11 +212,11 @@ export default function ProfilScreen() {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Slutförda uppdrag</Text>
               <Text style={styles.detailValue}>
-                {(user?.ratingCount ?? 0) === 0
+                {(user?.completedOffersCount ?? 0) === 0
                   ? "Inga slutförda uppdrag"
-                  : (user?.ratingCount ?? 0) === 1
+                  : (user?.completedOffersCount ?? 0) === 1
                   ? "1 slutfört uppdrag"
-                  : `${user?.ratingCount ?? 0} slutförda uppdrag`}
+                  : `${user?.completedOffersCount ?? 0} slutförda uppdrag`}
               </Text>
             </View>
           </View>
@@ -354,7 +342,7 @@ function createStyles(colors: ThemeColors) {
     },
     logoContainer: {
       alignItems: "center",
-      marginTop: 10,
+      marginTop: 40,
       marginBottom: -16,
     },
     logo: {
@@ -455,20 +443,6 @@ function createStyles(colors: ThemeColors) {
     verifiedIcon: {
       width: 24,
       height: 24,
-    },
-    tooltip: {
-      backgroundColor: "#E0ECFF",
-      borderRadius: 6,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      marginTop: -4,
-      marginBottom: -2,
-    },
-    tooltipText: {
-      fontSize: 11,
-      color: "#3B82F6",
-      fontWeight: "500",
-      letterSpacing: 0.3,
     },
     verifiedPillText: {
       fontSize: 13,

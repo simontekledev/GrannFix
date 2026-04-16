@@ -129,11 +129,11 @@ export default function PublicUserScreen() {
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Slutförda uppdrag</Text>
             <Text style={styles.detailValue}>
-              {(user.ratingCount ?? 0) === 0
+              {(user.completedOffersCount ?? 0) === 0
                 ? "Inga slutförda uppdrag"
-                : (user.ratingCount ?? 0) === 1
+                : (user.completedOffersCount ?? 0) === 1
                 ? "1 slutfört uppdrag"
-                : `${user.ratingCount} slutförda uppdrag`}
+                : `${user.completedOffersCount} slutförda uppdrag`}
             </Text>
           </View>
         </View>

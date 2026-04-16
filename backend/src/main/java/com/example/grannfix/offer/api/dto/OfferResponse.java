@@ -8,6 +8,7 @@ import java.util.UUID;
 public record OfferResponse(
         UUID id,
         UUID helperId,
+        String helperName,
         BigDecimal proposedPrice,
         String message,
         OfferStatus status,

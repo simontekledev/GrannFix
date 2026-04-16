@@ -7,11 +7,16 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class OfferMapper {
     public OfferResponse toResponse(Offer o) {
+        return toResponse(o, null);
+    }
+
+    public OfferResponse toResponse(Offer o, String helperName) {
         if(o == null) return null;
 
         return new OfferResponse(
                 o.getId(),
                 o.getHelperId(),
+                helperName,
                 o.getProposedPrice(),
                 o.getMessage(),
                 o.getStatus(),

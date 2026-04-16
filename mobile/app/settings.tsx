@@ -76,7 +76,7 @@ export default function SettingsScreen() {
   ];
 
   const APP_ROWS = [
-    { icon: require("@/assets/images/notification-icon.png"), label: "Notifikationer", onPress: () => {} },
+    { icon: require("@/assets/images/notification-icon.png"), label: "Notifikationer", onPress: () => router.push("/notifications") },
     { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => router.push("/about") },
   ];
 

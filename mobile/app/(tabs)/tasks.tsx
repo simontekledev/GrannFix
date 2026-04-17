@@ -22,7 +22,6 @@ import { useRouter } from "expo-router";
 import { taskApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
-import { EmptyState } from "@/src/components/EmptyState";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 import { TASK_CATEGORIES } from "@/src/helpers/categories";
 import { TaskCard } from "@/src/components/TaskCard";
@@ -209,11 +208,15 @@ export default function TasksScreen() {
       </SafeAreaView>
 
       {tasks.length === 0 ? (
-        <EmptyState
-          iconImage={require("@/assets/images/empty-inbox-icon.png")}
-          title="Inga uppdrag"
-          subtitle="Du har inga uppdrag just nu."
-        />
+        <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+          <Image
+            source={require("@/assets/images/activity-icon.png")}
+            style={styles.loginIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.loginTitle}>Inga uppdrag</Text>
+          <Text style={styles.loginSubtitle}>Tryck + för att skapa ditt första uppdrag</Text>
+        </View>
       ) : (
         <SectionList
           sections={sections}

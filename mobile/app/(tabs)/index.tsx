@@ -1,5 +1,6 @@
 import { taskQueryApi } from "@/src/api/client";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { formatDistance, getDistanceKm, AREA_COORDS } from "@/src/helpers/distance";
@@ -42,6 +43,12 @@ export default function UpptäckScreen() {
   const [sortNearest, setSortNearest] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("onboarding_complete").then((done) => {
+      if (!done) router.replace("/onboarding");
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -251,7 +258,7 @@ export default function UpptäckScreen() {
             />
             <Text style={styles.loginTitle}>Inga uppdrag just nu</Text>
             <Text style={styles.loginSubtitle}>
-              {selectedCategory ? "Prova att ändra filter" : "Kom tillbaka senare för nya uppdrag"}
+              Dra nedåt för att uppdatera
             </Text>
           </View>
         }

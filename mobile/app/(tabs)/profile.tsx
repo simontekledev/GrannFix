@@ -75,6 +75,8 @@ export default function ProfilScreen() {
         router.replace("/(tabs)" as any);
       } else if (returnTo === "tasks") {
         router.replace("/(tabs)/tasks");
+      } else if (returnTo === "chat") {
+        router.replace("/(tabs)/chat");
       }
     } catch (e: any) {
       console.log("Login error:", e);

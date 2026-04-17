@@ -42,7 +42,7 @@ export default function AboutScreen() {
         </View>
 
         <Text style={styles.description}>
-          Grannfix kopplar ihop grannar som behöver hjälp med de som kan hjälpa till — från småfixar till vardagssysslor.
+          Grannfix kopplar ihop grannar som behöver hjälp med de som kan hjälpa till. Publicera ett uppdrag, få erbjudanden och hitta rätt person nära dig.
         </Text>
 
         <Text style={styles.sectionTitle}>INFO</Text>

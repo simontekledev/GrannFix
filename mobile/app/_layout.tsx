@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Asset } from 'expo-asset';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -29,10 +30,14 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [appReady, setAppReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   usePushNotifications();
 
   useEffect(() => {
     async function prepare() {
+      const onboardingDone = await AsyncStorage.getItem("onboarding_complete");
+      if (!onboardingDone) setShowOnboarding(true);
+
       await Promise.all([
         new Promise((resolve) => setTimeout(resolve, 1200)),
         Asset.loadAsync([
@@ -79,7 +84,8 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {appReady && (
         <>
-          <Stack>
+          <Stack initialRouteName={showOnboarding ? "onboarding" : "(tabs)"}>
+            <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="about" options={{ headerShown: false }} />

@@ -3,9 +3,7 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const BASE_URL = "http://192.168.1.164:8080";
+import { notificationApi } from "@/src/api/client";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -43,22 +41,15 @@ async function registerForPushNotifications(): Promise<string | null> {
 
 async function sendTokenToBackend(pushToken: string) {
   try {
-    const accessToken = await AsyncStorage.getItem("access_token");
-    if (!accessToken) return;
-
     const deviceId = Constants.deviceName ?? "unknown-device";
     const platform = Platform.OS === "ios" ? "IOS" : "ANDROID";
 
-    await fetch(`${BASE_URL}/notifications/devices/${encodeURIComponent(deviceId)}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
+    await notificationApi.registerDevice({
+      deviceId,
+      registerDeviceRequest: {
         fcmToken: pushToken,
         platform,
-      }),
+      },
     });
   } catch (e) {
     console.log("Failed to register push token:", e);

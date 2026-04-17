@@ -18,6 +18,7 @@ import type {
   AuthResponse,
   ForgotPasswordRequest,
   LoginRequest,
+  RefreshRequest,
   RegisterRequest,
   ResetPasswordRequest,
   VerifyOtpRequest,
@@ -29,6 +30,8 @@ import {
     ForgotPasswordRequestToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
+    RefreshRequestFromJSON,
+    RefreshRequestToJSON,
     RegisterRequestFromJSON,
     RegisterRequestToJSON,
     ResetPasswordRequestFromJSON,
@@ -43,6 +46,10 @@ export interface ForgotPasswordOperationRequest {
 
 export interface LoginOperationRequest {
     loginRequest: LoginRequest;
+}
+
+export interface RefreshOperationRequest {
+    refreshRequest: RefreshRequest;
 }
 
 export interface RegisterOperationRequest {
@@ -168,6 +175,59 @@ export class AuthControllerApi extends runtime.BaseAPI {
      */
     async login(requestParameters: LoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponse> {
         const response = await this.loginRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for refresh without sending the request
+     */
+    async refreshRequestOpts(requestParameters: RefreshOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['refreshRequest'] == null) {
+            throw new runtime.RequiredError(
+                'refreshRequest',
+                'Required parameter "refreshRequest" was null or undefined when calling refresh().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/auth/refresh`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RefreshRequestToJSON(requestParameters['refreshRequest']),
+        };
+    }
+
+    /**
+     */
+    async refreshRaw(requestParameters: RefreshOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponse>> {
+        const requestOptions = await this.refreshRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async refresh(requestParameters: RefreshOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponse> {
+        const response = await this.refreshRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

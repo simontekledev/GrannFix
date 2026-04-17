@@ -6,8 +6,9 @@
 
 Name | Type
 ------------ | -------------
-`totalElements` | number
 `totalPages` | number
+`totalElements` | number
+`pageable` | [PageableObject](PageableObject.md)
 `size` | number
 `content` | [Array&lt;AdminUserDto&gt;](AdminUserDto.md)
 `number` | number
@@ -15,7 +16,6 @@ Name | Type
 `first` | boolean
 `last` | boolean
 `numberOfElements` | number
-`pageable` | [PageableObject](PageableObject.md)
 `empty` | boolean
 
 ## Example
@@ -25,8 +25,9 @@ import type { PageAdminUserDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "totalElements": null,
   "totalPages": null,
+  "totalElements": null,
+  "pageable": null,
   "size": null,
   "content": null,
   "number": null,
@@ -34,7 +35,6 @@ const example = {
   "first": null,
   "last": null,
   "numberOfElements": null,
-  "pageable": null,
   "empty": null,
 } satisfies PageAdminUserDto
 

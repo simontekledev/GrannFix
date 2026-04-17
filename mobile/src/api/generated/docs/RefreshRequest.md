@@ -1,26 +1,22 @@
 
-# SortObject
+# RefreshRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`sorted` | boolean
-`empty` | boolean
-`unsorted` | boolean
+`refreshToken` | string
 
 ## Example
 
 ```typescript
-import type { SortObject } from ''
+import type { RefreshRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "sorted": null,
-  "empty": null,
-  "unsorted": null,
-} satisfies SortObject
+  "refreshToken": null,
+} satisfies RefreshRequest
 
 console.log(example)
 
@@ -29,7 +25,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SortObject
+const exampleParsed = JSON.parse(exampleJSON) as RefreshRequest
 console.log(exampleParsed)
 ```
 

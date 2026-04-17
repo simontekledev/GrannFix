@@ -20,11 +20,13 @@ import { authApi } from "@/src/api/client";
 import { validatePassword } from "@/src/helpers/password";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { useUser } from "@/src/context/UserContext";
 
 export default function RegisterScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { loadProfile } = useUser();
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -109,6 +111,7 @@ export default function RegisterScreen() {
         await AsyncStorage.setItem("refresh_token", res.refreshToken);
       }
 
+      await loadProfile();
       Alert.alert("Konto skapat", "Du är registrerad och redo att börja.");
       router.replace("/(tabs)/tasks");
     } catch (e: any) {
@@ -257,14 +260,12 @@ export default function RegisterScreen() {
             animationType="slide"
             onRequestClose={() => { setAreaModalVisible(false); setAreaSearch(""); }}
           >
-            <Pressable
-              style={styles.modalOverlay}
-              onPress={() => { setAreaModalVisible(false); setAreaSearch(""); }}
-            >
-              <View
-                style={styles.modalContent}
-                onStartShouldSetResponder={() => true}
-              >
+            <View style={styles.modalOverlay}>
+              <Pressable
+                style={{ flex: 1 }}
+                onPress={() => { setAreaModalVisible(false); setAreaSearch(""); }}
+              />
+              <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Välj område</Text>
                 <View style={styles.modalHandle} />
                 <TextInput
@@ -298,7 +299,7 @@ export default function RegisterScreen() {
                   )}
                 />
               </View>
-            </Pressable>
+            </View>
           </Modal>
 
           <Pressable

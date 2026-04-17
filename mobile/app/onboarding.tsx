@@ -48,7 +48,9 @@ export default function OnboardingScreen() {
 
   function handleNext() {
     if (currentIndex < PAGES.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+      const next = currentIndex + 1;
+      flatListRef.current?.scrollToOffset({ offset: next * width, animated: true });
+      setCurrentIndex(next);
     } else {
       handleFinish();
     }

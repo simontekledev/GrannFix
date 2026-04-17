@@ -132,6 +132,28 @@ export function ChatListSkeleton() {
   );
 }
 
+export function ChatMessagesSkeleton() {
+  return (
+    <View style={{ paddingHorizontal: 16, paddingTop: 16, flex: 1 }}>
+      <View style={{ alignItems: "flex-start", marginBottom: 12 }}>
+        <Skeleton width={180} height={36} borderRadius={16} />
+      </View>
+      <View style={{ alignItems: "flex-end", marginBottom: 12 }}>
+        <Skeleton width={140} height={36} borderRadius={16} />
+      </View>
+      <View style={{ alignItems: "flex-start", marginBottom: 12 }}>
+        <Skeleton width={220} height={36} borderRadius={16} />
+      </View>
+      <View style={{ alignItems: "flex-end", marginBottom: 12 }}>
+        <Skeleton width={100} height={36} borderRadius={16} />
+      </View>
+      <View style={{ alignItems: "flex-start", marginBottom: 12 }}>
+        <Skeleton width={160} height={36} borderRadius={16} />
+      </View>
+    </View>
+  );
+}
+
 const skeletonStyles = StyleSheet.create({
   card: {
     borderRadius: 14,

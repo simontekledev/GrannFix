@@ -9,6 +9,7 @@ Name | Type
 `id` | string
 `taskId` | string
 `taskTitle` | string
+`otherPartyId` | string
 `otherPartyName` | string
 `lastMessage` | string
 `lastMessageAt` | Date
@@ -23,6 +24,7 @@ const example = {
   "id": null,
   "taskId": null,
   "taskTitle": null,
+  "otherPartyId": null,
   "otherPartyName": null,
   "lastMessage": null,
   "lastMessageAt": null,

@@ -63,6 +63,7 @@ public class ChatService {
                     chat.getId(),
                     chat.getTaskId(),
                     titles.getOrDefault(chat.getTaskId(), "Uppdrag"),
+                    otherPartyId,
                     names.get(otherPartyId),
                     lastMsg != null ? lastMsg.getContent() : null,
                     lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt()

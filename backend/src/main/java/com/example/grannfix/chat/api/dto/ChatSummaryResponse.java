@@ -7,6 +7,7 @@ public record ChatSummaryResponse(
         UUID id,
         UUID taskId,
         String taskTitle,
+        UUID otherPartyId,
         String otherPartyName,
         String lastMessage,
         Instant lastMessageAt

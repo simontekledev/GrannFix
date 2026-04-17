@@ -117,7 +117,7 @@ export default function ChatListScreen() {
         style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
         onPress={() => {
           if (item.id) markAsRead(item.id);
-          router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}` as any);
+          router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}&otherUserId=${item.otherPartyId ?? ""}` as any);
         }}
       >
         <View style={styles.avatar}>

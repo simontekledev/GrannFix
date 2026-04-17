@@ -66,11 +66,12 @@ function timeLabel(date: Date): string {
 
 export default function ChatConversationScreen() {
   const router = useRouter();
-  const { chatId, taskId, name, taskTitle } = useLocalSearchParams<{
+  const { chatId, taskId, name, taskTitle, otherUserId } = useLocalSearchParams<{
     chatId: string;
     taskId?: string;
     name?: string;
     taskTitle?: string;
+    otherUserId?: string;
   }>();
   const { user } = useUser();
   const { colors } = useTheme();
@@ -270,17 +271,17 @@ export default function ChatConversationScreen() {
         </View>
         <Pressable
           style={styles.headerInfo}
-          onPress={() => taskId && router.push(`/task-detail?id=${taskId}` as any)}
-          disabled={!taskId}
+          onPress={() => {
+            if (otherUserId) router.push(`/public-user?id=${otherUserId}` as any);
+          }}
+          disabled={!otherUserId}
         >
           <Text style={styles.headerName} numberOfLines={1}>{name ?? "Chatt"}</Text>
           {taskTitle && (
             <Text style={styles.headerTask} numberOfLines={1}>{taskTitle}</Text>
           )}
         </Pressable>
-        {taskId && (
-          <Text style={styles.headerChevron}>›</Text>
-        )}
+        <Text style={styles.headerChevron}>›</Text>
       </View>
 
       <KeyboardAvoidingView

@@ -249,7 +249,7 @@ export default function TaskDetailScreen() {
       const chat = await chatApi.getOrCreateChat({ taskId: id });
       const helperName = task?.assignedTo?.name ?? "";
       const taskTitle = task?.title ?? "";
-      router.push(`/chat-conversation?chatId=${chat.id}&taskId=${id}&name=${encodeURIComponent(helperName)}&taskTitle=${encodeURIComponent(taskTitle)}` as any);
+      router.push(`/chat-conversation?chatId=${chat.id}&taskId=${id}&name=${encodeURIComponent(helperName)}&taskTitle=${encodeURIComponent(taskTitle)}&otherUserId=${task?.assignedTo?.id ?? ""}` as any);
     } catch (e) {
       console.log("Chat error:", e);
     }
@@ -443,9 +443,14 @@ export default function TaskDetailScreen() {
 
         {task.assignedTo && (
           <Pressable
-            style={({ pressed }) => [styles.card, perms?.canChat && styles.cardChatActive, pressed && perms?.canChat && { opacity: 0.7 }]}
-            onPress={perms?.canChat ? handleChat : undefined}
-            disabled={!perms?.canChat}
+            style={({ pressed }) => [styles.card, perms?.canChat && styles.cardChatActive, pressed && { opacity: 0.7 }]}
+            onPress={
+              perms?.canChat
+                ? handleChat
+                : task.assignedTo.id !== user?.id
+                ? () => router.push(`/public-user?id=${task.assignedTo?.id}` as any)
+                : undefined
+            }
           >
             <Text style={styles.sectionTitle}>HJÄLPARE</Text>
             <View style={styles.userRow}>
@@ -465,6 +470,9 @@ export default function TaskDetailScreen() {
                     resizeMode="contain"
                   />
                 </View>
+              )}
+              {!perms?.canChat && task.assignedTo.id !== user?.id && (
+                <Text style={styles.userArrow}>›</Text>
               )}
             </View>
           </Pressable>

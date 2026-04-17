@@ -11,8 +11,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "@/src/context/UserContext";
-import { EmptyState } from "@/src/components/EmptyState";
 import { chatApi } from "@/src/api/client";
 import type { ChatSummaryResponse } from "@/src/api/generated/models/ChatSummaryResponse";
 import { timeAgo } from "@/src/helpers/time";
@@ -27,11 +27,14 @@ export default function ChatListScreen() {
   const [chats, setChats] = useState<ChatSummaryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastReadMap, setLastReadMap] = useState<Record<string, string>>({});
 
   const fetchChats = useCallback(async () => {
     try {
       const data = await chatApi.getMyChats();
       setChats(data);
+      const stored = await AsyncStorage.getItem("chat_last_read");
+      if (stored) setLastReadMap(JSON.parse(stored));
     } catch (e) {
       console.log("Failed to load chats:", e);
     }
@@ -92,31 +95,49 @@ export default function ChatListScreen() {
     );
   }
 
+  async function markAsRead(chatId: string) {
+    const updated = { ...lastReadMap, [chatId]: new Date().toISOString() };
+    setLastReadMap(updated);
+    await AsyncStorage.setItem("chat_last_read", JSON.stringify(updated));
+  }
+
+  function isUnread(item: ChatSummaryResponse): boolean {
+    if (!item.id || !item.lastMessageAt) return false;
+    const lastRead = lastReadMap[item.id];
+    if (!lastRead) return true;
+    return new Date(item.lastMessageAt).getTime() > new Date(lastRead).getTime();
+  }
+
   function renderChat({ item }: { item: ChatSummaryResponse }) {
     const initial = (item.otherPartyName ?? "?").charAt(0).toUpperCase();
+    const unread = isUnread(item);
 
     return (
       <Pressable
         style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
-        onPress={() => router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}` as any)}
+        onPress={() => {
+          if (item.id) markAsRead(item.id);
+          router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}` as any);
+        }}
       >
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{initial}</Text>
         </View>
         <View style={styles.chatContent}>
           <View style={styles.chatTopRow}>
-            <Text style={styles.chatName} numberOfLines={1}>{item.otherPartyName}</Text>
+            <Text style={[styles.chatName, unread && styles.chatNameUnread]} numberOfLines={1}>{item.otherPartyName}</Text>
             {item.lastMessageAt && (
-              <Text style={styles.chatTime}>{timeAgo(item.lastMessageAt)}</Text>
+              <Text style={[styles.chatTime, unread && styles.chatTimeUnread]}>{timeAgo(item.lastMessageAt)}</Text>
             )}
           </View>
           {item.taskTitle && (
             <Text style={styles.chatTask} numberOfLines={1}>{item.taskTitle}</Text>
           )}
           {item.lastMessage && (
-            <Text style={styles.chatPreview} numberOfLines={1}>{item.lastMessage}</Text>
+            <Text style={[styles.chatPreview, unread && styles.chatPreviewUnread]} numberOfLines={1}>{item.lastMessage}</Text>
           )}
         </View>
+        {unread && <View style={styles.unreadDot} />}
       </Pressable>
     );
   }
@@ -138,12 +159,14 @@ export default function ChatListScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
         }
         ListEmptyComponent={
-          <View style={{ paddingTop: 140 }}>
-            <EmptyState
-              iconImage={require("@/assets/images/chat-icon.png")}
-              title="Inga chattar"
-              subtitle="Här visas dina chattar när du har aktiva uppdrag"
+          <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+            <Image
+              source={require("@/assets/images/chat-tab-icon.png")}
+              style={styles.loginIcon}
+              resizeMode="contain"
             />
+            <Text style={styles.loginTitle}>Inga chattar</Text>
+            <Text style={styles.loginSubtitle}>Chattar skapas när du har aktiva uppdrag</Text>
           </View>
         }
       />
@@ -208,6 +231,7 @@ function createStyles(colors: ThemeColors) {
       color: "#fff",
     },
     list: {
+      flexGrow: 1,
       paddingHorizontal: 24,
       paddingBottom: 24,
     },
@@ -271,6 +295,24 @@ function createStyles(colors: ThemeColors) {
       fontSize: 14,
       color: colors.textMuted,
       lineHeight: 18,
+    },
+    chatNameUnread: {
+      fontWeight: "700",
+    },
+    chatTimeUnread: {
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    chatPreviewUnread: {
+      color: colors.textPrimary,
+      fontWeight: "500",
+    },
+    unreadDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.accent,
+      marginLeft: 8,
     },
   });
 }

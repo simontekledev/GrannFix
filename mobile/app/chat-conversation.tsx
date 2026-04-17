@@ -15,9 +15,11 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { chatApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { ChatMessagesSkeleton } from "@/src/components/Skeleton";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
 
 type ListItem =
@@ -103,8 +105,21 @@ export default function ChatConversationScreen() {
     }
   }
 
+  async function markChatAsRead() {
+    if (!chatId) return;
+    try {
+      const stored = await AsyncStorage.getItem("chat_last_read");
+      const map = stored ? JSON.parse(stored) : {};
+      map[chatId] = new Date().toISOString();
+      await AsyncStorage.setItem("chat_last_read", JSON.stringify(map));
+    } catch {}
+  }
+
   useEffect(() => {
-    loadMessages().finally(() => setLoading(false));
+    loadMessages().finally(() => {
+      setLoading(false);
+      markChatAsRead();
+    });
 
     pollRef.current = setInterval(() => {
       setMessages((prev) => {
@@ -129,6 +144,7 @@ export default function ChatConversationScreen() {
       });
       setMessages((prev) => [...prev, msg]);
       setText("");
+      markChatAsRead();
       setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (e) {
       console.log("Send error:", e);
@@ -273,9 +289,7 @@ export default function ChatConversationScreen() {
         keyboardVerticalOffset={0}
       >
         {loading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator size="large" color={colors.accent} />
-          </View>
+          <ChatMessagesSkeleton />
         ) : (
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={{ flex: 1 }}>

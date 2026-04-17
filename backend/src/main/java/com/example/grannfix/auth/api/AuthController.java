@@ -45,6 +45,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody @Valid RefreshRequest request) {
+        AuthResponse response = authService.refresh(request.refreshToken());
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequest req) {
         authService.forgotPassword(req.email());

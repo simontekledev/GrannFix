@@ -16,6 +16,7 @@ import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.common.errors.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
@@ -113,6 +114,19 @@ public class AuthService {
             userAuthPort.markVerified(user.id());
             user = userAuthPort.findById(user.id())
                     .orElseThrow(() -> new NotFoundException("User not found"));
+        }
+        return buildAuthResponse(user);
+    }
+
+    public AuthResponse refresh(String refreshToken) {
+        if (!jwtService.isValid(refreshToken)) {
+            throw new UnauthorizedException("Invalid or expired refresh token");
+        }
+        UUID userId = jwtService.extractUserId(refreshToken);
+        UserAuthView user = userAuthPort.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        if (!user.active()) {
+            throw new ForbiddenException("User is disabled");
         }
         return buildAuthResponse(user);
     }

@@ -351,8 +351,8 @@ function createStyles(colors: ThemeColors) {
     },
     logoContainer: {
       alignItems: "center",
-      marginTop: 16,
-      marginBottom: -16,
+      marginTop: 8,
+      marginBottom: -40,
     },
     logo: {
       width: 260,
@@ -523,20 +523,20 @@ function createStyles(colors: ThemeColors) {
       fontWeight: "600",
       color: colors.textPrimary,
       marginBottom: 6,
-      marginTop: 16,
+      marginTop: 12,
     },
     input: {
       backgroundColor: colors.card,
       borderRadius: 12,
       paddingHorizontal: 16,
-      paddingVertical: 14,
+      paddingVertical: 12,
       fontSize: 16,
       color: colors.textPrimary,
       borderWidth: 1,
       borderColor: colors.border,
     },
     button: {
-      marginTop: 28,
+      marginTop: 20,
       backgroundColor: colors.accent,
       borderRadius: 12,
       paddingVertical: 16,
@@ -567,7 +567,7 @@ function createStyles(colors: ThemeColors) {
     divider: {
       flexDirection: "row",
       alignItems: "center",
-      marginVertical: 24,
+      marginVertical: 16,
     },
     dividerLine: {
       flex: 1,

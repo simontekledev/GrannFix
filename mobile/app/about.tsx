@@ -115,11 +115,12 @@ function createStyles(colors: ThemeColors) {
     },
     scroll: {
       paddingHorizontal: 24,
-      paddingBottom: 48,
+      paddingBottom: 24,
     },
     logoContainer: {
       alignItems: "center",
-      marginBottom: -20,
+      marginTop: -10,
+      marginBottom: -50,
     },
     logo: {
       width: 240,
@@ -187,7 +188,7 @@ function createStyles(colors: ThemeColors) {
       textAlign: "center",
       fontSize: 13,
       color: colors.textMuted,
-      marginTop: 32,
+      marginTop: 20,
       opacity: 0.6,
     },
   });

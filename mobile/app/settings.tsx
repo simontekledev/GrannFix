@@ -160,6 +160,18 @@ export default function SettingsScreen() {
           )}
         </Pressable>
 
+        <Pressable
+          onPress={async () => {
+            const AsyncStorage = (await import("@react-native-async-storage/async-storage")).default;
+            await AsyncStorage.removeItem("onboarding_complete");
+            if (Platform.OS === "web") window.alert("Onboarding reset! Starta om appen.");
+            else Alert.alert("Reset", "Onboarding visas vid nästa omstart");
+          }}
+          style={({ pressed }) => [styles.deleteButton, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.deleteButtonText}>Reset onboarding (debug)</Text>
+        </Pressable>
+
         <Text style={styles.versionText}>Grannfix v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>

@@ -1,105 +1,71 @@
-# GrannFix
+# GrannFix 🏠
 
-A mobile marketplace platform connecting users with local helpers for everyday tasks. Post a task, receive offers from nearby helpers, and complete jobs securely — all through the app.
+**Quick help from your neighbors.** GrannFix connects people who need help with everyday tasks — carrying, mounting, moving — with reliable helpers nearby.
 
-> **Status:** In active development
+> 📱 React Native (Expo) · ☕ Spring Boot · 🐘 PostgreSQL
 
 ---
+
+## Screenshots
+
+<!-- Add screenshots here -->
+<!-- | Discover | Tasks | Chat | Profile |
+|----------|-------|------|---------|
+| ![](docs/screenshots/discover.png) | ![](docs/screenshots/tasks.png) | ![](docs/screenshots/chat.png) | ![](docs/screenshots/profile.png) | -->
+
+*Screenshots coming soon*
+
+---
+
+## What can you do?
+
+🔍 **Find help** — Browse tasks near you, filter by category
+
+📦 **Post a task** — Describe what you need, pick a category and price
+
+💬 **Chat** — Talk directly with the helper before and during the task
+
+⭐ **Rate** — Leave a star rating after the task is completed
+
+🔔 **Push notifications** — Never miss a new offer or message
+
+🌙 **Dark mode** — Full dark theme support across the app
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Mobile** | React Native, Expo, TypeScript, Expo Router |
+| **Backend** | Java 17, Spring Boot 4, Spring Security |
+| **Database** | PostgreSQL |
+| **Push** | Firebase Cloud Messaging (FCM) |
+| **Email** | Resend SMTP |
+| **Auth** | JWT (access 15 min + refresh 30 days) |
+| **API** | REST, OpenAPI 3.0, auto-generated TypeScript client |
 
 ## Architecture
 
-The project follows a **modular monolith** pattern with a Spring Boot backend and a React Native mobile client.
-
 ```
 GrannFix/
-├── backend/     # Spring Boot REST API
-└── mobile/      # React Native (Expo) client
+├── backend/          # Modular monolith (Spring Boot)
+│   ├── auth/         # JWT, OTP, password reset
+│   ├── user/         # Profiles, admin
+│   ├── task/         # Tasks, categories, search
+│   ├── offer/        # Offers, ratings
+│   ├── chat/         # Messages
+│   └── notification/ # Push (FCM)
+└── mobile/           # React Native (Expo)
+    ├── app/          # Screens (Expo Router)
+    ├── src/api/      # Auto-generated API client
+    ├── src/context/  # User, Theme
+    └── src/components/ # TaskCard, Skeleton, ErrorBoundary
 ```
-
-### Backend
-
-- **Java 17 + Spring Boot 4**
-- **PostgreSQL** — relational data store
-- **Spring Security** — stateless JWT authentication
-- **SpringDoc OpenAPI 3** — auto-generated API documentation
-- **Maven** — build and dependency management
-
-### Mobile
-
-- **React Native + Expo** — cross-platform mobile app
-- **TypeScript** — type-safe frontend code
-- **React Navigation** — tab-based routing
-- **Auto-generated API clients** — TypeScript clients generated from the OpenAPI spec
-
----
-
-## Features
-
-### Authentication & Users
-
-- Phone number verification via OTP (Twilio)
-- Email/password registration and login
-- Password reset flow via email (Brevo SMTP)
-- JWT-based session management with Bearer tokens
-- Role-based access control (User, Admin)
-- User profiles with location (city, area, street)
-- Admin endpoints for user management (deactivation, listing)
-
-### Tasks
-
-- Create tasks with title, description, location, and offered price
-- Browse and search tasks with cursor-based pagination
-- Filter by city, area, and status
-- Task lifecycle: `OPEN` → `ASSIGNED` → `COMPLETED` / `CANCELLED`
-- Soft deletion with an active flag
-- Only verified users can create tasks
-
-### Offers
-
-- Helpers submit offers on open tasks with an optional proposed price and message
-- Task owners can accept an offer, which auto-declines all other pending offers and assigns the task
-- Two-step completion flow: helper marks done → task owner confirms done
-- One offer per helper per task (enforced via unique constraint)
-- Pending offer count surfaced on task detail (visible only to task owner)
-- `canOffer` permission disables the offer button for users who already have an offer
-
-### Chat
-
-- One chat per assigned task between owner and helper
-- Real-time messaging via polling (every 4 seconds)
-- Chat list shows task title, other party's name, and last message preview
-- Participant validation on every message endpoint
-
-### Notifications
-
-- Device token registration for push notifications (FCM)
-- Per-device token storage with platform type (iOS/Android)
-- Upsert logic: same device ID updates the existing token
-- Secure removal: only the token owner can unregister a device
-
-### Account Management
-
-- Account deletion with GDPR-compliant anonymization
-- Soft delete: sets account inactive, anonymizes personal data (name, email, phone)
-- Cancels all open/assigned tasks on deletion
-- Dark mode toggle with persistent theme preference
-
-### API Documentation
-
-- Swagger UI available at `/swagger-ui.html`
-- OpenAPI 3.0 spec at `/v3/api-docs`
-- TypeScript API clients auto-generated from the spec (`npm run generate-api` in `/mobile`)
 
 ---
 
 ## Getting Started
-
-### Prerequisites
-
-- Java 17+
-- PostgreSQL
-- Node.js 18+
-- Expo CLI
 
 ### Backend
 
@@ -108,7 +74,12 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-The API starts on `http://localhost:8080`. Configure database credentials and external service keys in `backend/src/main/resources/application.properties`.
+Create `backend/src/main/resources/application-local.properties`:
+
+```properties
+spring.datasource.password=your_db_password
+spring.mail.password=your_resend_api_key
+```
 
 ### Mobile
 
@@ -118,83 +89,13 @@ npm install
 npm start
 ```
 
-Update the API base URL in `mobile/src/api/client.ts` to point to your backend.
+Update the API base URL in `mobile/src/api/client.ts`.
 
-### Regenerate API Clients
+### API Documentation
 
-After making backend API changes:
+Swagger UI: `/swagger-ui.html` · OpenAPI spec: `/v3/api-docs`
 
-```bash
-cd mobile
-npm run generate-api
-```
-
----
-
-## API Overview
-
-| Area   | Endpoint                          | Description                    |
-|--------|-----------------------------------|--------------------------------|
-| Auth   | `POST /auth/register`             | Register a new user            |
-| Auth   | `POST /auth/login`                | Login with email and password  |
-| Auth   | `POST /auth/send-otp`             | Send OTP to phone number       |
-| Auth   | `POST /auth/verify-otp`           | Verify OTP code                |
-| Auth   | `POST /auth/forgot-password`      | Request password reset         |
-| Auth   | `POST /auth/reset-password`       | Reset password with token      |
-| Users  | `GET /users/me`                   | Get current user profile       |
-| Users  | `PATCH /users/me`                 | Update current user            |
-| Users  | `GET /users/{id}`                 | Get public user profile        |
-| Tasks  | `POST /tasks`                     | Create a new task              |
-| Tasks  | `GET /tasks`                      | Browse tasks (public)          |
-| Tasks  | `GET /tasks/me`                   | Get own tasks                  |
-| Tasks  | `PATCH /tasks/{id}`               | Update a task                  |
-| Tasks  | `POST /tasks/{id}/cancel`         | Cancel a task                  |
-| Offers | `POST /tasks/{taskId}/offers`     | Submit an offer                |
-| Offers | `GET /tasks/{taskId}/offers`      | List offers (task owner only)  |
-| Offers | `POST /offers/{id}/accept`        | Accept an offer                |
-| Offers | `POST /offers/{id}/mark-done`     | Helper marks offer as done     |
-| Offers | `POST /offers/{id}/confirm-done`  | Owner confirms completion      |
-| Chat   | `GET /chats`                      | List current user's chats      |
-| Chat   | `GET /tasks/{taskId}/chat`        | Get or create chat for task    |
-| Chat   | `GET /chats/{chatId}/messages`    | Get messages (with `after`)    |
-| Chat   | `POST /chats/{chatId}/messages`   | Send a message                 |
-| Notif. | `PUT /notifications/devices/{id}` | Register/update device token   |
-| Notif. | `DELETE /notifications/devices/{id}` | Unregister device           |
-| Users  | `DELETE /users/me`                | Delete account (anonymize)     |
-| Admin  | `GET /admin/users`                | List all users (paginated)     |
-| Health | `GET /ping`                       | Health check                   |
-
----
-
-## Project Structure
-
-```
-backend/src/main/java/com/example/grannfix/
-├── auth/          # Authentication, OTP, JWT, password reset
-├── user/          # User profiles, admin operations
-├── task/          # Task CRUD, search, status transitions
-├── offer/         # Offer lifecycle, acceptance, completion
-├── chat/          # Chats, messages, task-scoped conversations
-├── notification/  # Device tokens, push notification registration
-└── common/        # Security config, error handling, shared contracts
-```
-
-```
-mobile/
-├── app/           # Screens and navigation (Expo Router)
-│   ├── (tabs)/    # Tab-based screens (Discover, Tasks, Chat, Profile)
-│   ├── task-detail.tsx        # Task details, offers, edit, cancel
-│   ├── chat-conversation.tsx  # Message thread for a chat
-│   ├── edit-profile.tsx       # Edit user profile
-│   ├── settings.tsx           # Account & app settings
-│   └── public-user.tsx        # Public profile view
-├── src/api/       # Auto-generated API clients and config
-├── src/context/   # React contexts (UserContext, ThemeContext)
-├── src/helpers/   # Utilities (time formatting, distance, areas)
-├── src/styles/    # Shared styles (modal, form)
-├── components/    # Reusable UI components
-└── constants/     # Theme and color definitions
-```
+Regenerate client after backend changes: `npm run generate-api`
 
 ---
 

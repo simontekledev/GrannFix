@@ -70,6 +70,7 @@ public class TaskService {
                 .area(req.area().trim())
                 .street(req.street() != null ? req.street().trim() : null)
                 .offeredPrice(price)
+                .imageUrls(req.imageUrls() != null ? req.imageUrls() : new java.util.ArrayList<>())
                 .build();
         return TaskMapper.toResponse(taskRepository.save(task));
     }
@@ -97,10 +98,12 @@ public class TaskService {
             throw new ForbiddenException("Forbidden");
         }
         String ownerName = userLookupPort.displayName(task.getCreatedById());
+        String ownerImage = userLookupPort.profileImageUrl(task.getCreatedById());
         String helperName = task.getAssignedToId() != null ? userLookupPort.displayName(task.getAssignedToId()) : null;
+        String helperImage = task.getAssignedToId() != null ? userLookupPort.profileImageUrl(task.getAssignedToId()) : null;
         int pendingOffers = offerTaskPort.countPendingOffers(taskId);
         boolean viewerHasOffer = offerTaskPort.hasOffer(taskId, userId);
-        return TaskMapper.toDetailResponse(task, userId, ownerName, helperName, pendingOffers, viewerHasOffer);
+        return TaskMapper.toDetailResponse(task, userId, ownerName, ownerImage, helperName, helperImage, pendingOffers, viewerHasOffer);
     }
 
     @Transactional

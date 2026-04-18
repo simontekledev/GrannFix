@@ -9,6 +9,7 @@ public record OfferResponse(
         UUID id,
         UUID helperId,
         String helperName,
+        String helperProfileImageUrl,
         BigDecimal proposedPrice,
         String message,
         OfferStatus status,

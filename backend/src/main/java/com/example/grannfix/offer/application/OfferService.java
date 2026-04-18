@@ -78,8 +78,9 @@ public class OfferService {
         var offers = offerRepository.findByTaskIdOrderByCreatedAtDesc(taskId);
         var helperIds = offers.stream().map(Offer::getHelperId).collect(java.util.stream.Collectors.toSet());
         var names = userLookupPort.displayNames(helperIds);
+        var images = userLookupPort.profileImageUrls(helperIds);
         return offers.stream()
-                .map(o -> OfferMapper.toResponse(o, names.get(o.getHelperId())))
+                .map(o -> OfferMapper.toResponse(o, names.get(o.getHelperId()), images.get(o.getHelperId())))
                 .toList();
     }
 

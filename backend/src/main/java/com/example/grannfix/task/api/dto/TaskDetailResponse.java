@@ -4,6 +4,7 @@ import com.example.grannfix.task.domain.TaskStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record TaskDetailResponse(
@@ -16,6 +17,7 @@ public record TaskDetailResponse(
         String area,
         String street,
         BigDecimal offeredPrice,
+        List<String> imageUrls,
         TaskStatus status,
         boolean active,
         Instant createdAt,
@@ -28,7 +30,7 @@ public record TaskDetailResponse(
         UUID chatId,
         Permissions permissions
 ) {
-    public record UserSummary(UUID id, String name) {}
+    public record UserSummary(UUID id, String name, String profileImageUrl) {}
 
     public record Permissions(
             boolean canEdit,

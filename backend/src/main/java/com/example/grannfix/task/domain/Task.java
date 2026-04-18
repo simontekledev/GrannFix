@@ -5,6 +5,8 @@ import lombok.*;
 import jakarta.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter @Setter
@@ -51,6 +53,13 @@ public class Task {
 
     @DecimalMin(value = "0.00")
     private BigDecimal offeredPrice;
+
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "task_images", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "image_url")
+    @org.hibernate.annotations.BatchSize(size = 50)
+    private List<String> imageUrls = new ArrayList<>();
 
     @Builder.Default
     @Enumerated(EnumType.STRING)

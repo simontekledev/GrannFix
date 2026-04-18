@@ -6,6 +6,7 @@ import com.example.grannfix.task.domain.Task;
 import com.example.grannfix.task.domain.TaskStatus;
 import lombok.experimental.UtilityClass;
 
+import java.util.List;
 import java.util.UUID;
 
 @UtilityClass
@@ -26,6 +27,7 @@ public class TaskMapper {
                 t.getArea(),
                 t.getStreet(),
                 t.getOfferedPrice(),
+                t.getImageUrls() != null ? t.getImageUrls() : List.of(),
                 t.getStatus(),
                 t.getCreatedById(),
                 t.isActive(),
@@ -36,7 +38,7 @@ public class TaskMapper {
         );
     }
 
-    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String ownerName, String helperName, int pendingOffersCount, boolean viewerHasOffer) {
+    public TaskDetailResponse toDetailResponse(Task task, UUID viewerUserId, String ownerName, String ownerImage, String helperName, String helperImage, int pendingOffersCount, boolean viewerHasOffer) {
         if (task == null) return null;
 
         UUID ownerId = task.getCreatedById();
@@ -48,9 +50,9 @@ public class TaskMapper {
         boolean canOffer = viewerUserId != null && !isOwner && task.isActive() && task.getStatus() == TaskStatus.OPEN && !viewerHasOffer;
         boolean canChat = isOwner && task.isActive() && task.getStatus() == TaskStatus.ASSIGNED;
 
-        var createdBy = new TaskDetailResponse.UserSummary(ownerId, ownerName);
+        var createdBy = new TaskDetailResponse.UserSummary(ownerId, ownerName, ownerImage);
         var assignedTo = task.getAssignedToId() != null
-                ? new TaskDetailResponse.UserSummary(task.getAssignedToId(), helperName)
+                ? new TaskDetailResponse.UserSummary(task.getAssignedToId(), helperName, helperImage)
                 : null;
 
         return new TaskDetailResponse(
@@ -63,6 +65,7 @@ public class TaskMapper {
                 task.getArea(),
                 task.getStreet(),
                 task.getOfferedPrice(),
+                task.getImageUrls() != null ? task.getImageUrls() : List.of(),
                 task.getStatus(),
                 task.isActive(),
                 task.getCreatedAt(),

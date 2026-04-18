@@ -41,6 +41,9 @@ public class User {
     @Column
     private String street;
 
+    @Column
+    private String profileImageUrl;
+
     @Builder.Default
     @Column(nullable = false)
     private boolean active = true;

@@ -94,6 +94,13 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
     }
 
     @Override
+    public String profileImageUrl(UUID userId) {
+        return userRepository.findById(userId)
+                .map(User::getProfileImageUrl)
+                .orElse(null);
+    }
+
+    @Override
     public void updateRating(UUID userId, int newRating) {
         userRepository.findById(userId).ifPresent(user -> {
             int count = user.getRatingCount() != null ? user.getRatingCount() : 0;
@@ -117,6 +124,14 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
         if (userIds.isEmpty()) return Map.of();
         return userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(User::getId, User::getName));
+    }
+
+    @Override
+    public Map<UUID, String> profileImageUrls(Collection<UUID> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        return userRepository.findAllById(userIds).stream()
+                .filter(u -> u.getProfileImageUrl() != null)
+                .collect(Collectors.toMap(User::getId, User::getProfileImageUrl));
     }
     private UserAuthView toView(User u) {
         return new UserAuthView(

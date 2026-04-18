@@ -3,6 +3,7 @@ package com.example.grannfix.user.application;
 import com.example.grannfix.common.errors.ConflictException;
 import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
+import com.example.grannfix.common.file.FileStorageService;
 import com.example.grannfix.user.application.port.out.TaskAdminPort;
 import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -27,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final TaskAdminPort taskAdminPort;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
     @Transactional(readOnly = true)
     public MeUserDto getMe(UUID userId) {
         return UserMapper.toMeDto(getActiveUserOrThrow(userId));
@@ -75,6 +78,31 @@ public class UserService {
         u.setPassword("DELETED");
         u.setVerified(false);
         taskAdminPort.cancelOpenOrAssignedTasksCreatedBy(u.getId());
+    }
+
+    @Transactional
+    public MeUserDto updateProfileImage(UUID userId, MultipartFile file) {
+        User u = getActiveUserOrThrow(userId);
+        String oldImage = u.getProfileImageUrl();
+        String filename = fileStorageService.store(file);
+        u.setProfileImageUrl("/files/" + filename);
+        if (oldImage != null) {
+            String oldFilename = oldImage.replace("/files/", "");
+            fileStorageService.delete(oldFilename);
+        }
+        return UserMapper.toMeDto(u);
+    }
+
+    @Transactional
+    public MeUserDto deleteProfileImage(UUID userId) {
+        User u = getActiveUserOrThrow(userId);
+        String oldImage = u.getProfileImageUrl();
+        if (oldImage != null) {
+            String oldFilename = oldImage.replace("/files/", "");
+            fileStorageService.delete(oldFilename);
+        }
+        u.setProfileImageUrl(null);
+        return UserMapper.toMeDto(u);
     }
 
     @Transactional(readOnly = true)

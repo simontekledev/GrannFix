@@ -12,6 +12,7 @@ public record MeUserDto(
         String city,
         String area,
         String street,
+        String profileImageUrl,
         boolean verified,
         String role,
         Double ratingAverage,

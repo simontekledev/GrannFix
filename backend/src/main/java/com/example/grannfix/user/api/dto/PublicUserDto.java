@@ -8,6 +8,7 @@ public record PublicUserDto(
         String bio,
         String city,
         String area,
+        String profileImageUrl,
         double ratingAverage,
         int ratingCount,
         int completedOffersCount,

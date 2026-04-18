@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -36,6 +37,17 @@ public class UserController {
                                                @Valid @RequestBody ChangePasswordRequest req) {
         userService.changePassword(userId, req);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/me/profile-image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MeUserDto uploadProfileImage(@AuthenticationPrincipal UUID userId,
+                                        @org.springframework.web.bind.annotation.RequestPart("file") MultipartFile file) {
+        return userService.updateProfileImage(userId, file);
+    }
+
+    @DeleteMapping("/me/profile-image")
+    public MeUserDto deleteProfileImage(@AuthenticationPrincipal UUID userId) {
+        return userService.deleteProfileImage(userId);
     }
 
     @DeleteMapping("/me")

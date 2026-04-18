@@ -23,7 +23,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtService jwtService) throws Exception {
+                                                   JwtService jwtService,
+                                                   RateLimitConfig rateLimitFilter) throws Exception {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -48,11 +49,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/tasks/*").permitAll()
                         .requestMatchers("/tasks/**").authenticated()
 
+                        .requestMatchers(HttpMethod.GET, "/files/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/files/upload").authenticated()
+
                         .requestMatchers("/offers/**").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(rateLimitFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtService),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class

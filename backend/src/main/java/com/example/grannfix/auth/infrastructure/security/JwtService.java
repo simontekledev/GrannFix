@@ -12,7 +12,7 @@ public class JwtService {
     private static final String SECRET =
             "my-super-secret-key-my-super-secret-key";
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes());
-    private static final long ACCESS_EXPIRATION = 1000L * 60 * 15; // 15 minutes
+    private static final long ACCESS_EXPIRATION = 1000L * 60 * 60 * 24; // 24 hours
     private static final long REFRESH_EXPIRATION = 1000L * 60 * 60 * 24 * 30; // 30 days
 
     public String generateAccessToken(UUID userId) {

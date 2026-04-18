@@ -33,11 +33,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setUser(me);
         if (me.id) await AsyncStorage.setItem("user_id", me.id);
       } catch (e: any) {
+        console.log("loadProfile error:", e);
         const status = e?.response?.status ?? e?.status;
         if (status === 401 || status === 403) {
           await AsyncStorage.removeItem("access_token");
           await AsyncStorage.removeItem("refresh_token");
-          await AsyncStorage.removeItem("user_id");
           setLoggedIn(false);
           setUser(null);
         }

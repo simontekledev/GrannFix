@@ -250,7 +250,7 @@ export default function ProfilScreen() {
               resizeMode="contain"
             />
           </View>
-          <Text style={styles.subtitle}>Logga in eller skapa ett konto</Text>
+          <Text style={styles.subtitle}>Snabb hjälp nära dig</Text>
 
           <Text style={styles.label}>E-post</Text>
           <TextInput
@@ -365,9 +365,8 @@ function createStyles(colors: ThemeColors) {
       marginBottom: 4,
     },
     subtitle: {
-      fontSize: 13,
-      color: colors.textMuted,
-      opacity: 0.7,
+      fontSize: 14,
+      color: colors.textSecondary,
       marginBottom: 24,
       textAlign: "center",
     },

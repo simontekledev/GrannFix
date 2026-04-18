@@ -8,8 +8,9 @@ import { TaskOfferControllerApi } from "./generated/apis/TaskOfferControllerApi"
 import { OfferControllerApi } from "./generated/apis/OfferControllerApi";
 import { NotificationControllerApi } from "./generated/apis/NotificationControllerApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 
-const BASE_URL = "http://192.168.1.164:8080";
+const BASE_URL = Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:8080";
 
 let isRefreshing = false;
 

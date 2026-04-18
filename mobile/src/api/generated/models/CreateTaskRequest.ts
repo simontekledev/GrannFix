@@ -42,6 +42,12 @@ export interface CreateTaskRequest {
      * @type {string}
      * @memberof CreateTaskRequest
      */
+    urgency?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateTaskRequest
+     */
     city: string;
     /**
      * 
@@ -88,6 +94,7 @@ export function CreateTaskRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'title': json['title'],
         'description': json['description'],
         'category': json['category'],
+        'urgency': json['urgency'] == null ? undefined : json['urgency'],
         'city': json['city'],
         'area': json['area'],
         'street': json['street'] == null ? undefined : json['street'],
@@ -109,6 +116,7 @@ export function CreateTaskRequestToJSONTyped(value?: CreateTaskRequest | null, i
         'title': value['title'],
         'description': value['description'],
         'category': value['category'],
+        'urgency': value['urgency'],
         'city': value['city'],
         'area': value['area'],
         'street': value['street'],

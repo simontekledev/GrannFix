@@ -48,6 +48,12 @@ export interface TaskResponse {
      * @type {string}
      * @memberof TaskResponse
      */
+    urgency?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TaskResponse
+     */
     city?: string;
     /**
      * 
@@ -145,6 +151,7 @@ export function TaskResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'title': json['title'] == null ? undefined : json['title'],
         'description': json['description'] == null ? undefined : json['description'],
         'category': json['category'] == null ? undefined : json['category'],
+        'urgency': json['urgency'] == null ? undefined : json['urgency'],
         'city': json['city'] == null ? undefined : json['city'],
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
@@ -174,6 +181,7 @@ export function TaskResponseToJSONTyped(value?: TaskResponse | null, ignoreDiscr
         'title': value['title'],
         'description': value['description'],
         'category': value['category'],
+        'urgency': value['urgency'],
         'city': value['city'],
         'area': value['area'],
         'street': value['street'],

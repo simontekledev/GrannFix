@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { timeAgo } from "@/src/helpers/time";
-import { getCategoryEmoji } from "@/src/helpers/categories";
+import { getCategoryEmoji, getUrgencyLabel, getUrgencyColor } from "@/src/helpers/categories";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -68,11 +68,18 @@ export function TaskCard({
         <Text style={styles.cardTitle} numberOfLines={1}>
           {task.title ?? "Uppdrag"}
         </Text>
-        {task.offeredPrice != null && (
-          <View style={styles.priceBadge}>
-            <Text style={styles.cardPrice}>{task.offeredPrice} kr</Text>
-          </View>
-        )}
+        <View style={styles.cardHeaderRight}>
+          {task.urgency && task.urgency !== "FLEXIBLE" && (
+            <Text style={[styles.urgencyDot, { color: getUrgencyColor(task.urgency) }]}>
+              {getUrgencyLabel(task.urgency)}
+            </Text>
+          )}
+          {task.offeredPrice != null && (
+            <View style={styles.priceBadge}>
+              <Text style={styles.cardPrice}>{task.offeredPrice} kr</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View style={styles.cardMeta}>
@@ -198,6 +205,15 @@ function createStyles(colors: ThemeColors) {
       fontSize: 12,
       fontWeight: "500",
       color: colors.textSecondary,
+    },
+    urgencyDot: {
+      fontSize: 12,
+      fontWeight: "600",
+    },
+    cardHeaderRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
     },
     statusBadge: {
       borderRadius: 6,

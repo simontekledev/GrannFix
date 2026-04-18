@@ -3,7 +3,6 @@ import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -23,7 +22,7 @@ import { taskApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
-import { TASK_CATEGORIES } from "@/src/helpers/categories";
+import { TASK_CATEGORIES, TASK_URGENCIES } from "@/src/helpers/categories";
 import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { createModalStyles } from "@/src/styles/modal";
@@ -32,8 +31,8 @@ import { useTheme } from "@/src/context/ThemeContext";
 import { createTasksStyles } from "@/src/styles/screens/tasks";
 
 const STATUS_ORDER: Record<string, number> = {
-  ASSIGNED: 0,
-  OPEN: 1,
+  OPEN: 0,
+  ASSIGNED: 1,
   CANCELLED: 2,
   COMPLETED: 3,
 };
@@ -54,6 +53,7 @@ export default function TasksScreen() {
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [newUrgency, setNewUrgency] = useState("FLEXIBLE");
   const [newArea, setNewArea] = useState("");
   const [newStreet, setNewStreet] = useState("");
   const [newPrice, setNewPrice] = useState("");
@@ -72,6 +72,7 @@ export default function TasksScreen() {
     setNewTitle("");
     setNewDescription("");
     setNewCategory("");
+    setNewUrgency("FLEXIBLE");
     setNewArea("");
     setNewStreet("");
     setNewPrice("");
@@ -87,6 +88,7 @@ export default function TasksScreen() {
           title: newTitle.trim(),
           description: newDescription.trim(),
           category: newCategory,
+          urgency: newUrgency,
           city: "Stockholm",
           area: newArea,
           street: newStreet.trim() || undefined,
@@ -303,6 +305,28 @@ export default function TasksScreen() {
                   ))}
                 </View>
 
+                <Text style={formStyles.label}>När behöver du hjälp?</Text>
+                <View style={styles.categoryGrid}>
+                  {TASK_URGENCIES.map((u) => (
+                    <Pressable
+                      key={u.key}
+                      onPress={() => setNewUrgency(u.key)}
+                      style={[
+                        styles.categoryChip,
+                        newUrgency === u.key && styles.categoryChipActive,
+                      ]}
+                    >
+                      <Text style={styles.categoryEmoji}>{u.emoji}</Text>
+                      <Text style={[
+                        styles.categoryChipText,
+                        newUrgency === u.key && styles.categoryChipTextActive,
+                      ]}>
+                        {u.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
                 <Text style={formStyles.label}>Område <Text style={formStyles.required}>*</Text></Text>
                 {areaPickerOpen ? (
                   <View>
@@ -314,13 +338,10 @@ export default function TasksScreen() {
                       style={formStyles.input}
                       autoFocus
                     />
-                    <FlatList
-                      data={filteredAreas}
-                      keyExtractor={(item) => item}
-                      keyboardShouldPersistTaps="handled"
-                      style={styles.areaList}
-                      renderItem={({ item }) => (
+                    <ScrollView style={styles.areaList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
+                      {filteredAreas.map((item) => (
                         <Pressable
+                          key={item}
                           onPress={() => {
                             setNewArea(item);
                             setAreaPickerOpen(false);
@@ -330,8 +351,8 @@ export default function TasksScreen() {
                         >
                           <Text style={[styles.areaItemText, item === newArea && { color: "#16A34A", fontWeight: "600" }]}>{item}</Text>
                         </Pressable>
-                      )}
-                    />
+                      ))}
+                    </ScrollView>
                   </View>
                 ) : (
                   <Pressable

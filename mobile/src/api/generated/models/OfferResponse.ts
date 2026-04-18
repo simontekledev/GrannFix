@@ -39,6 +39,12 @@ export interface OfferResponse {
     helperName?: string;
     /**
      * 
+     * @type {string}
+     * @memberof OfferResponse
+     */
+    helperProfileImageUrl?: string;
+    /**
+     * 
      * @type {number}
      * @memberof OfferResponse
      */
@@ -116,6 +122,7 @@ export function OfferResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'id': json['id'] == null ? undefined : json['id'],
         'helperId': json['helperId'] == null ? undefined : json['helperId'],
         'helperName': json['helperName'] == null ? undefined : json['helperName'],
+        'helperProfileImageUrl': json['helperProfileImageUrl'] == null ? undefined : json['helperProfileImageUrl'],
         'proposedPrice': json['proposedPrice'] == null ? undefined : json['proposedPrice'],
         'message': json['message'] == null ? undefined : json['message'],
         'status': json['status'] == null ? undefined : json['status'],
@@ -140,6 +147,7 @@ export function OfferResponseToJSONTyped(value?: OfferResponse | null, ignoreDis
         'id': value['id'],
         'helperId': value['helperId'],
         'helperName': value['helperName'],
+        'helperProfileImageUrl': value['helperProfileImageUrl'],
         'proposedPrice': value['proposedPrice'],
         'message': value['message'],
         'status': value['status'],

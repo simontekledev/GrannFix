@@ -90,6 +90,12 @@ export interface TaskDetailResponse {
     offeredPrice?: number;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof TaskDetailResponse
+     */
+    imageUrls?: Array<string>;
+    /**
+     * 
      * @type {TaskDetailResponseStatusEnum}
      * @memberof TaskDetailResponse
      */
@@ -189,6 +195,7 @@ export function TaskDetailResponseFromJSONTyped(json: any, ignoreDiscriminator: 
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
         'offeredPrice': json['offeredPrice'] == null ? undefined : json['offeredPrice'],
+        'imageUrls': json['imageUrls'] == null ? undefined : json['imageUrls'],
         'status': json['status'] == null ? undefined : json['status'],
         'active': json['active'] == null ? undefined : json['active'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
@@ -222,6 +229,7 @@ export function TaskDetailResponseToJSONTyped(value?: TaskDetailResponse | null,
         'area': value['area'],
         'street': value['street'],
         'offeredPrice': value['offeredPrice'],
+        'imageUrls': value['imageUrls'],
         'status': value['status'],
         'active': value['active'],
         'createdAt': value['createdAt'] == null ? value['createdAt'] : value['createdAt'].toISOString(),

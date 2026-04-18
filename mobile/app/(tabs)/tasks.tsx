@@ -29,6 +29,7 @@ import { createModalStyles } from "@/src/styles/modal";
 import { createFormStyles } from "@/src/styles/form";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createTasksStyles } from "@/src/styles/screens/tasks";
+import { pickTaskImages, uploadImage } from "@/src/helpers/images";
 
 const STATUS_ORDER: Record<string, number> = {
   OPEN: 0,
@@ -60,6 +61,7 @@ export default function TasksScreen() {
   const [areaPickerOpen, setAreaPickerOpen] = useState(false);
   const [areaSearch, setAreaSearch] = useState("");
   const [creating, setCreating] = useState(false);
+  const [imageUris, setImageUris] = useState<string[]>([]);
 
 
   const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
@@ -77,12 +79,25 @@ export default function TasksScreen() {
     setNewStreet("");
     setNewPrice("");
     setAreaSearch("");
+    setImageUris([]);
+  }
+
+  async function handlePickImages() {
+    const uris = await pickTaskImages();
+    if (uris.length > 0) {
+      setImageUris((prev) => [...prev, ...uris].slice(0, 5));
+    }
   }
 
   async function handleCreateTask() {
     if (!canCreate) return;
     setCreating(true);
     try {
+      let uploadedUrls: string[] = [];
+      if (imageUris.length > 0) {
+        const results = await Promise.all(imageUris.map(uploadImage));
+        uploadedUrls = results.filter((u): u is string => u !== null);
+      }
       await taskApi.createTask({
         createTaskRequest: {
           title: newTitle.trim(),
@@ -93,6 +108,7 @@ export default function TasksScreen() {
           area: newArea,
           street: newStreet.trim() || undefined,
           offeredPrice: newPrice ? Number(newPrice) : undefined,
+          imageUrls: uploadedUrls.length > 0 ? uploadedUrls : undefined,
         },
       });
       resetCreateForm();
@@ -383,6 +399,29 @@ export default function TasksScreen() {
                   keyboardType="number-pad"
                   style={formStyles.input}
                 />
+
+                <Text style={formStyles.label}>Bilder <Text style={formStyles.optional}>(valfritt, max 5)</Text></Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    {imageUris.map((uri, i) => (
+                      <View key={i} style={{ position: "relative" }}>
+                        <Image source={{ uri }} style={styles.imageThumb} />
+                        <Pressable
+                          onPress={() => setImageUris((prev) => prev.filter((_, idx) => idx !== i))}
+                          style={styles.imageRemove}
+                        >
+                          <Text style={styles.imageRemoveText}>✕</Text>
+                        </Pressable>
+                      </View>
+                    ))}
+                    {imageUris.length < 5 && (
+                      <Pressable onPress={handlePickImages} style={styles.imageAdd}>
+                        <Text style={styles.imageAddText}>+</Text>
+                        <Text style={styles.imageAddLabel}>Lägg till</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                </ScrollView>
 
                 <Pressable
                   onPress={handleCreateTask}

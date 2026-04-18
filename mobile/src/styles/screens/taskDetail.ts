@@ -166,6 +166,12 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       justifyContent: "center",
       marginRight: 12,
     },
+    userAvatarImage: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      marginRight: 12,
+    },
     userAvatarText: {
       fontSize: 16,
       fontWeight: "700",
@@ -372,6 +378,11 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       fontWeight: "500",
       textAlign: "center",
       marginTop: 8,
+    },
+    taskImage: {
+      width: 200,
+      height: 150,
+      borderRadius: 10,
     },
   });
 }

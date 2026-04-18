@@ -11,6 +11,7 @@ Name | Type
 `bio` | string
 `city` | string
 `area` | string
+`profileImageUrl` | string
 `ratingAverage` | number
 `ratingCount` | number
 `completedOffersCount` | number
@@ -28,6 +29,7 @@ const example = {
   "bio": null,
   "city": null,
   "area": null,
+  "profileImageUrl": null,
   "ratingAverage": null,
   "ratingCount": null,
   "completedOffersCount": null,

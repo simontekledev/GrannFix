@@ -14,6 +14,7 @@ import { userApi } from "@/src/api/client";
 import type { PublicUserDto } from "@/src/api/generated/models/PublicUserDto";
 import { StarRating } from "@/src/components/StarRating";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { resolveImageUrl } from "@/src/helpers/images";
 
 export default function PublicUserScreen() {
   const router = useRouter();
@@ -77,10 +78,17 @@ export default function PublicUserScreen() {
       <ScrollView contentContainerStyle={styles.profileScroll}>
         <View style={styles.profileHero}>
           <View style={styles.profileIconWrapper}>
-            <Image
-              source={require("@/assets/images/user-profile1-icon.png")}
-              style={styles.profileIcon}
-            />
+            {user.profileImageUrl ? (
+              <Image
+                source={{ uri: resolveImageUrl(user.profileImageUrl)! }}
+                style={styles.profileIcon}
+              />
+            ) : (
+              <Image
+                source={require("@/assets/images/user-profile1-icon.png")}
+                style={styles.profileIcon}
+              />
+            )}
             {user.verified && (
               <Pressable
                 onPress={() => {

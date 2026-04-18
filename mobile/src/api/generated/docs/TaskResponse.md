@@ -15,6 +15,7 @@ Name | Type
 `area` | string
 `street` | string
 `offeredPrice` | number
+`imageUrls` | Array&lt;string&gt;
 `status` | string
 `createdById` | string
 `active` | boolean
@@ -39,6 +40,7 @@ const example = {
   "area": null,
   "street": null,
   "offeredPrice": null,
+  "imageUrls": null,
   "status": null,
   "createdById": null,
   "active": null,

@@ -55,6 +55,18 @@ export interface PageAdminUserDto {
     totalPages?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof PageAdminUserDto
+     */
+    first?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageAdminUserDto
+     */
+    last?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof PageAdminUserDto
      */
@@ -77,18 +89,6 @@ export interface PageAdminUserDto {
      * @memberof PageAdminUserDto
      */
     sort?: SortObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageAdminUserDto
-     */
-    first?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageAdminUserDto
-     */
-    last?: boolean;
     /**
      * 
      * @type {number}
@@ -128,12 +128,12 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
+        'first': json['first'] == null ? undefined : json['first'],
+        'last': json['last'] == null ? undefined : json['last'],
         'size': json['size'] == null ? undefined : json['size'],
         'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminUserDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
         'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
-        'first': json['first'] == null ? undefined : json['first'],
-        'last': json['last'] == null ? undefined : json['last'],
         'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
         'pageable': json['pageable'] == null ? undefined : PageableObjectFromJSON(json['pageable']),
         'empty': json['empty'] == null ? undefined : json['empty'],
@@ -153,12 +153,12 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
         
         'totalElements': value['totalElements'],
         'totalPages': value['totalPages'],
+        'first': value['first'],
+        'last': value['last'],
         'size': value['size'],
         'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminUserDtoToJSON)),
         'number': value['number'],
         'sort': SortObjectToJSON(value['sort']),
-        'first': value['first'],
-        'last': value['last'],
         'numberOfElements': value['numberOfElements'],
         'pageable': PageableObjectToJSON(value['pageable']),
         'empty': value['empty'],

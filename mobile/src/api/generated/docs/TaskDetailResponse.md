@@ -15,6 +15,7 @@ Name | Type
 `area` | string
 `street` | string
 `offeredPrice` | number
+`imageUrls` | Array&lt;string&gt;
 `status` | string
 `active` | boolean
 `createdAt` | Date
@@ -42,6 +43,7 @@ const example = {
   "area": null,
   "street": null,
   "offeredPrice": null,
+  "imageUrls": null,
   "status": null,
   "active": null,
   "createdAt": null,

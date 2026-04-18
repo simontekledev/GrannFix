@@ -24,6 +24,7 @@ import { timeAgo } from "@/src/helpers/time";
 import { createModalStyles } from "@/src/styles/modal";
 import { createFormStyles } from "@/src/styles/form";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
+import { resolveImageUrl } from "@/src/helpers/images";
 
 
 const STATUS_LABELS: Record<string, string> = {
@@ -321,6 +322,24 @@ export default function TaskDetailScreen() {
           </View>
         ) : null}
 
+        {(task.imageUrls?.length ?? 0) > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>BILDER</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                {task.imageUrls!.map((url: string, i: number) => (
+                  <Image
+                    key={i}
+                    source={{ uri: resolveImageUrl(url)! }}
+                    style={styles.taskImage}
+                    resizeMode="cover"
+                  />
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        )}
+
         {task.offersCount != null && task.offersCount > 0 && task.createdBy?.id === user?.id && (
           <View style={styles.card}>
             <Pressable
@@ -350,11 +369,15 @@ export default function TaskDetailScreen() {
                       style={styles.offerItem}
                       onPress={() => offer.helperId && router.push(`/public-user?id=${offer.helperId}` as any)}
                     >
-                      <View style={[styles.userAvatar, { marginRight: 10 }]}>
-                        <Text style={styles.userAvatarText}>
-                          {(offer.helperName ?? "?").charAt(0).toUpperCase()}
-                        </Text>
-                      </View>
+                      {offer.helperProfileImageUrl ? (
+                        <Image source={{ uri: resolveImageUrl(offer.helperProfileImageUrl)! }} style={[styles.userAvatarImage, { marginRight: 10 }]} />
+                      ) : (
+                        <View style={[styles.userAvatar, { marginRight: 10 }]}>
+                          <Text style={styles.userAvatarText}>
+                            {(offer.helperName ?? "?").charAt(0).toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
                       <View style={styles.offerInfo}>
                         <Text style={styles.userName} numberOfLines={1}>
                           {offer.helperName ?? "Hjälpare"}
@@ -417,11 +440,15 @@ export default function TaskDetailScreen() {
             <Text style={styles.sectionTitle}>SKAPAD AV</Text>
             {task.createdBy.id === user?.id ? (
               <View style={styles.userRow}>
-                <View style={styles.userAvatar}>
-                  <Text style={styles.userAvatarText}>
-                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                  </Text>
-                </View>
+                {task.createdBy.profileImageUrl ? (
+                  <Image source={{ uri: resolveImageUrl(task.createdBy.profileImageUrl)! }} style={styles.userAvatarImage} />
+                ) : (
+                  <View style={styles.userAvatar}>
+                    <Text style={styles.userAvatarText}>
+                      {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
                 <Text style={styles.userName}>{task.createdBy.name}</Text>
               </View>
             ) : (
@@ -429,11 +456,15 @@ export default function TaskDetailScreen() {
                 onPress={() => router.push(`/public-user?id=${task.createdBy?.id}` as any)}
                 style={styles.userRow}
               >
-                <View style={styles.userAvatar}>
-                  <Text style={styles.userAvatarText}>
-                    {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
-                  </Text>
-                </View>
+                {task.createdBy.profileImageUrl ? (
+                  <Image source={{ uri: resolveImageUrl(task.createdBy.profileImageUrl)! }} style={styles.userAvatarImage} />
+                ) : (
+                  <View style={styles.userAvatar}>
+                    <Text style={styles.userAvatarText}>
+                      {(task.createdBy.name ?? "?").charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
                 <Text style={styles.userName}>{task.createdBy.name}</Text>
                 <Text style={styles.userArrow}>›</Text>
               </Pressable>
@@ -454,11 +485,15 @@ export default function TaskDetailScreen() {
           >
             <Text style={styles.sectionTitle}>HJÄLPARE</Text>
             <View style={styles.userRow}>
-              <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
-                <Text style={styles.userAvatarText}>
-                  {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
-                </Text>
-              </View>
+              {task.assignedTo.profileImageUrl ? (
+                <Image source={{ uri: resolveImageUrl(task.assignedTo.profileImageUrl)! }} style={styles.userAvatarImage} />
+              ) : (
+                <View style={[styles.userAvatar, { backgroundColor: "#16A34A" }]}>
+                  <Text style={styles.userAvatarText}>
+                    {(task.assignedTo.name ?? "?").charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+              )}
               <Text style={styles.userName}>
                 {task.assignedTo.name}{task.assignedTo.id === user?.id ? " (du)" : ""}
               </Text>

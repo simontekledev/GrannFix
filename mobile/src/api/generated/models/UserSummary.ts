@@ -31,6 +31,12 @@ export interface UserSummary {
      * @memberof UserSummary
      */
     name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSummary
+     */
+    profileImageUrl?: string;
 }
 
 /**
@@ -52,6 +58,7 @@ export function UserSummaryFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'] == null ? undefined : json['id'],
         'name': json['name'] == null ? undefined : json['name'],
+        'profileImageUrl': json['profileImageUrl'] == null ? undefined : json['profileImageUrl'],
     };
 }
 
@@ -68,6 +75,7 @@ export function UserSummaryToJSONTyped(value?: UserSummary | null, ignoreDiscrim
         
         'id': value['id'],
         'name': value['name'],
+        'profileImageUrl': value['profileImageUrl'],
     };
 }
 

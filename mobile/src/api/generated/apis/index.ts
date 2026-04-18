@@ -3,6 +3,7 @@
 export * from './AdminUserControllerApi';
 export * from './AuthControllerApi';
 export * from './ChatControllerApi';
+export * from './FileControllerApi';
 export * from './NotificationControllerApi';
 export * from './OfferControllerApi';
 export * from './PingControllerApi';

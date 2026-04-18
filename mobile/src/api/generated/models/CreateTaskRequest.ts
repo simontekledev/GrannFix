@@ -67,6 +67,12 @@ export interface CreateTaskRequest {
      * @memberof CreateTaskRequest
      */
     offeredPrice?: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateTaskRequest
+     */
+    imageUrls?: Array<string>;
 }
 
 /**
@@ -99,6 +105,7 @@ export function CreateTaskRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'area': json['area'],
         'street': json['street'] == null ? undefined : json['street'],
         'offeredPrice': json['offeredPrice'] == null ? undefined : json['offeredPrice'],
+        'imageUrls': json['imageUrls'] == null ? undefined : json['imageUrls'],
     };
 }
 
@@ -121,6 +128,7 @@ export function CreateTaskRequestToJSONTyped(value?: CreateTaskRequest | null, i
         'area': value['area'],
         'street': value['street'],
         'offeredPrice': value['offeredPrice'],
+        'imageUrls': value['imageUrls'],
     };
 }
 

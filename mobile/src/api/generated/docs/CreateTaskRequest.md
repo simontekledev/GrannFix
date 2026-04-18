@@ -14,6 +14,7 @@ Name | Type
 `area` | string
 `street` | string
 `offeredPrice` | number
+`imageUrls` | Array&lt;string&gt;
 
 ## Example
 
@@ -30,6 +31,7 @@ const example = {
   "area": null,
   "street": null,
   "offeredPrice": null,
+  "imageUrls": null,
 } satisfies CreateTaskRequest
 
 console.log(example)

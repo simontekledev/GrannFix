@@ -69,6 +69,12 @@ export interface MeUserDto {
     street?: string;
     /**
      * 
+     * @type {string}
+     * @memberof MeUserDto
+     */
+    profileImageUrl?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof MeUserDto
      */
@@ -130,6 +136,7 @@ export function MeUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'city': json['city'] == null ? undefined : json['city'],
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
+        'profileImageUrl': json['profileImageUrl'] == null ? undefined : json['profileImageUrl'],
         'verified': json['verified'] == null ? undefined : json['verified'],
         'role': json['role'] == null ? undefined : json['role'],
         'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
@@ -158,6 +165,7 @@ export function MeUserDtoToJSONTyped(value?: MeUserDto | null, ignoreDiscriminat
         'city': value['city'],
         'area': value['area'],
         'street': value['street'],
+        'profileImageUrl': value['profileImageUrl'],
         'verified': value['verified'],
         'role': value['role'],
         'ratingAverage': value['ratingAverage'],

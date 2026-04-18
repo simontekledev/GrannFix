@@ -51,6 +51,12 @@ export interface PublicUserDto {
     area?: string;
     /**
      * 
+     * @type {string}
+     * @memberof PublicUserDto
+     */
+    profileImageUrl?: string;
+    /**
+     * 
      * @type {number}
      * @memberof PublicUserDto
      */
@@ -97,6 +103,7 @@ export function PublicUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boole
         'bio': json['bio'] == null ? undefined : json['bio'],
         'city': json['city'] == null ? undefined : json['city'],
         'area': json['area'] == null ? undefined : json['area'],
+        'profileImageUrl': json['profileImageUrl'] == null ? undefined : json['profileImageUrl'],
         'ratingAverage': json['ratingAverage'] == null ? undefined : json['ratingAverage'],
         'ratingCount': json['ratingCount'] == null ? undefined : json['ratingCount'],
         'completedOffersCount': json['completedOffersCount'] == null ? undefined : json['completedOffersCount'],
@@ -120,6 +127,7 @@ export function PublicUserDtoToJSONTyped(value?: PublicUserDto | null, ignoreDis
         'bio': value['bio'],
         'city': value['city'],
         'area': value['area'],
+        'profileImageUrl': value['profileImageUrl'],
         'ratingAverage': value['ratingAverage'],
         'ratingCount': value['ratingCount'],
         'completedOffersCount': value['completedOffersCount'],

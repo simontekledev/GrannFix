@@ -1,6 +1,7 @@
 apis/AdminUserControllerApi.ts
 apis/AuthControllerApi.ts
 apis/ChatControllerApi.ts
+apis/FileControllerApi.ts
 apis/NotificationControllerApi.ts
 apis/OfferControllerApi.ts
 apis/PingControllerApi.ts
@@ -22,6 +23,7 @@ docs/ChatSummaryResponse.md
 docs/CreateOfferRequest.md
 docs/CreateTaskRequest.md
 docs/CursorPageResponseTaskResponse.md
+docs/FileControllerApi.md
 docs/ForgotPasswordRequest.md
 docs/LoginRequest.md
 docs/MeUserDto.md
@@ -48,6 +50,7 @@ docs/TaskQueryControllerApi.md
 docs/TaskResponse.md
 docs/UpdateMeRequest.md
 docs/UpdateTaskRequest.md
+docs/UploadProfileImageRequest.md
 docs/UserControllerApi.md
 docs/UserSummary.md
 docs/VerifyOtpRequest.md
@@ -82,6 +85,7 @@ models/TaskDetailResponse.ts
 models/TaskResponse.ts
 models/UpdateMeRequest.ts
 models/UpdateTaskRequest.ts
+models/UploadProfileImageRequest.ts
 models/UserSummary.ts
 models/VerifyOtpRequest.ts
 models/index.ts

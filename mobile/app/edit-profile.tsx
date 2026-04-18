@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,10 +17,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { userApi } from "@/src/api/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { createFormStyles } from "@/src/styles/form";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
+import { pickImage, uploadProfileImage, resolveImageUrl } from "@/src/helpers/images";
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -37,8 +41,67 @@ export default function EditProfileScreen() {
   const [street, setStreet] = useState(user?.street ?? "");
   const [city] = useState(user?.city ?? "Stockholm");
 
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [areaModalVisible, setAreaModalVisible] = useState(false);
   const [areaSearch, setAreaSearch] = useState("");
+
+  async function handleImagePress() {
+    if (!user?.profileImageUrl) {
+      doPickAndUpload();
+      return;
+    }
+    if (Platform.OS === "web") {
+      const choice = window.prompt("Skriv 'byt' för ny bild eller 'ta bort' för att ta bort");
+      if (choice?.toLowerCase().startsWith("byt")) doPickAndUpload();
+      else if (choice?.toLowerCase().startsWith("ta")) doDeleteImage();
+      return;
+    }
+    Alert.alert("Profilbild", "Vad vill du göra?", [
+      { text: "Avbryt", style: "cancel" },
+      { text: "Byt bild", onPress: doPickAndUpload },
+      { text: "Ta bort bild", style: "destructive", onPress: doDeleteImage },
+    ]);
+  }
+
+  async function doPickAndUpload() {
+    const uri = await pickImage();
+    if (!uri) return;
+    setUploadingImage(true);
+    try {
+      const updated = await uploadProfileImage(uri);
+      setUser(updated);
+    } catch (e) {
+      console.log("Profile image upload error:", e);
+      const msg = "Kunde inte ladda upp bilden.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
+  async function doDeleteImage() {
+    setUploadingImage(true);
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const base = Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:8080";
+      const res = await fetch(`${base}/users/me/profile-image`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setUser(updated);
+      }
+    } catch (e) {
+      console.log("Delete profile image error:", e);
+      const msg = "Kunde inte ta bort bilden.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setUploadingImage(false);
+    }
+  }
 
   const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
     a.toLowerCase().includes(areaSearch.toLowerCase())
@@ -107,6 +170,30 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
+          <Pressable onPress={handleImagePress} style={styles.avatarWrapper}>
+            {user?.profileImageUrl ? (
+              <Image
+                source={{ uri: resolveImageUrl(user.profileImageUrl)! }}
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarInitial}>
+                  {(user?.name ?? "?").charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
+            {uploadingImage && (
+              <View style={styles.avatarOverlay}>
+                <ActivityIndicator color="#fff" />
+              </View>
+            )}
+            <View style={styles.avatarBadge}>
+              <Text style={styles.avatarBadgeText}>📷</Text>
+            </View>
+          </Pressable>
+          <Text style={styles.changePhotoText}>Tryck för att byta bild</Text>
+
           <Text style={styles.label}>Namn <Text style={formStyles.required}>*</Text></Text>
           <TextInput
             value={name}
@@ -266,6 +353,63 @@ function createStyles(colors: ThemeColors) {
     scroll: {
       paddingHorizontal: 24,
       paddingBottom: 48,
+    },
+    avatarWrapper: {
+      alignSelf: "center",
+      marginBottom: 4,
+      marginTop: 4,
+      position: "relative",
+    },
+    avatar: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+    },
+    avatarPlaceholder: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    avatarInitial: {
+      fontSize: 36,
+      fontWeight: "700",
+      color: "#fff",
+    },
+    avatarOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0,0,0,0.4)",
+      borderRadius: 50,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    avatarBadge: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      width: 28,
+      height: 28,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.15,
+      shadowRadius: 3,
+      elevation: 3,
+    },
+    avatarBadgeText: {
+      fontSize: 14,
+    },
+    changePhotoText: {
+      textAlign: "center",
+      fontSize: 13,
+      color: colors.accent,
+      fontWeight: "500",
+      marginBottom: 8,
     },
     label: {
       fontSize: 14,

@@ -198,5 +198,45 @@ export function createTasksStyles(colors: ThemeColors) {
       color: colors.accent,
       fontWeight: "600",
     },
+    imageThumb: {
+      width: 72,
+      height: 72,
+      borderRadius: 10,
+    },
+    imageRemove: {
+      position: "absolute",
+      top: -6,
+      right: -6,
+      backgroundColor: colors.danger,
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    imageRemoveText: {
+      color: "#fff",
+      fontSize: 11,
+      fontWeight: "700",
+    },
+    imageAdd: {
+      width: 72,
+      height: 72,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderStyle: "dashed",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    imageAddText: {
+      fontSize: 22,
+      color: colors.textMuted,
+      marginBottom: -2,
+    },
+    imageAddLabel: {
+      fontSize: 10,
+      color: colors.textMuted,
+    },
   });
 }

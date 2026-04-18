@@ -8,7 +8,6 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -20,15 +19,17 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { authApi } from "@/src/api/client";
 import { StarRating } from "@/src/components/StarRating";
 import { useUser } from "@/src/context/UserContext";
-import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { useTheme } from "@/src/context/ThemeContext";
 import { ProfileSkeleton } from "@/src/components/Skeleton";
+import { resolveImageUrl } from "@/src/helpers/images";
+import { createProfileStyles } from "@/src/styles/screens/profile";
 
 export default function ProfilScreen() {
   const router = useRouter();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const { user, loggedIn, loadProfile } = useUser();
   const { mode, colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createProfileStyles(colors), [colors]);
   const [refreshing, setRefreshing] = useState(false);
 
   async function onRefresh() {
@@ -138,14 +139,21 @@ export default function ProfilScreen() {
         >
           <View style={styles.profileHero}>
             <View style={styles.profileIconWrapper}>
-              <Image
-                source={
-                  (user as any)?.role === "ADMIN"
-                    ? require("@/assets/images/grannfix-icon.png")
-                    : require("@/assets/images/user-profile1-icon.png")
-                }
-                style={styles.profileIcon}
-              />
+              {user?.profileImageUrl ? (
+                <Image
+                  source={{ uri: resolveImageUrl(user.profileImageUrl)! }}
+                  style={styles.profileIcon}
+                />
+              ) : (
+                <Image
+                  source={
+                    user?.role === "ADMIN"
+                      ? require("@/assets/images/grannfix-icon.png")
+                      : require("@/assets/images/user-profile1-icon.png")
+                  }
+                  style={styles.profileIcon}
+                />
+              )}
               {user?.verified && (
                 <View style={styles.verifiedIconWrapper}>
                   <Image
@@ -327,273 +335,4 @@ export default function ProfilScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
-
-function createStyles(colors: ThemeColors) {
-  return StyleSheet.create({
-    safe: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    safeLogin: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    centered: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    scroll: {
-      paddingHorizontal: 24,
-      paddingTop: 0,
-      paddingBottom: 48,
-    },
-    logoContainer: {
-      alignItems: "center",
-      marginTop: 8,
-      marginBottom: -40,
-    },
-    logo: {
-      width: 260,
-      height: 260,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: "700",
-      color: colors.textPrimary,
-      marginBottom: 4,
-    },
-    subtitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginBottom: 24,
-      textAlign: "center",
-    },
-    profileGradientHeader: {
-      flexDirection: "row",
-      justifyContent: "flex-end",
-      paddingHorizontal: 16,
-      paddingTop: 8,
-      paddingBottom: 4,
-    },
-    profileScroll: {
-      paddingHorizontal: 24,
-      paddingTop: 0,
-      paddingBottom: 48,
-    },
-    settingsButton: {
-      padding: 6,
-    },
-    settingsIcon: {
-      width: 26,
-      height: 26,
-      opacity: 0.7,
-      tintColor: colors.textPrimary,
-    },
-    profileHero: {
-      alignItems: "center",
-      marginBottom: 28,
-      marginTop: 4,
-    },
-    profileIconWrapper: {
-      position: "relative",
-      marginBottom: 14,
-    },
-    profileIcon: {
-      width: 140,
-      height: 140,
-      borderRadius: 70,
-    },
-    nameRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-    profileName: {
-      fontSize: 26,
-      fontWeight: "700",
-      color: colors.textPrimary,
-      marginBottom: 6,
-    },
-    bioText: {
-      fontSize: 15,
-      color: colors.textSecondary,
-      textAlign: "center",
-      lineHeight: 22,
-      marginBottom: 10,
-      paddingHorizontal: 12,
-    },
-    verifiedText: {
-      fontSize: 13,
-      fontWeight: "500",
-      color: "#3B82F6",
-      marginTop: 2,
-      marginBottom: 4,
-    },
-    verifiedPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 7,
-      backgroundColor: "#E0ECFF",
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 5,
-      marginTop: 4,
-    },
-    verifiedIconWrapper: {
-      position: "absolute",
-      bottom: 8,
-      right: 8,
-      backgroundColor: colors.card,
-      borderRadius: 14,
-      padding: 2,
-    },
-    verifiedIcon: {
-      width: 24,
-      height: 24,
-    },
-    verifiedPillText: {
-      fontSize: 13,
-      fontWeight: "500",
-      color: "#3B82F6",
-      opacity: 0.85,
-    },
-    unverifiedPill: {
-      backgroundColor: "#fef2f2",
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 5,
-      marginTop: 4,
-    },
-    unverifiedPillText: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: colors.textMuted,
-    },
-    sectionTitle: {
-      fontSize: 13,
-      fontWeight: "700",
-      color: colors.textMuted,
-      marginBottom: 8,
-      marginTop: 4,
-      textTransform: "uppercase",
-      letterSpacing: 1,
-    },
-    detailCard: {
-      backgroundColor: colors.card,
-      borderRadius: 14,
-      padding: 16,
-      marginBottom: 16,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 8,
-      elevation: 3,
-    },
-    detailRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 10,
-    },
-    detailLabel: {
-      fontSize: 14,
-      fontWeight: "500",
-      color: colors.textMuted,
-    },
-    detailValue: {
-      fontSize: 15,
-      fontWeight: "500",
-      color: colors.textPrimary,
-      textAlign: "right",
-      flex: 1,
-      marginLeft: 16,
-    },
-    detailDivider: {
-      height: 1,
-      backgroundColor: colors.divider,
-    },
-    section: {
-      marginTop: 32,
-    },
-    label: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.textPrimary,
-      marginBottom: 6,
-      marginTop: 12,
-    },
-    input: {
-      backgroundColor: colors.card,
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      fontSize: 16,
-      color: colors.textPrimary,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    button: {
-      marginTop: 20,
-      backgroundColor: colors.accent,
-      borderRadius: 12,
-      paddingVertical: 16,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    buttonHovered: {
-      backgroundColor: colors.accent,
-      opacity: 0.92,
-      transform: [{ scale: 1.015 }],
-    },
-    buttonDisabled: { opacity: 0.35 },
-    forgotButton: {
-      alignSelf: "center",
-      marginTop: 12,
-    },
-    forgotText: {
-      fontSize: 14,
-      color: colors.accent,
-      fontWeight: "500",
-    },
-    buttonPressed: { opacity: 0.8 },
-    buttonText: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: "#fff",
-    },
-    divider: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginVertical: 16,
-    },
-    dividerLine: {
-      flex: 1,
-      height: 1,
-      backgroundColor: colors.border,
-    },
-    dividerText: {
-      marginHorizontal: 16,
-      fontSize: 13,
-      color: colors.textMuted,
-    },
-    registerButton: {
-      borderWidth: 1,
-      borderColor: colors.accent,
-      borderRadius: 12,
-      paddingVertical: 16,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    registerButtonHovered: {
-      backgroundColor: colors.accentMuted,
-      transform: [{ scale: 1.015 }],
-    },
-    registerButtonText: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: colors.accent,
-    },
-  });
 }

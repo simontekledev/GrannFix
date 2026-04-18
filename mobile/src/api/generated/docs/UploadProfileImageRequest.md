@@ -1,26 +1,22 @@
 
-# UserSummary
+# UploadProfileImageRequest
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`id` | string
-`name` | string
-`profileImageUrl` | string
+`file` | Blob
 
 ## Example
 
 ```typescript
-import type { UserSummary } from ''
+import type { UploadProfileImageRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "id": null,
-  "name": null,
-  "profileImageUrl": null,
-} satisfies UserSummary
+  "file": null,
+} satisfies UploadProfileImageRequest
 
 console.log(example)
 
@@ -29,7 +25,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as UserSummary
+const exampleParsed = JSON.parse(exampleJSON) as UploadProfileImageRequest
 console.log(exampleParsed)
 ```
 

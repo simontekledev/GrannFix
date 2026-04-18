@@ -30,5 +30,6 @@ export * from './TaskDetailResponse';
 export * from './TaskResponse';
 export * from './UpdateMeRequest';
 export * from './UpdateTaskRequest';
+export * from './UploadProfileImageRequest';
 export * from './UserSummary';
 export * from './VerifyOtpRequest';

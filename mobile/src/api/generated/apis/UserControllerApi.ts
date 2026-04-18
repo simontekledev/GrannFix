@@ -19,6 +19,7 @@ import type {
   MeUserDto,
   PublicUserDto,
   UpdateMeRequest,
+  UploadProfileImageRequest,
 } from '../models/index';
 import {
     ChangePasswordRequestFromJSON,
@@ -29,6 +30,8 @@ import {
     PublicUserDtoToJSON,
     UpdateMeRequestFromJSON,
     UpdateMeRequestToJSON,
+    UploadProfileImageRequestFromJSON,
+    UploadProfileImageRequestToJSON,
 } from '../models/index';
 
 export interface ChangePasswordOperationRequest {
@@ -41,6 +44,10 @@ export interface GetPublicUserRequest {
 
 export interface UpdateMeOperationRequest {
     updateMeRequest: UpdateMeRequest;
+}
+
+export interface UploadProfileImageOperationRequest {
+    uploadProfileImageRequest?: UploadProfileImageRequest;
 }
 
 /**
@@ -286,6 +293,52 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async updateMe(requestParameters: UpdateMeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MeUserDto> {
         const response = await this.updateMeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for uploadProfileImage without sending the request
+     */
+    async uploadProfileImageRequestOpts(requestParameters: UploadProfileImageOperationRequest): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/users/me/profile-image`;
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UploadProfileImageRequestToJSON(requestParameters['uploadProfileImageRequest']),
+        };
+    }
+
+    /**
+     */
+    async uploadProfileImageRaw(requestParameters: UploadProfileImageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MeUserDto>> {
+        const requestOptions = await this.uploadProfileImageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MeUserDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async uploadProfileImage(requestParameters: UploadProfileImageOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MeUserDto> {
+        const response = await this.uploadProfileImageRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

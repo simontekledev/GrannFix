@@ -9,6 +9,7 @@ Name | Type
 `id` | string
 `helperId` | string
 `helperName` | string
+`helperProfileImageUrl` | string
 `proposedPrice` | number
 `message` | string
 `status` | string
@@ -27,6 +28,7 @@ const example = {
   "id": null,
   "helperId": null,
   "helperName": null,
+  "helperProfileImageUrl": null,
   "proposedPrice": null,
   "message": null,
   "status": null,

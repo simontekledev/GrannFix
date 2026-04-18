@@ -14,6 +14,7 @@ Name | Type
 `city` | string
 `area` | string
 `street` | string
+`profileImageUrl` | string
 `verified` | boolean
 `role` | string
 `ratingAverage` | number
@@ -36,6 +37,7 @@ const example = {
   "city": null,
   "area": null,
   "street": null,
+  "profileImageUrl": null,
   "verified": null,
   "role": null,
   "ratingAverage": null,

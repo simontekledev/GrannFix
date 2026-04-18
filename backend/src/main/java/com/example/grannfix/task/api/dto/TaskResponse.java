@@ -10,6 +10,7 @@ public record TaskResponse(
         String title,
         String description,
         String category,
+        String urgency,
         String city,
         String area,
         String street,

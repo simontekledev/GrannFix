@@ -35,6 +35,11 @@ public class Task {
     @Column(nullable = false)
     private TaskCategory category;
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskUrgency urgency = TaskUrgency.FLEXIBLE;
+
     @Column(nullable = false, length = 100)
     private String city;
 

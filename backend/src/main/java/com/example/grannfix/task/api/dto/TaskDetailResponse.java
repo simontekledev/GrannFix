@@ -11,6 +11,7 @@ public record TaskDetailResponse(
         String title,
         String description,
         String category,
+        String urgency,
         String city,
         String area,
         String street,

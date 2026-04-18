@@ -10,6 +10,7 @@ public record CreateTaskRequest(
         @NotBlank @Size(max = 120) String title,
         @NotBlank @Size(max = 1000) String description,
         @NotNull String category,
+        String urgency,
         @NotBlank String city,
         @NotBlank String area,
         String street,

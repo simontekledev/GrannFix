@@ -11,6 +11,7 @@ import com.example.grannfix.task.api.dto.UpdateTaskRequest;
 import com.example.grannfix.task.application.port.out.OfferTaskPort;
 import com.example.grannfix.task.domain.Task;
 import com.example.grannfix.task.domain.TaskCategory;
+import com.example.grannfix.task.domain.TaskUrgency;
 import com.example.grannfix.task.domain.TaskStatus;
 import com.example.grannfix.task.mapper.TaskMapper;
 import com.example.grannfix.task.persistence.TaskRepository;
@@ -52,11 +53,19 @@ public class TaskService {
             throw new BadRequestException("Invalid category: " + req.category());
         }
 
+        TaskUrgency urgency = TaskUrgency.FLEXIBLE;
+        if (req.urgency() != null && !req.urgency().isBlank()) {
+            try {
+                urgency = TaskUrgency.valueOf(req.urgency().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+
         Task task = Task.builder()
                 .createdById(createdById)
                 .title(req.title().trim())
                 .description(req.description().trim())
                 .category(category)
+                .urgency(urgency)
                 .city(req.city().trim())
                 .area(req.area().trim())
                 .street(req.street() != null ? req.street().trim() : null)

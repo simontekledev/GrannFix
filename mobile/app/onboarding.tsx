@@ -41,6 +41,12 @@ export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  React.useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then((done) => {
+      if (done) router.replace("/(tabs)");
+    });
+  }, []);
+
   async function handleFinish() {
     await AsyncStorage.setItem(STORAGE_KEY, "true");
     router.replace("/(tabs)");

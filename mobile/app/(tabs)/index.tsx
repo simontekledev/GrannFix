@@ -45,9 +45,11 @@ export default function UpptäckScreen() {
   const searchInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
+    let cancelled = false;
     AsyncStorage.getItem("onboarding_complete").then((done) => {
-      if (!done) router.replace("/onboarding");
+      if (!done && !cancelled) router.replace("/onboarding");
     });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

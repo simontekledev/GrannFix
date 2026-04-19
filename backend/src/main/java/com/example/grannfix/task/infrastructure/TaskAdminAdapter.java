@@ -69,6 +69,24 @@ public class TaskAdminAdapter implements TaskAdminPort, TaskAssignmentPort, Task
 
     @Override
     @Transactional(readOnly = true)
+    public Map<UUID, TaskOfferSummary> findTaskSummaries(Collection<UUID> taskIds) {
+        if (taskIds.isEmpty()) return Map.of();
+        return taskRepository.findAllById(taskIds).stream()
+                .collect(Collectors.toMap(
+                        Task::getId,
+                        t -> new TaskOfferSummary(
+                                t.getId(),
+                                t.getTitle(),
+                                t.getCategory() != null ? t.getCategory().name() : null,
+                                t.getArea(),
+                                t.getStatus().name(),
+                                t.getCreatedById()
+                        )
+                ));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<TaskChatView> findTaskForChat(UUID taskId) {
         return taskRepository.findById(taskId)
                 .map(t -> new TaskChatView(

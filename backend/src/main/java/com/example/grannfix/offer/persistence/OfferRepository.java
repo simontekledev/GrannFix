@@ -36,4 +36,6 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
 
     @Query("SELECT o.taskId, COUNT(o) FROM Offer o WHERE o.taskId IN :taskIds AND o.status = :status GROUP BY o.taskId")
     List<Object[]> countPendingByTaskIds(@Param("taskIds") List<UUID> taskIds, @Param("status") OfferStatus status);
+
+    List<Offer> findByHelperIdOrderByCreatedAtDesc(UUID helperId);
 }

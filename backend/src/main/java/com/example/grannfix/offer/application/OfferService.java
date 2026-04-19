@@ -7,6 +7,7 @@ import com.example.grannfix.common.errors.ConflictException;
 import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.offer.api.dto.CreateOfferRequest;
+import com.example.grannfix.offer.api.dto.MyOfferResponse;
 import com.example.grannfix.offer.api.dto.OfferResponse;
 import com.example.grannfix.offer.api.dto.RateHelperRequest;
 import com.example.grannfix.offer.application.port.out.TaskAssignmentPort;
@@ -72,10 +73,20 @@ public class OfferService {
         TaskOfferView task = taskOfferPort.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));
 
-        if (!task.createdById().equals(userId)) {
+        boolean isOwner = task.createdById().equals(userId);
+        boolean isHelper = userId.equals(task.assignedToId());
+
+        if (!isOwner && !isHelper) {
             throw new ForbiddenException("Not your task");
         }
+
         var offers = offerRepository.findByTaskIdOrderByCreatedAtDesc(taskId);
+
+        // Helper only sees their own offer
+        if (isHelper && !isOwner) {
+            offers = offers.stream().filter(o -> o.getHelperId().equals(userId)).toList();
+        }
+
         var helperIds = offers.stream().map(Offer::getHelperId).collect(java.util.stream.Collectors.toSet());
         var names = userLookupPort.displayNames(helperIds);
         var images = userLookupPort.profileImageUrls(helperIds);
@@ -180,6 +191,39 @@ public class OfferService {
         taskOfferPort.completeTask(saved.getTaskId(), now);
         userRatingPort.incrementCompletedCount(offer.getHelperId());
         return OfferMapper.toResponse(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MyOfferResponse> getMyOffers(UUID helperId) {
+        var offers = offerRepository.findByHelperIdOrderByCreatedAtDesc(helperId);
+        if (offers.isEmpty()) return List.of();
+
+        var taskIds = offers.stream().map(Offer::getTaskId).collect(java.util.stream.Collectors.toSet());
+        var tasks = taskOfferPort.findTaskSummaries(taskIds);
+        var ownerIds = tasks.values().stream().map(TaskAssignmentPort.TaskOfferSummary::createdById).collect(java.util.stream.Collectors.toSet());
+        var names = userLookupPort.displayNames(ownerIds);
+        var images = userLookupPort.profileImageUrls(ownerIds);
+
+        return offers.stream().map(o -> {
+            var task = tasks.get(o.getTaskId());
+            if (task == null) return null;
+            UUID ownerId = task.createdById();
+            return new MyOfferResponse(
+                    o.getId(),
+                    o.getStatus(),
+                    o.getProposedPrice(),
+                    o.getCreatedAt(),
+                    new MyOfferResponse.TaskSummary(
+                            task.id(),
+                            task.title(),
+                            task.category(),
+                            task.area(),
+                            task.status(),
+                            names.get(ownerId),
+                            images.get(ownerId)
+                    )
+            );
+        }).filter(java.util.Objects::nonNull).toList();
     }
 
     @Transactional

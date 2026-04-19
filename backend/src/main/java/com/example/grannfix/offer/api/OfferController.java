@@ -1,5 +1,6 @@
 package com.example.grannfix.offer.api;
 
+import com.example.grannfix.offer.api.dto.MyOfferResponse;
 import com.example.grannfix.offer.api.dto.OfferResponse;
 import com.example.grannfix.offer.api.dto.RateHelperRequest;
 import com.example.grannfix.offer.application.OfferService;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +17,11 @@ import java.util.UUID;
 public class OfferController {
 
     private final OfferService offerService;
+
+    @GetMapping("/mine")
+    public List<MyOfferResponse> getMyOffers(@AuthenticationPrincipal UUID userId) {
+        return offerService.getMyOffers(userId);
+    }
 
     @PostMapping("/{offerId}/accept")
     public OfferResponse acceptOffer(

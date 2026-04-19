@@ -18,6 +18,7 @@ import type { ChatSummaryResponse } from "@/src/api/generated/models/ChatSummary
 import { timeAgo } from "@/src/helpers/time";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatListSkeleton } from "@/src/components/Skeleton";
+import { resolveImageUrl } from "@/src/helpers/images";
 
 export default function ChatListScreen() {
   const router = useRouter();
@@ -117,12 +118,19 @@ export default function ChatListScreen() {
         style={({ pressed }) => [styles.chatRow, pressed && { opacity: 0.7 }]}
         onPress={() => {
           if (item.id) markAsRead(item.id);
-          router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}&otherUserId=${item.otherPartyId ?? ""}` as any);
+          router.push(`/chat-conversation?chatId=${item.id}&taskId=${item.taskId}&name=${encodeURIComponent(item.otherPartyName ?? "")}&taskTitle=${encodeURIComponent(item.taskTitle ?? "")}&otherUserId=${item.otherPartyId ?? ""}&otherUserImage=${encodeURIComponent(item.otherPartyProfileImageUrl ?? "")}` as any);
         }}
       >
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initial}</Text>
-        </View>
+        {item.otherPartyProfileImageUrl ? (
+          <Image
+            source={{ uri: resolveImageUrl(item.otherPartyProfileImageUrl)! }}
+            style={styles.avatarImage}
+          />
+        ) : (
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{initial}</Text>
+          </View>
+        )}
         <View style={styles.chatContent}>
           <View style={styles.chatTopRow}>
             <Text style={[styles.chatName, unread && styles.chatNameUnread]} numberOfLines={1}>{item.otherPartyName}</Text>
@@ -258,6 +266,12 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.accent,
       alignItems: "center",
       justifyContent: "center",
+      marginRight: 12,
+    },
+    avatarImage: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       marginRight: 12,
     },
     avatarText: {

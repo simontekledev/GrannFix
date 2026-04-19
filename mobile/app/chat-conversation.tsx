@@ -21,6 +21,7 @@ import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatMessagesSkeleton } from "@/src/components/Skeleton";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
+import { resolveImageUrl } from "@/src/helpers/images";
 
 type ListItem =
   | { type: "date"; key: string; label: string }
@@ -66,12 +67,13 @@ function timeLabel(date: Date): string {
 
 export default function ChatConversationScreen() {
   const router = useRouter();
-  const { chatId, taskId, name, taskTitle, otherUserId } = useLocalSearchParams<{
+  const { chatId, taskId, name, taskTitle, otherUserId, otherUserImage } = useLocalSearchParams<{
     chatId: string;
     taskId?: string;
     name?: string;
     taskTitle?: string;
     otherUserId?: string;
+    otherUserImage?: string;
   }>();
   const { user } = useUser();
   const { colors } = useTheme();
@@ -264,11 +266,18 @@ export default function ChatConversationScreen() {
         >
           <Text style={styles.backArrow}>←</Text>
         </Pressable>
-        <View style={styles.headerAvatar}>
-          <Text style={styles.headerAvatarText}>
-            {(name ?? "?").charAt(0).toUpperCase()}
-          </Text>
-        </View>
+        {otherUserImage ? (
+          <Image
+            source={{ uri: resolveImageUrl(otherUserImage)! }}
+            style={styles.headerAvatarImage}
+          />
+        ) : (
+          <View style={styles.headerAvatar}>
+            <Text style={styles.headerAvatarText}>
+              {(name ?? "?").charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        )}
         <Pressable
           style={styles.headerInfo}
           onPress={() => {
@@ -385,6 +394,12 @@ function createStyles(colors: ThemeColors) {
       backgroundColor: colors.accent,
       alignItems: "center",
       justifyContent: "center",
+      marginRight: 10,
+    },
+    headerAvatarImage: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
       marginRight: 10,
     },
     headerAvatarText: {

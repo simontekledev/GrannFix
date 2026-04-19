@@ -19,7 +19,6 @@ import type {
   MeUserDto,
   PublicUserDto,
   UpdateMeRequest,
-  UploadProfileImageRequest,
 } from '../models/index';
 import {
     ChangePasswordRequestFromJSON,
@@ -30,8 +29,6 @@ import {
     PublicUserDtoToJSON,
     UpdateMeRequestFromJSON,
     UpdateMeRequestToJSON,
-    UploadProfileImageRequestFromJSON,
-    UploadProfileImageRequestToJSON,
 } from '../models/index';
 
 export interface ChangePasswordOperationRequest {
@@ -46,8 +43,8 @@ export interface UpdateMeOperationRequest {
     updateMeRequest: UpdateMeRequest;
 }
 
-export interface UploadProfileImageOperationRequest {
-    uploadProfileImageRequest?: UploadProfileImageRequest;
+export interface UploadProfileImageRequest {
+    file: Blob;
 }
 
 /**
@@ -105,6 +102,49 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async changePassword(requestParameters: ChangePasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.changePasswordRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for deleteProfileImage without sending the request
+     */
+    async deleteProfileImageRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/users/me/profile-image`;
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async deleteProfileImageRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MeUserDto>> {
+        const requestOptions = await this.deleteProfileImageRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MeUserDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async deleteProfileImage(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MeUserDto> {
+        const response = await this.deleteProfileImageRaw(initOverrides);
+        return await response.value();
     }
 
     /**
@@ -299,12 +339,17 @@ export class UserControllerApi extends runtime.BaseAPI {
     /**
      * Creates request options for uploadProfileImage without sending the request
      */
-    async uploadProfileImageRequestOpts(requestParameters: UploadProfileImageOperationRequest): Promise<runtime.RequestOpts> {
+    async uploadProfileImageRequestOpts(requestParameters: UploadProfileImageRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadProfileImage().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -314,6 +359,26 @@ export class UserControllerApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
 
         let urlPath = `/users/me/profile-image`;
 
@@ -322,13 +387,13 @@ export class UserControllerApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: UploadProfileImageRequestToJSON(requestParameters['uploadProfileImageRequest']),
+            body: formParams,
         };
     }
 
     /**
      */
-    async uploadProfileImageRaw(requestParameters: UploadProfileImageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MeUserDto>> {
+    async uploadProfileImageRaw(requestParameters: UploadProfileImageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MeUserDto>> {
         const requestOptions = await this.uploadProfileImageRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
@@ -337,7 +402,7 @@ export class UserControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async uploadProfileImage(requestParameters: UploadProfileImageOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MeUserDto> {
+    async uploadProfileImage(requestParameters: UploadProfileImageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MeUserDto> {
         const response = await this.uploadProfileImageRaw(requestParameters, initOverrides);
         return await response.value();
     }

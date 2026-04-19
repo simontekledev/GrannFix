@@ -54,6 +54,12 @@ export interface ChatSummaryResponse {
      * @type {string}
      * @memberof ChatSummaryResponse
      */
+    otherPartyProfileImageUrl?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatSummaryResponse
+     */
     lastMessage?: string;
     /**
      * 
@@ -85,6 +91,7 @@ export function ChatSummaryResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'taskTitle': json['taskTitle'] == null ? undefined : json['taskTitle'],
         'otherPartyId': json['otherPartyId'] == null ? undefined : json['otherPartyId'],
         'otherPartyName': json['otherPartyName'] == null ? undefined : json['otherPartyName'],
+        'otherPartyProfileImageUrl': json['otherPartyProfileImageUrl'] == null ? undefined : json['otherPartyProfileImageUrl'],
         'lastMessage': json['lastMessage'] == null ? undefined : json['lastMessage'],
         'lastMessageAt': json['lastMessageAt'] == null ? undefined : (new Date(json['lastMessageAt'])),
     };
@@ -106,6 +113,7 @@ export function ChatSummaryResponseToJSONTyped(value?: ChatSummaryResponse | nul
         'taskTitle': value['taskTitle'],
         'otherPartyId': value['otherPartyId'],
         'otherPartyName': value['otherPartyName'],
+        'otherPartyProfileImageUrl': value['otherPartyProfileImageUrl'],
         'lastMessage': value['lastMessage'],
         'lastMessageAt': value['lastMessageAt'] == null ? value['lastMessageAt'] : value['lastMessageAt'].toISOString(),
     };

@@ -80,7 +80,7 @@ example().catch(console.error);
 
 ## upload
 
-> { [key: string]: string; } upload(uploadProfileImageRequest)
+> { [key: string]: string; } upload(file)
 
 
 
@@ -102,8 +102,8 @@ async function example() {
   const api = new FileControllerApi(config);
 
   const body = {
-    // UploadProfileImageRequest (optional)
-    uploadProfileImageRequest: ...,
+    // Blob
+    file: BINARY_DATA_HERE,
   } satisfies UploadRequest;
 
   try {
@@ -123,7 +123,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uploadProfileImageRequest** | [UploadProfileImageRequest](UploadProfileImageRequest.md) |  | [Optional] |
+| **file** | `Blob` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -135,7 +135,7 @@ example().catch(console.error);
 
 ### HTTP request headers
 
-- **Content-Type**: `application/json`
+- **Content-Type**: `multipart/form-data`
 - **Accept**: `*/*`
 
 

@@ -9,6 +9,7 @@ public record ChatSummaryResponse(
         String taskTitle,
         UUID otherPartyId,
         String otherPartyName,
+        String otherPartyProfileImageUrl,
         String lastMessage,
         Instant lastMessageAt
 ) {}

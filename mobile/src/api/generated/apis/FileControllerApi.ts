@@ -14,20 +14,13 @@
 
 
 import * as runtime from '../runtime';
-import type {
-  UploadProfileImageRequest,
-} from '../models/index';
-import {
-    UploadProfileImageRequestFromJSON,
-    UploadProfileImageRequestToJSON,
-} from '../models/index';
 
 export interface ServeRequest {
     filename: string;
 }
 
 export interface UploadRequest {
-    uploadProfileImageRequest?: UploadProfileImageRequest;
+    file: Blob;
 }
 
 /**
@@ -90,11 +83,16 @@ export class FileControllerApi extends runtime.BaseAPI {
      * Creates request options for upload without sending the request
      */
     async uploadRequestOpts(requestParameters: UploadRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling upload().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -104,6 +102,26 @@ export class FileControllerApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
 
         let urlPath = `/files/upload`;
 
@@ -112,7 +130,7 @@ export class FileControllerApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: UploadProfileImageRequestToJSON(requestParameters['uploadProfileImageRequest']),
+            body: formParams,
         };
     }
 
@@ -127,7 +145,7 @@ export class FileControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async upload(requestParameters: UploadRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
+    async upload(requestParameters: UploadRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.uploadRaw(requestParameters, initOverrides);
         return await response.value();
     }

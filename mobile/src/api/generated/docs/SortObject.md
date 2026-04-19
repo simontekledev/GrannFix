@@ -7,8 +7,8 @@
 Name | Type
 ------------ | -------------
 `empty` | boolean
-`sorted` | boolean
 `unsorted` | boolean
+`sorted` | boolean
 
 ## Example
 
@@ -18,8 +18,8 @@ import type { SortObject } from ''
 // TODO: Update the object below with actual values
 const example = {
   "empty": null,
-  "sorted": null,
   "unsorted": null,
+  "sorted": null,
 } satisfies SortObject
 
 console.log(example)

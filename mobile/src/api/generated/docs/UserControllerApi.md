@@ -5,11 +5,12 @@ All URIs are relative to *http://localhost:8080*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**changePassword**](UserControllerApi.md#changepasswordoperation) | **PATCH** /users/me/password |  |
+| [**deleteProfileImage**](UserControllerApi.md#deleteprofileimage) | **DELETE** /users/me/profile-image |  |
 | [**getMe**](UserControllerApi.md#getme) | **GET** /users/me |  |
 | [**getPublicUser**](UserControllerApi.md#getpublicuser) | **GET** /users/{id} |  |
 | [**removeMe**](UserControllerApi.md#removeme) | **DELETE** /users/me |  |
 | [**updateMe**](UserControllerApi.md#updatemeoperation) | **PATCH** /users/me |  |
-| [**uploadProfileImage**](UserControllerApi.md#uploadprofileimageoperation) | **POST** /users/me/profile-image |  |
+| [**uploadProfileImage**](UserControllerApi.md#uploadprofileimage) | **POST** /users/me/profile-image |  |
 
 
 
@@ -72,6 +73,67 @@ example().catch(console.error);
 
 - **Content-Type**: `application/json`
 - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## deleteProfileImage
+
+> MeUserDto deleteProfileImage()
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UserControllerApi,
+} from '';
+import type { DeleteProfileImageRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UserControllerApi(config);
+
+  try {
+    const data = await api.deleteProfileImage();
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MeUserDto**](MeUserDto.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
 
 
 ### HTTP response details
@@ -344,7 +406,7 @@ example().catch(console.error);
 
 ## uploadProfileImage
 
-> MeUserDto uploadProfileImage(uploadProfileImageRequest)
+> MeUserDto uploadProfileImage(file)
 
 
 
@@ -355,7 +417,7 @@ import {
   Configuration,
   UserControllerApi,
 } from '';
-import type { UploadProfileImageOperationRequest } from '';
+import type { UploadProfileImageRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -366,9 +428,9 @@ async function example() {
   const api = new UserControllerApi(config);
 
   const body = {
-    // UploadProfileImageRequest (optional)
-    uploadProfileImageRequest: ...,
-  } satisfies UploadProfileImageOperationRequest;
+    // Blob
+    file: BINARY_DATA_HERE,
+  } satisfies UploadProfileImageRequest;
 
   try {
     const data = await api.uploadProfileImage(body);
@@ -387,7 +449,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **uploadProfileImageRequest** | [UploadProfileImageRequest](UploadProfileImageRequest.md) |  | [Optional] |
+| **file** | `Blob` |  | [Defaults to `undefined`] |
 
 ### Return type
 
@@ -399,7 +461,7 @@ example().catch(console.error);
 
 ### HTTP request headers
 
-- **Content-Type**: `application/json`
+- **Content-Type**: `multipart/form-data`
 - **Accept**: `*/*`
 
 

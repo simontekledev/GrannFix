@@ -11,6 +11,7 @@ Name | Type
 `taskTitle` | string
 `otherPartyId` | string
 `otherPartyName` | string
+`otherPartyProfileImageUrl` | string
 `lastMessage` | string
 `lastMessageAt` | Date
 
@@ -26,6 +27,7 @@ const example = {
   "taskTitle": null,
   "otherPartyId": null,
   "otherPartyName": null,
+  "otherPartyProfileImageUrl": null,
   "lastMessage": null,
   "lastMessageAt": null,
 } satisfies ChatSummaryResponse

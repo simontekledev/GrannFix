@@ -18,7 +18,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { taskApi } from "@/src/api/client";
+import { taskApi, offerApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import type { TaskResponse } from "@/src/api/generated/models/TaskResponse";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
@@ -30,6 +30,8 @@ import { createFormStyles } from "@/src/styles/form";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createTasksStyles } from "@/src/styles/screens/tasks";
 import { pickTaskImages, uploadImage } from "@/src/helpers/images";
+import { timeAgo } from "@/src/helpers/time";
+import type { MyOfferResponse } from "@/src/api/generated/models/MyOfferResponse";
 
 const STATUS_ORDER: Record<string, number> = {
   OPEN: 0,
@@ -45,7 +47,9 @@ export default function TasksScreen() {
   const styles = useMemo(() => createTasksStyles(colors), [colors]);
   const modalStyles = useMemo(() => createModalStyles(colors), [colors]);
   const formStyles = useMemo(() => createFormStyles(colors), [colors]);
+  const [activeTab, setActiveTab] = useState<"tasks" | "offers">("tasks");
   const [tasks, setTasks] = useState<TaskResponse[]>([]);
+  const [myOffers, setMyOffers] = useState<MyOfferResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -138,23 +142,36 @@ export default function TasksScreen() {
     }
   }, []);
 
+  const fetchMyOffers = useCallback(async () => {
+    try {
+      const res = await offerApi.getMyOffers();
+      setMyOffers(res ?? []);
+    } catch (e) {
+      console.log("Failed to load my offers:", e);
+    }
+  }, []);
+
+  const fetchAll = useCallback(async () => {
+    await Promise.all([fetchTasks(), fetchMyOffers()]);
+  }, [fetchTasks, fetchMyOffers]);
+
   useEffect(() => {
     if (loggedIn) {
-      fetchTasks().finally(() => setLoading(false));
+      fetchAll().finally(() => setLoading(false));
     } else if (loggedIn === false) {
       setLoading(false);
     }
-  }, [loggedIn, fetchTasks]);
+  }, [loggedIn, fetchAll]);
 
   useFocusEffect(
     useCallback(() => {
-      if (loggedIn) fetchTasks();
-    }, [loggedIn, fetchTasks])
+      if (loggedIn) fetchAll();
+    }, [loggedIn, fetchAll])
   );
 
   async function onRefresh() {
     setRefreshing(true);
-    if (loggedIn) await fetchTasks();
+    if (loggedIn) await fetchAll();
     setRefreshing(false);
   }
 
@@ -212,10 +229,87 @@ export default function TasksScreen() {
   const activeTasks = tasks.filter((t) => t.status === "OPEN" || t.status === "ASSIGNED");
   const finishedTasks = tasks.filter((t) => t.status === "COMPLETED" || t.status === "CANCELLED");
 
-  const sections = [
-    ...(activeTasks.length > 0 ? [{ title: "Aktiva uppdrag", data: activeTasks }] : []),
-    ...(finishedTasks.length > 0 ? [{ title: "Avslutade uppdrag", data: finishedTasks }] : []),
+  const taskSections = [
+    ...(activeTasks.length > 0 ? [{ title: "Aktiva", data: activeTasks }] : []),
+    ...(finishedTasks.length > 0 ? [{ title: "Avslutade", data: finishedTasks }] : []),
   ];
+
+  const OFFER_STATUS_ORDER: Record<string, number> = {
+    ACCEPTED: 0,
+    MARKED_DONE: 1,
+    PENDING: 2,
+    COMPLETED: 3,
+    DECLINED: 4,
+    CANCELLED: 5,
+  };
+
+  const OFFER_STATUS_LABELS: Record<string, string> = {
+    PENDING: "Väntar",
+    ACCEPTED: "Accepterat",
+    MARKED_DONE: "Markerat klart",
+    COMPLETED: "Slutfört",
+    DECLINED: "Avböjt",
+    CANCELLED: "Avbrutet",
+  };
+
+  const OFFER_STATUS_COLORS: Record<string, string> = {
+    PENDING: "#F59E0B",
+    ACCEPTED: "#22C55E",
+    MARKED_DONE: "#3B82F6",
+    COMPLETED: "#6366F1",
+    DECLINED: "#9CA3AF",
+    CANCELLED: "#EF4444",
+  };
+
+  const sortedOffers = [...myOffers].sort((a, b) =>
+    (OFFER_STATUS_ORDER[a.status ?? ""] ?? 99) - (OFFER_STATUS_ORDER[b.status ?? ""] ?? 99)
+  );
+
+  const activeOffers = sortedOffers.filter((o) => ["PENDING", "ACCEPTED", "MARKED_DONE"].includes(o.status ?? ""));
+  const pastOffers = sortedOffers.filter((o) => ["COMPLETED", "DECLINED", "CANCELLED"].includes(o.status ?? ""));
+
+  const offerSections = [
+    ...(activeOffers.length > 0 ? [{ title: "Aktiva", data: activeOffers }] : []),
+    ...(pastOffers.length > 0 ? [{ title: "Avslutade", data: pastOffers }] : []),
+  ];
+
+  function renderOffer({ item }: { item: MyOfferResponse }) {
+    const task = item.task;
+    if (!task) return null;
+    const statusColor = OFFER_STATUS_COLORS[item.status ?? ""] ?? "#888";
+    const statusLabel = OFFER_STATUS_LABELS[item.status ?? ""] ?? item.status;
+
+    const isDeclined = item.status === "DECLINED" || item.status === "CANCELLED";
+
+    return (
+      <Pressable
+        onPress={isDeclined ? undefined : () => router.push(`/task-detail?id=${task.id}` as any)}
+        style={({ pressed }) => [styles.offerCard, pressed && !isDeclined && { opacity: 0.7 }, isDeclined && { opacity: 0.5 }]}
+      >
+        <View style={styles.offerCardHeader}>
+          <Text style={styles.offerTaskTitle} numberOfLines={1}>{task.title}</Text>
+          {item.proposedPrice != null && (
+            <Text style={styles.offerPrice}>{item.proposedPrice} kr</Text>
+          )}
+        </View>
+
+        <View style={styles.offerCardMeta}>
+          <View style={[styles.offerStatusBadge, { backgroundColor: statusColor + "18" }]}>
+            <Text style={[styles.offerStatusText, { color: statusColor }]}>{statusLabel}</Text>
+          </View>
+        </View>
+
+        <View style={styles.offerCardFooter}>
+          {item.createdAt && (
+            <Text style={styles.offerDate}>{timeAgo(item.createdAt)}</Text>
+          )}
+          {!isDeclined && (
+            <Text style={styles.offerDetailLink}>Visa detaljer →</Text>
+          )}
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <View style={styles.safe}>
@@ -225,33 +319,80 @@ export default function TasksScreen() {
         </LinearGradient>
       </SafeAreaView>
 
-      {tasks.length === 0 ? (
-        <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
-          <Image
-            source={require("@/assets/images/activity-icon.png")}
-            style={styles.loginIcon}
-            resizeMode="contain"
+      <View style={styles.segmentRow}>
+        <Pressable
+          onPress={() => setActiveTab("tasks")}
+          style={[styles.segmentButton, activeTab === "tasks" && styles.segmentButtonActive]}
+        >
+          <Text style={[styles.segmentText, activeTab === "tasks" && styles.segmentTextActive]}>
+            Mina uppdrag
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setActiveTab("offers")}
+          style={[styles.segmentButton, activeTab === "offers" && styles.segmentButtonActive]}
+        >
+          <Text style={[styles.segmentText, activeTab === "offers" && styles.segmentTextActive]}>
+            Mina erbjudanden
+          </Text>
+        </Pressable>
+      </View>
+
+      {activeTab === "tasks" ? (
+        tasks.length === 0 ? (
+          <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+            <Image
+              source={require("@/assets/images/activity-icon.png")}
+              style={styles.loginIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.loginTitle}>Inga uppdrag</Text>
+            <Text style={styles.loginSubtitle}>Tryck + för att skapa ditt första uppdrag</Text>
+          </View>
+        ) : (
+          <SectionList
+            sections={taskSections}
+            keyExtractor={(item) => item.id ?? Math.random().toString()}
+            renderItem={({ item }) => renderTask({ item })}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text style={styles.sectionHeader}>{title}</Text>
+            )}
+            contentContainerStyle={styles.list}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+            }
+            stickySectionHeadersEnabled={false}
           />
-          <Text style={styles.loginTitle}>Inga uppdrag</Text>
-          <Text style={styles.loginSubtitle}>Tryck + för att skapa ditt första uppdrag</Text>
-        </View>
+        )
       ) : (
-        <SectionList
-          sections={sections}
-          keyExtractor={(item) => item.id ?? Math.random().toString()}
-          renderItem={({ item }) => renderTask({ item })}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.sectionHeader}>{title}</Text>
-          )}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
-          }
-          stickySectionHeadersEnabled={false}
-        />
+        myOffers.length === 0 ? (
+          <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+            <Image
+              source={require("@/assets/images/activity-icon.png")}
+              style={styles.loginIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.loginTitle}>Inga erbjudanden</Text>
+            <Text style={styles.loginSubtitle}>Hjälp till med uppdrag på Upptäck-sidan</Text>
+          </View>
+        ) : (
+          <SectionList
+            sections={offerSections}
+            keyExtractor={(item) => item.id ?? Math.random().toString()}
+            renderItem={renderOffer}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text style={styles.sectionHeader}>{title}</Text>
+            )}
+            contentContainerStyle={styles.list}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+            }
+            stickySectionHeadersEnabled={false}
+          />
+        )
       )}
 
-      {loggedIn && (
+      {loggedIn && activeTab === "tasks" && (
         <Pressable
           onPress={() => setShowCreateModal(true)}
           style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}

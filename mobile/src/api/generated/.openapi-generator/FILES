@@ -27,6 +27,7 @@ docs/FileControllerApi.md
 docs/ForgotPasswordRequest.md
 docs/LoginRequest.md
 docs/MeUserDto.md
+docs/MyOfferResponse.md
 docs/NotificationControllerApi.md
 docs/OfferControllerApi.md
 docs/OfferResponse.md
@@ -48,9 +49,9 @@ docs/TaskDetailResponse.md
 docs/TaskOfferControllerApi.md
 docs/TaskQueryControllerApi.md
 docs/TaskResponse.md
+docs/TaskSummary.md
 docs/UpdateMeRequest.md
 docs/UpdateTaskRequest.md
-docs/UploadProfileImageRequest.md
 docs/UserControllerApi.md
 docs/UserSummary.md
 docs/VerifyOtpRequest.md
@@ -68,6 +69,7 @@ models/CursorPageResponseTaskResponse.ts
 models/ForgotPasswordRequest.ts
 models/LoginRequest.ts
 models/MeUserDto.ts
+models/MyOfferResponse.ts
 models/OfferResponse.ts
 models/PageAdminUserDto.ts
 models/Pageable.ts
@@ -83,9 +85,9 @@ models/SendMessageRequest.ts
 models/SortObject.ts
 models/TaskDetailResponse.ts
 models/TaskResponse.ts
+models/TaskSummary.ts
 models/UpdateMeRequest.ts
 models/UpdateTaskRequest.ts
-models/UploadProfileImageRequest.ts
 models/UserSummary.ts
 models/VerifyOtpRequest.ts
 models/index.ts

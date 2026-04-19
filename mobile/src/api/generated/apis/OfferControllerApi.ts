@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  MyOfferResponse,
   OfferResponse,
   RateHelperRequest,
 } from '../models/index';
 import {
+    MyOfferResponseFromJSON,
+    MyOfferResponseToJSON,
     OfferResponseFromJSON,
     OfferResponseToJSON,
     RateHelperRequestFromJSON,
@@ -201,6 +204,49 @@ export class OfferControllerApi extends runtime.BaseAPI {
      */
     async confirmDoneOffer(requestParameters: ConfirmDoneOfferRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OfferResponse> {
         const response = await this.confirmDoneOfferRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getMyOffers without sending the request
+     */
+    async getMyOffersRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/offers/mine`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async getMyOffersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<MyOfferResponse>>> {
+        const requestOptions = await this.getMyOffersRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(MyOfferResponseFromJSON));
+    }
+
+    /**
+     */
+    async getMyOffers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<MyOfferResponse>> {
+        const response = await this.getMyOffersRaw(initOverrides);
         return await response.value();
     }
 

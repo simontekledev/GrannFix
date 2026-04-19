@@ -94,7 +94,8 @@ public class TaskService {
                 .orElseThrow(() -> new NotFoundException("Task not found"));
 
         boolean isOwner = task.getCreatedById().equals(userId);
-        if (!isOwner && task.getStatus() != TaskStatus.OPEN) {
+        boolean isHelper = userId.equals(task.getAssignedToId());
+        if (!isOwner && !isHelper && task.getStatus() != TaskStatus.OPEN) {
             throw new ForbiddenException("Forbidden");
         }
         String ownerName = userLookupPort.displayName(task.getCreatedById());

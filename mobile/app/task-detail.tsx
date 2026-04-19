@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { taskApi, chatApi, taskOfferApi, offerApi } from "@/src/api/client";
 import type { OfferResponse } from "@/src/api/generated/models/OfferResponse";
 import { useUser } from "@/src/context/UserContext";
@@ -58,6 +58,10 @@ export default function TaskDetailScreen() {
   const [showOffers, setShowOffers] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
 
+  // Mark done / confirm done
+  const [markingDone, setMarkingDone] = useState(false);
+  const [confirmingDone, setConfirmingDone] = useState(false);
+
   // Rating
   const [ratingValue, setRatingValue] = useState(0);
   const [ratingComment, setRatingComment] = useState("");
@@ -71,6 +75,60 @@ export default function TaskDetailScreen() {
       setOffers(res);
     } catch (e) {
       console.log("Failed to load offers:", e);
+    }
+  }
+
+  async function handleMarkDone() {
+    const acceptedOffer = offers.find((o) => (o as any).status === "ACCEPTED");
+    if (!acceptedOffer?.id) return;
+    setMarkingDone(true);
+    try {
+      await offerApi.markDoneOffer({ offerId: acceptedOffer.id });
+      const updated = await taskApi.getTask({ id: id! });
+      setTask(updated);
+      loadOffers();
+      if (Platform.OS === "web") window.alert("Uppdraget har markerats som klart!");
+      else Alert.alert("Klart", "Uppdraget har markerats som klart. Väntar på bekräftelse.");
+    } catch (e) {
+      console.log("Mark done error:", e);
+      const msg = "Kunde inte markera som klart";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setMarkingDone(false);
+    }
+  }
+
+  async function handleConfirmDone() {
+    const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+    if (!markedOffer?.id) return;
+
+    const doConfirm = async () => {
+      setConfirmingDone(true);
+      try {
+        await offerApi.confirmDoneOffer({ offerId: markedOffer.id! });
+        const updated = await taskApi.getTask({ id: id! });
+        setTask(updated);
+        loadOffers();
+        if (Platform.OS === "web") window.alert("Uppdraget är slutfört!");
+        else Alert.alert("Slutfört", "Uppdraget har bekräftats som klart!");
+      } catch (e) {
+        console.log("Confirm done error:", e);
+        const msg = "Kunde inte bekräfta";
+        if (Platform.OS === "web") window.alert(msg);
+        else Alert.alert("Fel", msg);
+      } finally {
+        setConfirmingDone(false);
+      }
+    };
+
+    if (Platform.OS === "web") {
+      if (window.confirm("Är du säker på att uppdraget är klart?")) doConfirm();
+    } else {
+      Alert.alert("Bekräfta", "Är du säker på att uppdraget är klart?", [
+        { text: "Avbryt", style: "cancel" },
+        { text: "Ja, bekräfta", onPress: doConfirm },
+      ]);
     }
   }
 
@@ -195,6 +253,22 @@ export default function TaskDetailScreen() {
     }
   }
 
+  const reloadTask = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await taskApi.getTask({ id });
+      setTask(res);
+      if (
+        (res.status === "ASSIGNED" || res.status === "COMPLETED") &&
+        (res.createdBy?.id === user?.id || res.assignedTo?.id === user?.id)
+      ) {
+        loadOffers();
+      }
+    } catch (e) {
+      console.log("Failed to load task:", e);
+    }
+  }, [id, user?.id]);
+
   useEffect(() => {
     if (!id) return;
     setTask(null);
@@ -206,7 +280,10 @@ export default function TaskDetailScreen() {
         if (offer === "true" && res.permissions?.canOffer) {
           setShowOfferModal(true);
         }
-        if (res.status === "COMPLETED" && res.createdBy?.id === user?.id) {
+        if (
+          (res.status === "ASSIGNED" || res.status === "COMPLETED") &&
+          (res.createdBy?.id === user?.id || res.assignedTo?.id === user?.id)
+        ) {
           loadOffers();
         }
       } catch (e) {
@@ -216,6 +293,12 @@ export default function TaskDetailScreen() {
       }
     })();
   }, [id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (id && !loading) reloadTask();
+    }, [id, loading, reloadTask])
+  );
 
   async function handleCancel() {
     if (!id) return;
@@ -449,7 +532,7 @@ export default function TaskDetailScreen() {
                     </Text>
                   </View>
                 )}
-                <Text style={styles.userName}>{task.createdBy.name}</Text>
+                <Text style={styles.userName}>{task.createdBy.name} (jag)</Text>
               </View>
             ) : (
               <Pressable
@@ -495,7 +578,7 @@ export default function TaskDetailScreen() {
                 </View>
               )}
               <Text style={styles.userName}>
-                {task.assignedTo.name}{task.assignedTo.id === user?.id ? " (du)" : ""}
+                {task.assignedTo.name}{task.assignedTo.id === user?.id ? " (jag)" : ""}
               </Text>
               {perms?.canChat && (
                 <View style={styles.chatBubble}>
@@ -598,6 +681,63 @@ export default function TaskDetailScreen() {
             </Pressable>
           )}
 
+          {status === "ASSIGNED" && task.assignedTo?.id === user?.id && (() => {
+            const acceptedOffer = offers.find((o) => (o as any).status === "ACCEPTED");
+            const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+            if (markedOffer) {
+              return (
+                <View style={styles.infoBanner}>
+                  <Text style={styles.infoBannerText}>Väntar på att uppdragsskaparen bekräftar</Text>
+                </View>
+              );
+            }
+            if (acceptedOffer) {
+              return (
+                <Pressable
+                  onPress={handleMarkDone}
+                  disabled={markingDone}
+                  style={({ pressed, hovered }: any) => [
+                    styles.primaryButton,
+                    hovered && styles.primaryButtonHovered,
+                    pressed && styles.primaryButtonPressed,
+                    markingDone && { opacity: 0.35 },
+                  ]}
+                >
+                  {markingDone ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.primaryButtonText}>Markera som klar</Text>
+                  )}
+                </Pressable>
+              );
+            }
+            return null;
+          })()}
+
+          {status === "ASSIGNED" && task.createdBy?.id === user?.id && (() => {
+            const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+            if (markedOffer) {
+              return (
+                <Pressable
+                  onPress={handleConfirmDone}
+                  disabled={confirmingDone}
+                  style={({ pressed, hovered }: any) => [
+                    styles.primaryButton,
+                    hovered && styles.primaryButtonHovered,
+                    pressed && styles.primaryButtonPressed,
+                    confirmingDone && { opacity: 0.35 },
+                  ]}
+                >
+                  {confirmingDone ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.primaryButtonText}>Bekräfta klar</Text>
+                  )}
+                </Pressable>
+              );
+            }
+            return null;
+          })()}
 
           {perms?.canEdit && (
             <Pressable

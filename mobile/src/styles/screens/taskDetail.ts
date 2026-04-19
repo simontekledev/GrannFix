@@ -384,5 +384,17 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       height: 150,
       borderRadius: 10,
     },
+    infoBanner: {
+      backgroundColor: colors.accentMuted,
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      alignItems: "center",
+    },
+    infoBannerText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.accent,
+    },
   });
 }

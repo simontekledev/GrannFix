@@ -27,7 +27,7 @@ import { pickImage, uploadProfileImage, resolveImageUrl } from "@/src/helpers/im
 
 export default function EditProfileScreen() {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const { user, setUser, loadProfile } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const formStyles = useMemo(() => createFormStyles(colors), [colors]);
@@ -68,8 +68,8 @@ export default function EditProfileScreen() {
     if (!uri) return;
     setUploadingImage(true);
     try {
-      const updated = await uploadProfileImage(uri);
-      setUser(updated);
+      await uploadProfileImage(uri);
+      await loadProfile();
     } catch (e) {
       console.log("Profile image upload error:", e);
       const msg = "Kunde inte ladda upp bilden.";
@@ -85,14 +85,11 @@ export default function EditProfileScreen() {
     try {
       const token = await AsyncStorage.getItem("access_token");
       const base = Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:8080";
-      const res = await fetch(`${base}/users/me/profile-image`, {
+      await fetch(`${base}/users/me/profile-image`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setUser(updated);
-      }
+      await loadProfile();
     } catch (e) {
       console.log("Delete profile image error:", e);
       const msg = "Kunde inte ta bort bilden.";
@@ -177,11 +174,10 @@ export default function EditProfileScreen() {
                 style={styles.avatar}
               />
             ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarInitial}>
-                  {(user?.name ?? "?").charAt(0).toUpperCase()}
-                </Text>
-              </View>
+              <Image
+                source={require("@/assets/images/user-profile1-icon.png")}
+                style={styles.avatar}
+              />
             )}
             {uploadingImage && (
               <View style={styles.avatarOverlay}>
@@ -189,11 +185,13 @@ export default function EditProfileScreen() {
               </View>
             )}
             <View style={styles.avatarBadge}>
-              <Text style={styles.avatarBadgeText}>📷</Text>
+              <Image
+                source={require("@/assets/images/camera-icon.png")}
+                style={styles.avatarBadgeIcon}
+                resizeMode="contain"
+              />
             </View>
           </Pressable>
-          <Text style={styles.changePhotoText}>Tryck för att byta bild</Text>
-
           <Text style={styles.label}>Namn <Text style={formStyles.required}>*</Text></Text>
           <TextInput
             value={name}
@@ -356,32 +354,19 @@ function createStyles(colors: ThemeColors) {
     },
     avatarWrapper: {
       alignSelf: "center",
-      marginBottom: 4,
-      marginTop: 4,
+      marginBottom: 16,
+      marginTop: 8,
       position: "relative",
     },
     avatar: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-    },
-    avatarPlaceholder: {
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      backgroundColor: colors.accent,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    avatarInitial: {
-      fontSize: 36,
-      fontWeight: "700",
-      color: "#fff",
+      width: 140,
+      height: 140,
+      borderRadius: 70,
     },
     avatarOverlay: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.4)",
-      borderRadius: 50,
+      borderRadius: 70,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -389,27 +374,19 @@ function createStyles(colors: ThemeColors) {
       position: "absolute",
       bottom: 0,
       right: 0,
-      backgroundColor: colors.card,
-      borderRadius: 14,
-      width: 28,
-      height: 28,
+      backgroundColor: colors.accentMuted,
+      borderRadius: 18,
+      width: 36,
+      height: 36,
       alignItems: "center",
       justifyContent: "center",
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.15,
-      shadowRadius: 3,
-      elevation: 3,
+      borderWidth: 2,
+      borderColor: colors.background,
     },
-    avatarBadgeText: {
-      fontSize: 14,
-    },
-    changePhotoText: {
-      textAlign: "center",
-      fontSize: 13,
-      color: colors.accent,
-      fontWeight: "500",
-      marginBottom: 8,
+    avatarBadgeIcon: {
+      width: 18,
+      height: 18,
+      tintColor: colors.accent,
     },
     label: {
       fontSize: 14,

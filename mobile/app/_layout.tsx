@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, useColorScheme as useSystemColorScheme } from 'react-native';
 import { Asset } from 'expo-asset';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -27,6 +27,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const systemScheme = useSystemColorScheme();
   const [appReady, setAppReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   usePushNotifications();
@@ -52,6 +53,7 @@ export default function RootLayout() {
           require("@/assets/images/location-icon-transparent.png"),
           require("@/assets/images/chat-icon.png"),
           require("@/assets/images/empty-inbox-icon.png"),
+          require("@/assets/images/camera-icon.png"),
           require("@/assets/images/grannfix-primary-transparent-logo.png"),
           require("@/assets/images/grannfix-primary-transparent-logo-dark.png"),
           require("@/assets/images/grannfix-wordmark-transparent.png"),
@@ -102,11 +104,14 @@ export default function RootLayout() {
       )}
       {showSplash && (
         <Animated.View
-          style={styles.splash}
+          style={[
+            styles.splash,
+            { backgroundColor: systemScheme === 'dark' ? '#0f1411' : '#f5faf2' },
+          ]}
           exiting={FadeOut.duration(400)}
         >
           <Image
-            source={require('@/assets/images/grannfix-primary-logo.png')}
+            source={require('@/assets/images/grannfix-icon - transparent.png')}
             style={styles.splashLogo}
             resizeMode="contain"
           />
@@ -123,7 +128,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   splash: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,

@@ -21,8 +21,9 @@ public class TaskQueryController {
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String area,
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search
     ) {
-        return taskQueryService.listTasks(cursor, limit, status, city, area, category);
+        return taskQueryService.listTasks(cursor, limit, status, city, area, category, search);
     }
 }

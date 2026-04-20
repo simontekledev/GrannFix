@@ -30,16 +30,19 @@ public class TaskQueryService {
             TaskStatus status,
             String city,
             String area,
-            String category
+            String category,
+            String search
     ) {
         int safeLimit = Math.min(Math.max(limit, 1), 50);
 
-        TaskCategory cat = null;
+        String statusStr = status != null ? status.name() : null;
+        String catStr = null;
         if (category != null && !category.isBlank()) {
             try {
-                cat = TaskCategory.valueOf(category.toUpperCase());
+                catStr = TaskCategory.valueOf(category.toUpperCase()).name();
             } catch (IllegalArgumentException ignored) {}
         }
+        String searchStr = (search != null && !search.isBlank()) ? search.trim() : null;
 
         TaskCursor decoded = null;
         if (cursor != null && !cursor.isBlank()) {
@@ -49,13 +52,14 @@ public class TaskQueryService {
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
         List<Task> rows;
         if (decoded == null) {
-            rows = taskRepository.findActive(status, blankToNull(city), blankToNull(area), cat, pageable);
+            rows = taskRepository.findActive(statusStr, blankToNull(city), blankToNull(area), catStr, searchStr, pageable);
         } else {
             rows = taskRepository.findActiveAfterCursor(
-                    status,
+                    statusStr,
                     blankToNull(city),
                     blankToNull(area),
-                    cat,
+                    catStr,
+                    searchStr,
                     decoded.createdAt(),
                     decoded.id(),
                     pageable

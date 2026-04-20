@@ -19,41 +19,45 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Optional<Task> findByIdAndActiveTrue(UUID taskId);
     List<Task> findByCreatedByIdAndStatusIn(UUID userId, List<TaskStatus> statuses);
     Optional<TaskOfferProjection> findProjectedById(UUID id);
-    @Query("""
-    SELECT t FROM Task t
+    @Query(value = """
+    SELECT t.* FROM tasks t
     WHERE t.active = true
-      AND (:status IS NULL OR t.status = :status)
+      AND (:status IS NULL OR t.status = CAST(:status AS VARCHAR))
       AND (:city IS NULL OR t.city = :city)
       AND (:area IS NULL OR t.area = :area)
-      AND (:category IS NULL OR t.category = :category)
-    ORDER BY t.createdAt DESC, t.id DESC
-""")
+      AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
+      AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
+    ORDER BY t.created_at DESC, t.id DESC
+""", nativeQuery = true)
     List<Task> findActive(
-            @Param("status") TaskStatus status,
+            @Param("status") String status,
             @Param("city") String city,
             @Param("area") String area,
-            @Param("category") TaskCategory category,
+            @Param("category") String category,
+            @Param("search") String search,
             Pageable pageable
     );
 
-    @Query("""
-    SELECT t FROM Task t
+    @Query(value = """
+    SELECT t.* FROM tasks t
     WHERE t.active = true
-      AND (:status IS NULL OR t.status = :status)
+      AND (:status IS NULL OR t.status = CAST(:status AS VARCHAR))
       AND (:city IS NULL OR t.city = :city)
       AND (:area IS NULL OR t.area = :area)
-      AND (:category IS NULL OR t.category = :category)
+      AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
+      AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
       AND (
-            t.createdAt < :cursorCreatedAt
-            OR (t.createdAt = :cursorCreatedAt AND t.id < :cursorId)
+            t.created_at < :cursorCreatedAt
+            OR (t.created_at = :cursorCreatedAt AND t.id < CAST(:cursorId AS UUID))
       )
-    ORDER BY t.createdAt DESC, t.id DESC
-""")
+    ORDER BY t.created_at DESC, t.id DESC
+""", nativeQuery = true)
     List<Task> findActiveAfterCursor(
-            @Param("status") TaskStatus status,
+            @Param("status") String status,
             @Param("city") String city,
             @Param("area") String area,
-            @Param("category") TaskCategory category,
+            @Param("category") String category,
+            @Param("search") String search,
             @Param("cursorCreatedAt") Instant cursorCreatedAt,
             @Param("cursorId") UUID cursorId,
             Pageable pageable

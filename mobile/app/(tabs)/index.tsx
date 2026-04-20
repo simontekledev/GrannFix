@@ -43,6 +43,7 @@ export default function UpptäckScreen() {
   const [sortNearest, setSortNearest] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +63,8 @@ export default function UpptäckScreen() {
     })();
   }, []);
 
+  const [activeSearch, setActiveSearch] = useState("");
+
   const fetchTasks = useCallback(async (cursor?: string) => {
     try {
       const res = await taskQueryApi.listTasks({
@@ -71,6 +74,7 @@ export default function UpptäckScreen() {
         city: undefined,
         area: undefined,
         category: selectedCategory ?? undefined,
+        search: activeSearch || undefined,
       });
 
       if (cursor) {
@@ -83,15 +87,11 @@ export default function UpptäckScreen() {
     } catch (e: any) {
       console.log("Failed to load tasks:", e);
     }
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    fetchTasks().finally(() => setLoading(false));
-  }, [fetchTasks]);
+  }, [selectedCategory, activeSearch]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchTasks();
+      fetchTasks().finally(() => setLoading(false));
     }, [fetchTasks])
   );
 
@@ -167,23 +167,6 @@ export default function UpptäckScreen() {
       <FlatList
         data={(() => {
           let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
-          if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            filtered = filtered
-              .filter((t) =>
-                (t.title?.toLowerCase().includes(q)) ||
-                (t.description?.toLowerCase().includes(q)) ||
-                (t.area?.toLowerCase().includes(q))
-              )
-              .sort((a, b) => {
-                const aTitle = a.title?.toLowerCase().includes(q) ? 0 : 1;
-                const bTitle = b.title?.toLowerCase().includes(q) ? 0 : 1;
-                if (aTitle !== bTitle) return aTitle - bTitle;
-                const aDesc = a.description?.toLowerCase().includes(q) ? 0 : 1;
-                const bDesc = b.description?.toLowerCase().includes(q) ? 0 : 1;
-                return aDesc - bDesc;
-              });
-          }
           if (sortNearest && userLocation) {
             filtered = [...filtered].sort((a, b) => {
               const coordsA = a.area ? AREA_COORDS[a.area] : null;
@@ -197,7 +180,7 @@ export default function UpptäckScreen() {
         })()}
         keyExtractor={(item) => item.id ?? Math.random().toString()}
         renderItem={renderTask}
-        contentContainerStyle={tasks.length === 0 ? styles.emptyList : styles.list}
+        contentContainerStyle={styles.emptyList}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         refreshControl={
@@ -234,8 +217,16 @@ export default function UpptäckScreen() {
                 placeholder="Sök uppdrag..."
                 placeholderTextColor={colors.textMuted}
                 value={searchQuery}
-                onChangeText={setSearchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+                  searchDebounceRef.current = setTimeout(() => {
+                    setActiveSearch(text.trim());
+                  }, 400);
+                }}
                 autoCorrect={false}
+                returnKeyType="search"
+                onSubmitEditing={() => setActiveSearch(searchQuery.trim())}
               />
               <Pressable
                 onPress={() => setSortNearest((prev) => !prev)}
@@ -253,7 +244,7 @@ export default function UpptäckScreen() {
         }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null}
         ListEmptyComponent={
-          <View style={[styles.centered, { flex: 1, paddingBottom: 120 }]}>
+          <View style={[styles.centered, { flex: 1, paddingBottom: 200 }]}>
             <Image
               source={require("@/assets/images/empty-inbox-icon.png")}
               style={{ width: 130, height: 130, tintColor: colors.accent, marginBottom: -15 }}
@@ -276,13 +267,22 @@ export default function UpptäckScreen() {
                 placeholder="Sök uppdrag..."
                 placeholderTextColor={colors.textMuted}
                 value={searchQuery}
-                onChangeText={setSearchQuery}
+                onChangeText={(text) => {
+                  setSearchQuery(text);
+                  if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+                  searchDebounceRef.current = setTimeout(() => {
+                    setActiveSearch(text.trim());
+                  }, 400);
+                }}
                 autoCorrect={false}
+                returnKeyType="search"
+                onSubmitEditing={() => setActiveSearch(searchQuery.trim())}
               />
               <Pressable
                 onPress={() => {
                   setSearchOpen(false);
                   setSearchQuery("");
+                  setActiveSearch("");
                 }}
                 style={({ pressed }) => [pressed && { opacity: 0.6 }]}
               >
@@ -290,33 +290,30 @@ export default function UpptäckScreen() {
               </Pressable>
             </View>
             <FlatList
-              data={searchQuery.trim()
-                ? (userId ? tasks.filter((t) => t.createdById !== userId) : tasks)
-                    .filter((t) => {
-                      const q = searchQuery.toLowerCase();
-                      return (
-                        (t.title?.toLowerCase().includes(q)) ||
-                        (t.description?.toLowerCase().includes(q)) ||
-                        (t.area?.toLowerCase().includes(q))
-                      );
-                    })
-                    .sort((a, b) => {
-                      const q = searchQuery.toLowerCase();
-                      const aTitle = a.title?.toLowerCase().includes(q) ? 0 : 1;
-                      const bTitle = b.title?.toLowerCase().includes(q) ? 0 : 1;
-                      if (aTitle !== bTitle) return aTitle - bTitle;
-                      const aDesc = a.description?.toLowerCase().includes(q) ? 0 : 1;
-                      const bDesc = b.description?.toLowerCase().includes(q) ? 0 : 1;
-                      return aDesc - bDesc;
-                    })
-                : []}
+              data={(() => {
+                let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
+                if (sortNearest && userLocation) {
+                  filtered = [...filtered].sort((a, b) => {
+                    const coordsA = a.area ? AREA_COORDS[a.area] : null;
+                    const coordsB = b.area ? AREA_COORDS[b.area] : null;
+                    const distA = coordsA ? getDistanceKm(userLocation.lat, userLocation.lng, coordsA.lat, coordsA.lng) : 999;
+                    const distB = coordsB ? getDistanceKm(userLocation.lat, userLocation.lng, coordsB.lat, coordsB.lng) : 999;
+                    return distA - distB;
+                  });
+                }
+                return filtered;
+              })()}
               keyExtractor={(item) => item.id ?? Math.random().toString()}
               renderItem={renderTask}
-              contentContainerStyle={styles.list}
+              contentContainerStyle={styles.emptyList}
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
               ListEmptyComponent={
-                searchQuery.trim() ? (
-                  <Text style={styles.searchEmptyText}>Inga träffar</Text>
+                activeSearch ? (
+                  <View style={[styles.centered, { flex: 1, paddingBottom: 200 }]}>
+                    <Text style={styles.loginTitle}>Inga träffar</Text>
+                    <Text style={styles.loginSubtitle}>Prova ett annat sökord</Text>
+                  </View>
                 ) : null
               }
             />

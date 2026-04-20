@@ -29,6 +29,7 @@ export interface ListTasksRequest {
     city?: string;
     area?: string;
     category?: string;
+    search?: string;
 }
 
 /**
@@ -64,6 +65,10 @@ export class TaskQueryControllerApi extends runtime.BaseAPI {
 
         if (requestParameters['category'] != null) {
             queryParameters['category'] = requestParameters['category'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['search'] = requestParameters['search'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

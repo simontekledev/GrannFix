@@ -20,6 +20,7 @@ import type { OfferResponse } from "@/src/api/generated/models/OfferResponse";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createTaskDetailStyles } from "@/src/styles/screens/taskDetail";
+import { TaskDetailSkeleton } from "@/src/components/Skeleton";
 import { timeAgo } from "@/src/helpers/time";
 import { createModalStyles } from "@/src/styles/modal";
 import { createFormStyles } from "@/src/styles/form";
@@ -342,9 +343,7 @@ export default function TaskDetailScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.accent} />
-        </View>
+        <TaskDetailSkeleton />
       </SafeAreaView>
     );
   }

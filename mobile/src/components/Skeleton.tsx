@@ -132,6 +132,61 @@ export function ChatListSkeleton() {
   );
 }
 
+export function TaskDetailSkeleton() {
+  const { colors } = useTheme();
+
+  return (
+    <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+      {/* Back button */}
+      <Skeleton width={80} height={16} style={{ marginBottom: 16 }} />
+
+      {/* Title */}
+      <Skeleton width="75%" height={24} style={{ marginBottom: 12 }} />
+
+      {/* Status + price + date row */}
+      <View style={[skeletonStyles.row, { gap: 10, marginBottom: 20, justifyContent: "flex-start" }]}>
+        <Skeleton width={70} height={26} borderRadius={6} />
+        <Skeleton width={60} height={26} borderRadius={8} />
+        <Skeleton width={100} height={14} />
+      </View>
+
+      {/* Description card */}
+      <View style={[skeletonStyles.detailCard, { backgroundColor: colors.card }]}>
+        <Skeleton width={100} height={12} style={{ marginBottom: 10 }} />
+        <Skeleton width="100%" height={14} style={{ marginBottom: 6 }} />
+        <Skeleton width="85%" height={14} style={{ marginBottom: 6 }} />
+        <Skeleton width="60%" height={14} />
+      </View>
+
+      {/* Location card */}
+      <View style={[skeletonStyles.detailCard, { backgroundColor: colors.card }]}>
+        <Skeleton width={50} height={12} style={{ marginBottom: 10 }} />
+        <View style={skeletonStyles.detailRow}>
+          <Skeleton width={40} height={14} />
+          <Skeleton width={90} height={14} />
+        </View>
+        <View style={[skeletonStyles.divider, { backgroundColor: colors.divider }]} />
+        <View style={skeletonStyles.detailRow}>
+          <Skeleton width={55} height={14} />
+          <Skeleton width={100} height={14} />
+        </View>
+      </View>
+
+      {/* Created by card */}
+      <View style={[skeletonStyles.detailCard, { backgroundColor: colors.card }]}>
+        <Skeleton width={80} height={12} style={{ marginBottom: 10 }} />
+        <View style={[skeletonStyles.row, { justifyContent: "flex-start", gap: 12 }]}>
+          <Skeleton width={36} height={36} borderRadius={18} />
+          <Skeleton width={120} height={16} />
+        </View>
+      </View>
+
+      {/* Action button */}
+      <Skeleton width="100%" height={52} borderRadius={12} style={{ marginTop: 12 }} />
+    </View>
+  );
+}
+
 export function ChatMessagesSkeleton() {
   return (
     <View style={{ paddingHorizontal: 16, paddingTop: 16, flex: 1 }}>

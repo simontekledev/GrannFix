@@ -340,7 +340,7 @@ export default function TasksScreen() {
 
       {activeTab === "tasks" ? (
         tasks.length === 0 ? (
-          <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+          <View style={[styles.centered, { flex: 1, paddingBottom: 140 }]}>
             <Image
               source={require("@/assets/images/activity-icon.png")}
               style={styles.loginIcon}
@@ -366,7 +366,7 @@ export default function TasksScreen() {
         )
       ) : (
         myOffers.length === 0 ? (
-          <View style={[styles.centered, { flex: 1, paddingBottom: 80 }]}>
+          <View style={[styles.centered, { flex: 1, paddingBottom: 140 }]}>
             <Image
               source={require("@/assets/images/activity-icon.png")}
               style={styles.loginIcon}

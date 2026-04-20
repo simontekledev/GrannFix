@@ -36,10 +36,8 @@ export default function EditProfileScreen() {
 
   const [name, setName] = useState(user?.name ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
   const [area, setArea] = useState(user?.area ?? "");
   const [street, setStreet] = useState(user?.street ?? "");
-  const [city] = useState(user?.city ?? "Stockholm");
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [areaModalVisible, setAreaModalVisible] = useState(false);
@@ -116,8 +114,7 @@ export default function EditProfileScreen() {
         updateMeRequest: {
           name: name.trim(),
           bio: bio.trim(),
-          email: email.trim(),
-          city,
+          city: user?.city ?? "Stockholm",
           area: area.trim(),
           street: street.trim(),
         },
@@ -210,22 +207,6 @@ export default function EditProfileScreen() {
             placeholderTextColor={colors.textMuted}
             multiline
           />
-
-          <Text style={styles.label}>E-post <Text style={formStyles.required}>*</Text></Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-            placeholder="din@email.com"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
-          <Text style={styles.label}>Stad</Text>
-          <View style={[styles.input, styles.disabledInput]}>
-            <Text style={styles.disabledText}>{city}</Text>
-          </View>
 
           <Text style={styles.label}>Område <Text style={formStyles.required}>*</Text></Text>
           <Pressable

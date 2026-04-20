@@ -3,14 +3,12 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -148,7 +146,6 @@ export default function ChatConversationScreen() {
       setMessages((prev) => [...prev, msg]);
       setText("");
       markChatAsRead();
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (e) {
       console.log("Send error:", e);
     } finally {
@@ -301,26 +298,22 @@ export default function ChatConversationScreen() {
         {loading ? (
           <ChatMessagesSkeleton />
         ) : (
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <View style={{ flex: 1 }}>
-              <FlatList
-                ref={flatListRef}
-                data={listItems}
-                keyExtractor={(item) => item.key}
-                renderItem={renderItem}
-                contentContainerStyle={styles.messageList}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
-                keyboardDismissMode="on-drag"
-                keyboardShouldPersistTaps="handled"
-                ListEmptyComponent={
-                  <View style={styles.centered}>
-                    <Text style={styles.emptyText}>Inga meddelanden ännu</Text>
-                    <Text style={styles.emptySubtext}>Skriv ett meddelande för att starta konversationen</Text>
-                  </View>
-                }
-              />
-            </View>
-          </TouchableWithoutFeedback>
+          <FlatList
+            ref={flatListRef}
+            data={[...listItems].reverse()}
+            inverted
+            keyExtractor={(item) => item.key}
+            renderItem={renderItem}
+            contentContainerStyle={styles.messageList}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            ListEmptyComponent={
+              <View style={styles.centered}>
+                <Text style={styles.emptyText}>Inga meddelanden ännu</Text>
+                <Text style={styles.emptySubtext}>Skriv ett meddelande för att starta konversationen</Text>
+              </View>
+            }
+          />
         )}
 
         <View style={[styles.inputRow, { paddingBottom: Math.max(insets.bottom, 12) + 8 }]}>

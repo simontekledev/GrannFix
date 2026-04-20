@@ -1,12 +1,24 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect } from 'react';
 import { Image } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { useTheme } from '@/src/context/ThemeContext';
+import { useUnreadChat } from '@/src/context/UnreadChatContext';
+import { useUser } from '@/src/context/UserContext';
 
 export default function TabLayout() {
   const { mode, colors } = useTheme();
+  const { loggedIn } = useUser();
+  const { unreadCount, refresh } = useUnreadChat();
+
+  useEffect(() => {
+    if (loggedIn) {
+      const timer = setTimeout(refresh, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loggedIn]);
+
 
   return (
     <Tabs
@@ -41,6 +53,8 @@ export default function TabLayout() {
         options={{
           title: 'Chatt',
           tabBarIcon: ({ color }) => <Image source={require("@/assets/images/chat-tab-icon.png")} style={{ width: 32, height: 32, tintColor: color }} resizeMode="contain" />,
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarBadgeStyle: { backgroundColor: colors.accent, fontSize: 12, fontWeight: "700", minWidth: 20, height: 20, lineHeight: 20, borderRadius: 10 },
         }}
       />
       <Tabs.Screen

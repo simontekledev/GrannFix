@@ -68,7 +68,8 @@ public class ChatService {
                     names.get(otherPartyId),
                     images.get(otherPartyId),
                     lastMsg != null ? lastMsg.getContent() : null,
-                    lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt()
+                    lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt(),
+                    lastMsg != null ? lastMsg.getSenderId() : null
             );
         }).toList();
     }

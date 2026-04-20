@@ -12,6 +12,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
+import { UnreadChatProvider } from '@/src/context/UnreadChatContext';
 import { usePushNotifications } from '@/src/hooks/usePushNotifications';
 
 function ThemedStatusBar() {
@@ -78,6 +79,7 @@ export default function RootLayout() {
     <ErrorBoundary>
     <AppThemeProvider>
     <UserProvider>
+    <UnreadChatProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {appReady && (
         <>
@@ -118,6 +120,7 @@ export default function RootLayout() {
         </Animated.View>
       )}
     </ThemeProvider>
+    </UnreadChatProvider>
     </UserProvider>
     </AppThemeProvider>
     </ErrorBoundary>

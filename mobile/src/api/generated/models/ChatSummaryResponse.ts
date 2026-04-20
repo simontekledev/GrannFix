@@ -67,6 +67,12 @@ export interface ChatSummaryResponse {
      * @memberof ChatSummaryResponse
      */
     lastMessageAt?: Date;
+    /**
+     * 
+     * @type {string}
+     * @memberof ChatSummaryResponse
+     */
+    lastMessageSenderId?: string;
 }
 
 /**
@@ -94,6 +100,7 @@ export function ChatSummaryResponseFromJSONTyped(json: any, ignoreDiscriminator:
         'otherPartyProfileImageUrl': json['otherPartyProfileImageUrl'] == null ? undefined : json['otherPartyProfileImageUrl'],
         'lastMessage': json['lastMessage'] == null ? undefined : json['lastMessage'],
         'lastMessageAt': json['lastMessageAt'] == null ? undefined : (new Date(json['lastMessageAt'])),
+        'lastMessageSenderId': json['lastMessageSenderId'] == null ? undefined : json['lastMessageSenderId'],
     };
 }
 
@@ -116,6 +123,7 @@ export function ChatSummaryResponseToJSONTyped(value?: ChatSummaryResponse | nul
         'otherPartyProfileImageUrl': value['otherPartyProfileImageUrl'],
         'lastMessage': value['lastMessage'],
         'lastMessageAt': value['lastMessageAt'] == null ? value['lastMessageAt'] : value['lastMessageAt'].toISOString(),
+        'lastMessageSenderId': value['lastMessageSenderId'],
     };
 }
 

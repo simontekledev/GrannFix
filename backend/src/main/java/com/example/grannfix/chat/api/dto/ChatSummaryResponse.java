@@ -11,5 +11,6 @@ public record ChatSummaryResponse(
         String otherPartyName,
         String otherPartyProfileImageUrl,
         String lastMessage,
-        Instant lastMessageAt
+        Instant lastMessageAt,
+        UUID lastMessageSenderId
 ) {}

@@ -11,7 +11,6 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useFocusEffect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUser } from "@/src/context/UserContext";
 import { chatApi } from "@/src/api/client";
 import type { ChatSummaryResponse } from "@/src/api/generated/models/ChatSummaryResponse";
@@ -19,27 +18,27 @@ import { timeAgo } from "@/src/helpers/time";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatListSkeleton } from "@/src/components/Skeleton";
 import { resolveImageUrl } from "@/src/helpers/images";
+import { useUnreadChat } from "@/src/context/UnreadChatContext";
 
 export default function ChatListScreen() {
   const router = useRouter();
-  const { loggedIn } = useUser();
+  const { loggedIn, user } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { markAsRead, isUnread, refresh: refreshUnread } = useUnreadChat();
   const [chats, setChats] = useState<ChatSummaryResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [lastReadMap, setLastReadMap] = useState<Record<string, string>>({});
 
   const fetchChats = useCallback(async () => {
     try {
       const data = await chatApi.getMyChats();
       setChats(data);
-      const stored = await AsyncStorage.getItem("chat_last_read");
-      if (stored) setLastReadMap(JSON.parse(stored));
+      await refreshUnread();
     } catch (e) {
       console.log("Failed to load chats:", e);
     }
-  }, []);
+  }, [refreshUnread]);
 
   useEffect(() => {
     if (loggedIn) {
@@ -96,22 +95,9 @@ export default function ChatListScreen() {
     );
   }
 
-  async function markAsRead(chatId: string) {
-    const updated = { ...lastReadMap, [chatId]: new Date().toISOString() };
-    setLastReadMap(updated);
-    await AsyncStorage.setItem("chat_last_read", JSON.stringify(updated));
-  }
-
-  function isUnread(item: ChatSummaryResponse): boolean {
-    if (!item.id || !item.lastMessageAt) return false;
-    const lastRead = lastReadMap[item.id];
-    if (!lastRead) return true;
-    return new Date(item.lastMessageAt).getTime() > new Date(lastRead).getTime();
-  }
-
   function renderChat({ item }: { item: ChatSummaryResponse }) {
     const initial = (item.otherPartyName ?? "?").charAt(0).toUpperCase();
-    const unread = isUnread(item);
+    const unread = item.lastMessageSenderId !== user?.id && isUnread(item.id ?? "", item.lastMessageAt);
 
     return (
       <Pressable

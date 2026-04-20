@@ -14,6 +14,7 @@ Name | Type
 `otherPartyProfileImageUrl` | string
 `lastMessage` | string
 `lastMessageAt` | Date
+`lastMessageSenderId` | string
 
 ## Example
 
@@ -30,6 +31,7 @@ const example = {
   "otherPartyProfileImageUrl": null,
   "lastMessage": null,
   "lastMessageAt": null,
+  "lastMessageSenderId": null,
 } satisfies ChatSummaryResponse
 
 console.log(example)

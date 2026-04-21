@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -31,7 +33,10 @@ public class TaskQueryService {
             String city,
             String area,
             String category,
-            String search
+            String search,
+            Integer minPrice,
+            Integer maxPrice,
+            String period
     ) {
         int safeLimit = Math.min(Math.max(limit, 1), 50);
 
@@ -44,6 +49,16 @@ public class TaskQueryService {
         }
         String searchStr = (search != null && !search.isBlank()) ? search.trim() : null;
 
+        Instant createdAfter = null;
+        if (period != null) {
+            createdAfter = switch (period) {
+                case "today" -> Instant.now().truncatedTo(ChronoUnit.DAYS);
+                case "week" -> Instant.now().minus(7, ChronoUnit.DAYS);
+                case "month" -> Instant.now().minus(30, ChronoUnit.DAYS);
+                default -> null;
+            };
+        }
+
         TaskCursor decoded = null;
         if (cursor != null && !cursor.isBlank()) {
             decoded = CursorCodec.decode(cursor);
@@ -52,7 +67,7 @@ public class TaskQueryService {
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
         List<Task> rows;
         if (decoded == null) {
-            rows = taskRepository.findActive(statusStr, blankToNull(city), blankToNull(area), catStr, searchStr, pageable);
+            rows = taskRepository.findActive(statusStr, blankToNull(city), blankToNull(area), catStr, searchStr, minPrice, maxPrice, createdAfter, pageable);
         } else {
             rows = taskRepository.findActiveAfterCursor(
                     statusStr,
@@ -60,6 +75,9 @@ public class TaskQueryService {
                     blankToNull(area),
                     catStr,
                     searchStr,
+                    minPrice,
+                    maxPrice,
+                    createdAfter,
                     decoded.createdAt(),
                     decoded.id(),
                     pageable

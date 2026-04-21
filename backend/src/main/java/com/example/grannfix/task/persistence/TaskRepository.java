@@ -27,6 +27,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       AND (:area IS NULL OR t.area = :area)
       AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
       AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
+      AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
+      AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+      AND (:createdAfter IS NULL OR t.created_at >= :createdAfter)
     ORDER BY t.created_at DESC, t.id DESC
 """, nativeQuery = true)
     List<Task> findActive(
@@ -35,6 +38,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
             @Param("area") String area,
             @Param("category") String category,
             @Param("search") String search,
+            @Param("minPrice") Integer minPrice,
+            @Param("maxPrice") Integer maxPrice,
+            @Param("createdAfter") Instant createdAfter,
             Pageable pageable
     );
 
@@ -46,6 +52,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       AND (:area IS NULL OR t.area = :area)
       AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
       AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
+      AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
+      AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+      AND (:createdAfter IS NULL OR t.created_at >= :createdAfter)
       AND (
             t.created_at < :cursorCreatedAt
             OR (t.created_at = :cursorCreatedAt AND t.id < CAST(:cursorId AS UUID))
@@ -58,6 +67,38 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
             @Param("area") String area,
             @Param("category") String category,
             @Param("search") String search,
+            @Param("minPrice") Integer minPrice,
+            @Param("maxPrice") Integer maxPrice,
+            @Param("createdAfter") Instant createdAfter,
+Frontend (klart eller delvis klart kan tas bort):
+•	Offline-stöd — cachad data utan internet
+•	Animationer — smooth transitions
+•	Task-karta — visa uppdrag på karta
+•	Filtrering — område, pris, datum (utöver kategori)
+•	Custom splash screen — ersätt timeout
+
+Backend:
+•	Chat — websockets istället för polling
+•	Bildhantering — upload/storage (S3)
+•	E-postverifiering — vid registrering
+•	Admin-dashboard
+•	Rapportera användare
+•	Sökindex — fulltext-sökning (tsvector)
+•	Pagination i chat — cursor-baserad
+•	Caching — Redis
+•	Logging/monitoring
+•	CI/CD pipeline
+•	Tester — enhets + integration
+•	GDPR data export
+
+Infrastruktur
+•	Docker Compose — backend + postgres + redis
+•	Azure deployment — container instances eller app service
+•	HTTPS — SSL-certifikat
+•	Domän — grannfix.se
+•	App Store — iOS och Android publicering
+•	EAS Build — Expo Application Services
+
             @Param("cursorCreatedAt") Instant cursorCreatedAt,
             @Param("cursorId") UUID cursorId,
             Pageable pageable

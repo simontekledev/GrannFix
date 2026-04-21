@@ -22,8 +22,11 @@ public class TaskQueryController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String area,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String period
     ) {
-        return taskQueryService.listTasks(cursor, limit, status, city, area, category, search);
+        return taskQueryService.listTasks(cursor, limit, status, city, area, category, search, minPrice, maxPrice, period);
     }
 }

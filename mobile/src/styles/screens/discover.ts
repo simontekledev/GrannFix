@@ -108,7 +108,7 @@ export function createDiscoverStyles(colors: ThemeColors) {
     searchOverlayHeader: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: 16,
+      paddingHorizontal: 24,
       paddingVertical: 10,
       gap: 10,
       borderBottomWidth: 1,
@@ -221,6 +221,42 @@ export function createDiscoverStyles(colors: ThemeColors) {
     categoryChipTextActive: {
       color: "#fff",
       fontWeight: "600",
+    },
+    filterScroll: {
+      marginBottom: 8,
+      marginHorizontal: -24,
+    },
+    filterScrollContent: {
+      paddingHorizontal: 24,
+      gap: 8,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    filterChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    filterChipActive: {
+      backgroundColor: colors.accentMuted,
+      borderColor: colors.accent,
+    },
+    filterChipText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textMuted,
+    },
+    filterChipTextActive: {
+      color: colors.accent,
+      fontWeight: "600",
+    },
+    filterDivider: {
+      width: 1,
+      height: 20,
+      backgroundColor: colors.border,
     },
   });
 }

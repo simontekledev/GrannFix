@@ -14,6 +14,7 @@ import {
   Image,
   Pressable,
   RefreshControl,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -64,6 +65,23 @@ export default function UpptäckScreen() {
   }, []);
 
   const [activeSearch, setActiveSearch] = useState("");
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
+
+  const PRICE_RANGES = [
+    { key: "0-100", label: "0–100 kr", min: 0, max: 100 },
+    { key: "100-300", label: "100–300 kr", min: 100, max: 300 },
+    { key: "300-500", label: "300–500 kr", min: 300, max: 500 },
+    { key: "500+", label: "500+ kr", min: 500, max: undefined },
+  ];
+
+  const PERIODS = [
+    { key: "today", label: "Idag" },
+    { key: "week", label: "Denna vecka" },
+    { key: "month", label: "Denna månad" },
+  ];
+
+  const activePriceRange = PRICE_RANGES.find((p) => p.key === selectedPriceRange);
 
   const fetchTasks = useCallback(async (cursor?: string) => {
     try {
@@ -75,7 +93,10 @@ export default function UpptäckScreen() {
         area: undefined,
         category: selectedCategory ?? undefined,
         search: activeSearch || undefined,
-      });
+        minPrice: activePriceRange?.min,
+        maxPrice: activePriceRange?.max,
+        period: selectedPeriod ?? undefined,
+      } as any);
 
       if (cursor) {
         setTasks((prev) => [...prev, ...(res.items ?? [])]);
@@ -87,7 +108,7 @@ export default function UpptäckScreen() {
     } catch (e: any) {
       console.log("Failed to load tasks:", e);
     }
-  }, [selectedCategory, activeSearch]);
+  }, [selectedCategory, activeSearch, selectedPriceRange, selectedPeriod]);
 
   useFocusEffect(
     useCallback(() => {
@@ -119,7 +140,7 @@ export default function UpptäckScreen() {
         showArea
         distanceText={distanceText}
         actionButton={{
-          label: loggedIn ? "Hjälp till" : "Logga in för att hjälpa till",
+          label: "Hjälp till",
           onPress: () => loggedIn
             ? router.push(`/task-detail?id=${item.id}&offer=true` as any)
             : router.push("/(tabs)/profile?returnTo=index"),
@@ -240,6 +261,33 @@ export default function UpptäckScreen() {
                 </View>
               </Pressable>
             </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterScrollContent}>
+              {PERIODS.map((p) => {
+                const isActive = selectedPeriod === p.key;
+                return (
+                  <Pressable
+                    key={p.key}
+                    onPress={() => setSelectedPeriod(isActive ? null : p.key)}
+                    style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  >
+                    <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>{p.label}</Text>
+                  </Pressable>
+                );
+              })}
+              <View style={styles.filterDivider} />
+              {PRICE_RANGES.map((p) => {
+                const isActive = selectedPriceRange === p.key;
+                return (
+                  <Pressable
+                    key={p.key}
+                    onPress={() => setSelectedPriceRange(isActive ? null : p.key)}
+                    style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  >
+                    <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>{p.label}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
           </>
         }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null}

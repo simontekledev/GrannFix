@@ -14,6 +14,7 @@ import {
   Image,
   Pressable,
   RefreshControl,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -202,26 +203,6 @@ export default function UpptäckScreen() {
         ListHeaderComponent={
           <>
             <Text style={styles.listTitle}>Tillgängliga småjobb</Text>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={TASK_CATEGORIES}
-              keyExtractor={(item) => item.key}
-              style={styles.categoryScroll}
-              contentContainerStyle={styles.categoryScrollContent}
-              renderItem={({ item: cat }) => {
-                const isActive = selectedCategory === cat.key;
-                return (
-                  <Pressable
-                    onPress={() => setSelectedCategory(isActive ? null : cat.key)}
-                    style={[styles.categoryChip, isActive && styles.categoryChipActive]}
-                  >
-                    <Text style={styles.categoryChipEmoji}>{cat.emoji}</Text>
-                    <Text style={[styles.categoryChipText, isActive && styles.categoryChipTextActive]}>{cat.label}</Text>
-                  </Pressable>
-                );
-              }}
-            />
             <View style={styles.searchRow}>
               <TextInput
                 style={styles.searchInput}
@@ -244,13 +225,33 @@ export default function UpptäckScreen() {
                 style={[styles.sortButton, sortNearest && styles.sortButtonActive]}
               >
                 <View style={styles.sortButtonInner}>
-                  <Image source={require("@/assets/images/location-icon-transparent.png")} style={[styles.locationIconSmall, { tintColor: sortNearest ? "#fff" : colors.accent }]} resizeMode="contain" />
+                  <Image source={require("@/assets/images/location-icon-transparent.png")} style={[styles.locationIconSmall, { tintColor: colors.accent }]} resizeMode="contain" />
                   <Text style={[styles.sortButtonText, sortNearest && styles.sortButtonTextActive]}>
                     Närmast
                   </Text>
                 </View>
               </Pressable>
             </View>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={TASK_CATEGORIES}
+              keyExtractor={(item) => item.key}
+              style={styles.categoryScroll}
+              contentContainerStyle={styles.categoryScrollContent}
+              renderItem={({ item: cat }) => {
+                const isActive = selectedCategory === cat.key;
+                return (
+                  <Pressable
+                    onPress={() => setSelectedCategory(isActive ? null : cat.key)}
+                    style={[styles.categoryChip, isActive && styles.categoryChipActive]}
+                  >
+                    <Text style={styles.categoryChipEmoji}>{cat.emoji}</Text>
+                    <Text style={[styles.categoryChipText, isActive && styles.categoryChipTextActive]}>{cat.label}</Text>
+                  </Pressable>
+                );
+              }}
+            />
             <FilterChips
               filters={PRICE_RANGES.map((p) => ({ key: p.key, label: p.label }))}
               active={selectedPriceRange}

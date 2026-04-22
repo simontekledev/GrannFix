@@ -59,7 +59,7 @@ function createStyles(colors: ThemeColors) {
       borderColor: colors.border,
     },
     chipActive: {
-      backgroundColor: colors.accent,
+      backgroundColor: "transparent",
       borderColor: colors.accent,
     },
     chipText: {
@@ -68,7 +68,7 @@ function createStyles(colors: ThemeColors) {
       color: colors.textSecondary,
     },
     chipTextActive: {
-      color: "#fff",
+      color: colors.accent,
       fontWeight: "600",
     },
   });

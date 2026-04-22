@@ -25,28 +25,22 @@ export function createDiscoverStyles(colors: ThemeColors) {
     searchInput: {
       flex: 1,
       backgroundColor: colors.card,
-      borderRadius: 12,
+      borderRadius: 18,
       paddingHorizontal: 14,
-      paddingVertical: 10,
+      paddingVertical: 7,
       fontSize: 15,
       color: colors.textPrimary,
       outlineStyle: "none",
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
+      borderWidth: 1,
+      borderColor: colors.border,
     } as any,
     sortButton: {
       backgroundColor: colors.card,
-      borderRadius: 12,
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
+      borderRadius: 18,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     sortButtonInner: {
       flexDirection: "row",
@@ -67,11 +61,11 @@ export function createDiscoverStyles(colors: ThemeColors) {
       height: 18,
     },
     sortButtonActive: {
-      backgroundColor: colors.accent,
+      backgroundColor: "transparent",
       borderColor: colors.accent,
     },
     sortButtonTextActive: {
-      color: "#fff",
+      color: colors.accent,
     },
     listTitle: {
       fontSize: 15,
@@ -207,7 +201,7 @@ export function createDiscoverStyles(colors: ThemeColors) {
       borderColor: colors.border,
     },
     categoryChipActive: {
-      backgroundColor: colors.accent,
+      backgroundColor: "transparent",
       borderColor: colors.accent,
     },
     categoryChipEmoji: {
@@ -219,7 +213,7 @@ export function createDiscoverStyles(colors: ThemeColors) {
       color: colors.textSecondary,
     },
     categoryChipTextActive: {
-      color: "#fff",
+      color: colors.accent,
       fontWeight: "600",
     },
     filterScroll: {

@@ -124,11 +124,14 @@ export default function ChatListScreen() {
               <Text style={[styles.chatTime, unread && styles.chatTimeUnread]}>{timeAgo(item.lastMessageAt)}</Text>
             )}
           </View>
-          {item.taskTitle && (
-            <Text style={styles.chatTask} numberOfLines={1}>{item.taskTitle}</Text>
-          )}
           {item.lastMessage && (
             <Text style={[styles.chatPreview, unread && styles.chatPreviewUnread]} numberOfLines={1}>{item.lastMessage}</Text>
+          )}
+          {item.taskTitle && (
+            <View style={styles.chatTaskRow}>
+              <Text style={styles.chatTaskIcon}>🔗</Text>
+              <Text style={styles.chatTaskTitle} numberOfLines={1}>{item.taskTitle}</Text>
+            </View>
           )}
         </View>
         {unread && <View style={styles.unreadDot} />}
@@ -285,15 +288,25 @@ function createStyles(colors: ThemeColors) {
       fontSize: 12,
       color: colors.textMuted,
     },
-    chatTask: {
-      fontSize: 13,
-      color: colors.accent,
-      fontWeight: "500",
-      marginBottom: 2,
+    chatTaskRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 5,
+    },
+    chatTaskIcon: {
+      fontSize: 10,
+      marginRight: 4,
+      opacity: 0.6,
+    },
+    chatTaskTitle: {
+      fontSize: 11,
+      color: colors.textMuted,
+      opacity: 0.7,
+      flexShrink: 1,
     },
     chatPreview: {
       fontSize: 14,
-      color: colors.textMuted,
+      color: colors.textSecondary,
       lineHeight: 18,
     },
     chatNameUnread: {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -295,10 +295,15 @@ export default function TaskDetailScreen() {
     })();
   }, [id]);
 
+  const hasMounted = useRef(false);
   useFocusEffect(
     useCallback(() => {
-      if (id && !loading) reloadTask();
-    }, [id, loading, reloadTask])
+      if (!hasMounted.current) {
+        hasMounted.current = true;
+        return;
+      }
+      if (id) reloadTask();
+    }, [id, reloadTask])
   );
 
   async function handleCancel() {

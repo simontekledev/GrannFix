@@ -1,5 +1,6 @@
-import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
+import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 interface Filter {
   key: string | null;
@@ -13,58 +14,62 @@ interface FilterChipsProps {
 }
 
 export function FilterChips({ filters, active, onChange }: FilterChipsProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
-    <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-        {filters.map((f) => (
-          <Pressable
-            key={f.key ?? "all"}
-            onPress={() => onChange(f.key)}
-            style={[
-              styles.chip,
-              active === f.key && styles.chipActive,
-            ]}
-          >
-            <Text style={[
-              styles.chipText,
-              active === f.key && styles.chipTextActive,
-            ]}>
-              {f.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </View>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll} contentContainerStyle={styles.row}>
+      {filters.map((f) => (
+        <Pressable
+          key={f.key ?? "all"}
+          onPress={() => onChange(active === f.key ? null : f.key)}
+          style={[
+            styles.chip,
+            active === f.key && styles.chipActive,
+          ]}
+        >
+          <Text style={[
+            styles.chipText,
+            active === f.key && styles.chipTextActive,
+          ]}>
+            {f.label}
+          </Text>
+        </Pressable>
+      ))}
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 4,
-  },
-  row: {
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  chipActive: {
-    backgroundColor: "#16A34A",
-    borderColor: "#16A34A",
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#666",
-  },
-  chipTextActive: {
-    color: "#fff",
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    scroll: {
+      marginBottom: 8,
+      marginHorizontal: -24,
+    },
+    row: {
+      paddingHorizontal: 24,
+      gap: 8,
+    },
+    chip: {
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 18,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    chipActive: {
+      backgroundColor: colors.accent,
+      borderColor: colors.accent,
+    },
+    chipText: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textSecondary,
+    },
+    chipTextActive: {
+      color: "#fff",
+      fontWeight: "600",
+    },
+  });
+}

@@ -5,7 +5,7 @@ import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { formatDistance, getDistanceKm, AREA_COORDS } from "@/src/helpers/distance";
 import { useUser } from "@/src/context/UserContext";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -14,7 +14,6 @@ import {
   Image,
   Pressable,
   RefreshControl,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -24,6 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createDiscoverStyles } from "@/src/styles/screens/discover";
 import { TASK_CATEGORIES } from "@/src/helpers/categories";
+import { FilterChips } from "@/src/components/FilterChips";
 
 
 export default function UpptäckScreen() {
@@ -65,7 +65,6 @@ export default function UpptäckScreen() {
   }, []);
 
   const [activeSearch, setActiveSearch] = useState("");
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(null);
 
   const PRICE_RANGES = [
@@ -75,15 +74,8 @@ export default function UpptäckScreen() {
     { key: "500+", label: "500+ kr", min: 500, max: undefined },
   ];
 
-  const PERIODS = [
-    { key: "today", label: "Idag" },
-    { key: "week", label: "Denna vecka" },
-    { key: "month", label: "Denna månad" },
-  ];
-
-  const activePriceRange = PRICE_RANGES.find((p) => p.key === selectedPriceRange);
-
   const fetchTasks = useCallback(async (cursor?: string) => {
+    const priceRange = PRICE_RANGES.find((p) => p.key === selectedPriceRange);
     try {
       const res = await taskQueryApi.listTasks({
         cursor,
@@ -93,10 +85,10 @@ export default function UpptäckScreen() {
         area: undefined,
         category: selectedCategory ?? undefined,
         search: activeSearch || undefined,
-        minPrice: activePriceRange?.min,
-        maxPrice: activePriceRange?.max,
-        period: selectedPeriod ?? undefined,
-      } as any);
+        minPrice: priceRange?.min,
+        maxPrice: priceRange?.max,
+        period: undefined,
+      });
 
       if (cursor) {
         setTasks((prev) => [...prev, ...(res.items ?? [])]);
@@ -108,13 +100,11 @@ export default function UpptäckScreen() {
     } catch (e: any) {
       console.log("Failed to load tasks:", e);
     }
-  }, [selectedCategory, activeSearch, selectedPriceRange, selectedPeriod]);
+  }, [selectedCategory, activeSearch, selectedPriceRange]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchTasks().finally(() => setLoading(false));
-    }, [fetchTasks])
-  );
+  useEffect(() => {
+    fetchTasks().finally(() => setLoading(false));
+  }, [fetchTasks]);
 
   async function onRefresh() {
     setRefreshing(true);
@@ -261,33 +251,11 @@ export default function UpptäckScreen() {
                 </View>
               </Pressable>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterScrollContent}>
-              {PERIODS.map((p) => {
-                const isActive = selectedPeriod === p.key;
-                return (
-                  <Pressable
-                    key={p.key}
-                    onPress={() => setSelectedPeriod(isActive ? null : p.key)}
-                    style={[styles.filterChip, isActive && styles.filterChipActive]}
-                  >
-                    <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>{p.label}</Text>
-                  </Pressable>
-                );
-              })}
-              <View style={styles.filterDivider} />
-              {PRICE_RANGES.map((p) => {
-                const isActive = selectedPriceRange === p.key;
-                return (
-                  <Pressable
-                    key={p.key}
-                    onPress={() => setSelectedPriceRange(isActive ? null : p.key)}
-                    style={[styles.filterChip, isActive && styles.filterChipActive]}
-                  >
-                    <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>{p.label}</Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
+            <FilterChips
+              filters={PRICE_RANGES.map((p) => ({ key: p.key, label: p.label }))}
+              active={selectedPriceRange}
+              onChange={setSelectedPriceRange}
+            />
           </>
         }
         ListFooterComponent={loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null}

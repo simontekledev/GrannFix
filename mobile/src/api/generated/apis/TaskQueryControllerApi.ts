@@ -30,6 +30,9 @@ export interface ListTasksRequest {
     area?: string;
     category?: string;
     search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    period?: string;
 }
 
 /**
@@ -69,6 +72,18 @@ export class TaskQueryControllerApi extends runtime.BaseAPI {
 
         if (requestParameters['search'] != null) {
             queryParameters['search'] = requestParameters['search'];
+        }
+
+        if (requestParameters['minPrice'] != null) {
+            queryParameters['minPrice'] = requestParameters['minPrice'];
+        }
+
+        if (requestParameters['maxPrice'] != null) {
+            queryParameters['maxPrice'] = requestParameters['maxPrice'];
+        }
+
+        if (requestParameters['period'] != null) {
+            queryParameters['period'] = requestParameters['period'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

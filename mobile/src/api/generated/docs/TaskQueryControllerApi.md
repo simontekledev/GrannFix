@@ -10,7 +10,7 @@ All URIs are relative to *http://localhost:8080*
 
 ## listTasks
 
-> CursorPageResponseTaskResponse listTasks(cursor, limit, status, city, area, category, search)
+> CursorPageResponseTaskResponse listTasks(cursor, limit, status, city, area, category, search, minPrice, maxPrice, period)
 
 
 
@@ -46,6 +46,12 @@ async function example() {
     category: category_example,
     // string (optional)
     search: search_example,
+    // number (optional)
+    minPrice: 56,
+    // number (optional)
+    maxPrice: 56,
+    // string (optional)
+    period: period_example,
   } satisfies ListTasksRequest;
 
   try {
@@ -72,6 +78,9 @@ example().catch(console.error);
 | **area** | `string` |  | [Optional] [Defaults to `undefined`] |
 | **category** | `string` |  | [Optional] [Defaults to `undefined`] |
 | **search** | `string` |  | [Optional] [Defaults to `undefined`] |
+| **minPrice** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **maxPrice** | `number` |  | [Optional] [Defaults to `undefined`] |
+| **period** | `string` |  | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

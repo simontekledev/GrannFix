@@ -93,8 +93,8 @@ public class TaskService {
         Task task = taskRepository.findByIdAndActiveTrue(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found"));
 
-        boolean isOwner = task.getCreatedById().equals(userId);
-        boolean isHelper = userId.equals(task.getAssignedToId());
+        boolean isOwner = userId != null && task.getCreatedById().equals(userId);
+        boolean isHelper = userId != null && userId.equals(task.getAssignedToId());
         if (!isOwner && !isHelper && task.getStatus() != TaskStatus.OPEN) {
             throw new ForbiddenException("Forbidden");
         }
@@ -102,8 +102,8 @@ public class TaskService {
         String ownerImage = userLookupPort.profileImageUrl(task.getCreatedById());
         String helperName = task.getAssignedToId() != null ? userLookupPort.displayName(task.getAssignedToId()) : null;
         String helperImage = task.getAssignedToId() != null ? userLookupPort.profileImageUrl(task.getAssignedToId()) : null;
-        int pendingOffers = offerTaskPort.countPendingOffers(taskId);
-        boolean viewerHasOffer = offerTaskPort.hasOffer(taskId, userId);
+        int pendingOffers = isOwner ? offerTaskPort.countPendingOffers(taskId) : 0;
+        boolean viewerHasOffer = !isOwner && userId != null && offerTaskPort.hasOffer(taskId, userId);
         return TaskMapper.toDetailResponse(task, userId, ownerName, ownerImage, helperName, helperImage, pendingOffers, viewerHasOffer);
     }
 

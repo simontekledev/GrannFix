@@ -4,6 +4,7 @@ import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
 import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
+import com.example.grannfix.common.contracts.BlockLookupPort;
 import com.example.grannfix.common.contracts.PushPort;
 import com.example.grannfix.chat.application.port.out.TaskChatPort;
 import com.example.grannfix.chat.application.port.out.TaskChatPort.TaskChatView;
@@ -36,6 +37,7 @@ public class ChatService {
     private final TaskChatPort taskChatPort;
     private final UserLookupPort userLookupPort;
     private final PushPort pushPort;
+    private final BlockLookupPort blockLookupPort;
 
     @Transactional(readOnly = true)
     public List<ChatSummaryResponse> getMyChats(UUID userId) {
@@ -90,6 +92,10 @@ public class ChatService {
             throw new ForbiddenException("You are not part of this task");
         }
 
+        if (task.assignedToId() != null && blockLookupPort.isBlockedEitherWay(task.createdById(), task.assignedToId())) {
+            throw new ForbiddenException("You cannot chat with this user.");
+        }
+
         Chat chat = chatRepository.findByTaskId(taskId)
                 .orElseGet(() -> chatRepository.save(
                         Chat.builder()
@@ -125,6 +131,11 @@ public class ChatService {
                 .orElseThrow(() -> new NotFoundException("Chat not found"));
 
         validateParticipant(chat, userId);
+
+        UUID otherParty = chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId();
+        if (blockLookupPort.isBlockedEitherWay(userId, otherParty)) {
+            throw new ForbiddenException("You cannot message this user.");
+        }
 
         ChatMessage message = messageRepository.save(
                 ChatMessage.builder()

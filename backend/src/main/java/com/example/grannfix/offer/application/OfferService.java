@@ -1,5 +1,6 @@
 package com.example.grannfix.offer.application;
 
+import com.example.grannfix.common.contracts.BlockLookupPort;
 import com.example.grannfix.common.contracts.PushPort;
 import com.example.grannfix.common.contracts.UserLookupPort;
 import com.example.grannfix.common.errors.BadRequestException;
@@ -35,6 +36,7 @@ public class OfferService {
     private final UserLookupPort userLookupPort;
     private final UserRatingPort userRatingPort;
     private final PushPort pushPort;
+    private final BlockLookupPort blockLookupPort;
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
         if (!userLookupPort.isVerified(helperId)) {
@@ -45,6 +47,9 @@ public class OfferService {
 
         if (task.createdById().equals(helperId)) {
             throw new ForbiddenException("You cannot create an offer for your own task.");
+        }
+        if (blockLookupPort.isBlockedEitherWay(helperId, task.createdById())) {
+            throw new ForbiddenException("You cannot interact with this user.");
         }
         if (!task.offerable()) {
             throw new BadRequestException("Task is not open for offers.");

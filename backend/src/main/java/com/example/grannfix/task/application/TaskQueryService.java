@@ -1,5 +1,6 @@
 package com.example.grannfix.task.application;
 
+import com.example.grannfix.common.contracts.BlockLookupPort;
 import com.example.grannfix.task.api.dto.CursorPageResponse;
 import com.example.grannfix.task.api.dto.TaskCursor;
 import com.example.grannfix.task.api.dto.TaskResponse;
@@ -18,15 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TaskQueryService {
 
     private final TaskRepository taskRepository;
+    private final BlockLookupPort blockLookupPort;
 
     @Transactional(readOnly = true)
     public CursorPageResponse<TaskResponse> listTasks(
+            UUID currentUserId,
             String cursor,
             int limit,
             TaskStatus status,
@@ -82,6 +87,15 @@ public class TaskQueryService {
                     decoded.id(),
                     pageable
             );
+        }
+
+        Set<UUID> excludedIds = currentUserId != null
+                ? blockLookupPort.getBlockedAndBlockerIds(currentUserId)
+                : Set.of();
+        if (!excludedIds.isEmpty()) {
+            rows = rows.stream()
+                    .filter(t -> !excludedIds.contains(t.getCreatedById()))
+                    .toList();
         }
 
         boolean hasMore = rows.size() > safeLimit;

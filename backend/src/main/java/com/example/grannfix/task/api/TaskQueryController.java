@@ -5,7 +5,10 @@ import com.example.grannfix.task.api.dto.TaskResponse;
 import com.example.grannfix.task.domain.TaskStatus;
 import com.example.grannfix.task.application.TaskQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tasks")
@@ -16,6 +19,7 @@ public class TaskQueryController {
 
     @GetMapping
     public CursorPageResponse<TaskResponse> listTasks(
+            @AuthenticationPrincipal UUID userId,
             @RequestParam(required = false) String cursor,
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(required = false) TaskStatus status,
@@ -27,6 +31,6 @@ public class TaskQueryController {
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(required = false) String period
     ) {
-        return taskQueryService.listTasks(cursor, limit, status, city, area, category, search, minPrice, maxPrice, period);
+        return taskQueryService.listTasks(userId, cursor, limit, status, city, area, category, search, minPrice, maxPrice, period);
     }
 }

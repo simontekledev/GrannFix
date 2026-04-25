@@ -7,6 +7,8 @@ import { ChatControllerApi } from "./generated/apis/ChatControllerApi";
 import { TaskOfferControllerApi } from "./generated/apis/TaskOfferControllerApi";
 import { OfferControllerApi } from "./generated/apis/OfferControllerApi";
 import { NotificationControllerApi } from "./generated/apis/NotificationControllerApi";
+import { BlockControllerApi } from "./generated/apis/BlockControllerApi";
+import { ReportControllerApi } from "./generated/apis/ReportControllerApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 
@@ -77,3 +79,5 @@ export const chatApi = new ChatControllerApi(config);
 export const taskOfferApi = new TaskOfferControllerApi(config);
 export const offerApi = new OfferControllerApi(config);
 export const notificationApi = new NotificationControllerApi(config);
+export const blockApi = new BlockControllerApi(config);
+export const reportApi = new ReportControllerApi(config);

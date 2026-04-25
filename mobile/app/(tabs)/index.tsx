@@ -5,6 +5,7 @@ import { TaskCard } from "@/src/components/TaskCard";
 import { DiscoverListSkeleton } from "@/src/components/Skeleton";
 import { formatDistance, getDistanceKm, AREA_COORDS } from "@/src/helpers/distance";
 import { useUser } from "@/src/context/UserContext";
+import { useBlockedUsers } from "@/src/context/BlockedUsersContext";
 import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -39,6 +40,7 @@ export default function UpptäckScreen() {
   const [hasMore, setHasMore] = useState(false);
   const { user, loggedIn } = useUser();
   const userId = user?.id ?? null;
+  const { isBlocked } = useBlockedUsers();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -178,7 +180,7 @@ export default function UpptäckScreen() {
       </SafeAreaView>
       <FlatList
         data={(() => {
-          let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
+          let filtered = tasks.filter((t) => t.createdById !== userId && !isBlocked(t.createdById));
           if (sortNearest && userLocation) {
             filtered = [...filtered].sort((a, b) => {
               const coordsA = a.area ? AREA_COORDS[a.area] : null;
@@ -308,7 +310,7 @@ export default function UpptäckScreen() {
             </View>
             <FlatList
               data={(() => {
-                let filtered = userId ? tasks.filter((t) => t.createdById !== userId) : tasks;
+                let filtered = tasks.filter((t) => t.createdById !== userId && !isBlocked(t.createdById));
                 if (sortNearest && userLocation) {
                   filtered = [...filtered].sort((a, b) => {
                     const coordsA = a.area ? AREA_COORDS[a.area] : null;

@@ -128,7 +128,21 @@ export default function PublicUserScreen() {
           )}
           <Text style={styles.profileName}>{user.name ?? "—"}</Text>
 
-          <StarRating rating={user.ratingAverage ?? 0} color="green" />
+          {(user.ratingCount ?? 0) > 0 ? (
+            <Pressable
+              onPress={() => router.push(`/user-reviews?id=${id}&name=${encodeURIComponent(user.name ?? "")}` as any)}
+              style={({ pressed }) => [styles.ratingPressable, pressed && { opacity: 0.6 }]}
+            >
+              <StarRating rating={user.ratingAverage ?? 0} color="green" />
+              <Text style={styles.reviewsLink}>
+                {user.ratingCount === 1
+                  ? "1 recension ›"
+                  : `${user.ratingCount} recensioner ›`}
+              </Text>
+            </Pressable>
+          ) : (
+            <StarRating rating={user.ratingAverage ?? 0} color="green" />
+          )}
 
           {user.bio ? (
             <Text style={styles.bioText}>{user.bio}</Text>
@@ -275,6 +289,17 @@ function createStyles(colors: ThemeColors) {
       fontWeight: "700",
       color: colors.textPrimary,
       marginBottom: 6,
+    },
+    ratingPressable: {
+      alignItems: "center",
+      paddingVertical: 4,
+      marginBottom: 6,
+    },
+    reviewsLink: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.accent,
+      marginTop: -4,
     },
     bioText: {
       fontSize: 15,

@@ -101,6 +101,7 @@ export default function RootLayout() {
             <Stack.Screen name="chat-conversation" options={{ headerShown: false }} />
             <Stack.Screen name="notifications" options={{ headerShown: false }} />
             <Stack.Screen name="blocked-users" options={{ headerShown: false }} />
+            <Stack.Screen name="user-reviews" options={{ headerShown: false }} />
             <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
             <Stack.Screen name="reset-password" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

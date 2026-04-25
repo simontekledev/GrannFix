@@ -29,6 +29,8 @@
 
 🔔 **Push notifications** — Never miss a new offer or message
 
+🛡️ **Safety controls** — Report inappropriate users and block anyone to hide their tasks, offers, and messages
+
 🌙 **Dark mode** — Full dark theme support across the app
 
 ---
@@ -55,6 +57,7 @@ GrannFix/
 │   ├── task/         # Tasks, categories, search
 │   ├── offer/        # Offers, ratings
 │   ├── chat/         # Messages
+│   ├── moderation/   # User reports and blocks
 │   └── notification/ # Push (FCM)
 └── mobile/           # React Native (Expo)
     ├── app/          # Screens (Expo Router)

@@ -80,6 +80,10 @@ export default function SettingsScreen() {
     { icon: require("@/assets/images/info-icon.png"), label: "Om Grannfix", onPress: () => router.push("/about") },
   ];
 
+  const PRIVACY_ROWS = [
+    { icon: require("@/assets/images/blocked-user-icon.png"), label: "Blockerade användare", onPress: () => router.push("/blocked-users") },
+  ];
+
   function renderRow(item: { icon: any; label: string; onPress: () => void }, index: number, isLast: boolean) {
     return (
       <View key={index}>
@@ -114,6 +118,11 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>KONTO</Text>
         <View style={styles.card}>
           {ACCOUNT_ROWS.map((item, i) => renderRow(item, i, i === ACCOUNT_ROWS.length - 1))}
+        </View>
+
+        <Text style={styles.sectionTitle}>INTEGRITET</Text>
+        <View style={styles.card}>
+          {PRIVACY_ROWS.map((item, i) => renderRow(item, i, i === PRIVACY_ROWS.length - 1))}
         </View>
 
         <Text style={styles.sectionTitle}>APP</Text>

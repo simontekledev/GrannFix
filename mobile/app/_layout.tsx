@@ -13,6 +13,7 @@ import { UserProvider } from '@/src/context/UserContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { UnreadChatProvider } from '@/src/context/UnreadChatContext';
+import { BlockedUsersProvider } from '@/src/context/BlockedUsersContext';
 import { usePushNotifications } from '@/src/hooks/usePushNotifications';
 
 function ThemedStatusBar() {
@@ -40,6 +41,7 @@ export default function RootLayout() {
         Asset.loadAsync([
           require("@/assets/images/pen-icon.png"),
           require("@/assets/images/keylock-icon.png"),
+          require("@/assets/images/blocked-user-icon.png"),
           require("@/assets/images/notification-icon.png"),
           require("@/assets/images/info-icon.png"),
           require("@/assets/images/theme-icon.png"),
@@ -80,6 +82,7 @@ export default function RootLayout() {
     <AppThemeProvider>
     <UserProvider>
     <UnreadChatProvider>
+    <BlockedUsersProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       {appReady && (
         <>
@@ -97,6 +100,7 @@ export default function RootLayout() {
             <Stack.Screen name="register" options={{ headerShown: false }} />
             <Stack.Screen name="chat-conversation" options={{ headerShown: false }} />
             <Stack.Screen name="notifications" options={{ headerShown: false }} />
+            <Stack.Screen name="blocked-users" options={{ headerShown: false }} />
             <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
             <Stack.Screen name="reset-password" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
@@ -120,6 +124,7 @@ export default function RootLayout() {
         </Animated.View>
       )}
     </ThemeProvider>
+    </BlockedUsersProvider>
     </UnreadChatProvider>
     </UserProvider>
     </AppThemeProvider>

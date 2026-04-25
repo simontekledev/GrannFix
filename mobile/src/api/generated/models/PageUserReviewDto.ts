@@ -27,100 +27,100 @@ import {
     SortObjectToJSON,
     SortObjectToJSONTyped,
 } from './SortObject';
-import type { AdminReportDto } from './AdminReportDto';
+import type { UserReviewDto } from './UserReviewDto';
 import {
-    AdminReportDtoFromJSON,
-    AdminReportDtoFromJSONTyped,
-    AdminReportDtoToJSON,
-    AdminReportDtoToJSONTyped,
-} from './AdminReportDto';
+    UserReviewDtoFromJSON,
+    UserReviewDtoFromJSONTyped,
+    UserReviewDtoToJSON,
+    UserReviewDtoToJSONTyped,
+} from './UserReviewDto';
 
 /**
  * 
  * @export
- * @interface PageAdminReportDto
+ * @interface PageUserReviewDto
  */
-export interface PageAdminReportDto {
+export interface PageUserReviewDto {
     /**
      * 
      * @type {number}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     totalElements?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     totalPages?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     size?: number;
     /**
      * 
-     * @type {Array<AdminReportDto>}
-     * @memberof PageAdminReportDto
+     * @type {Array<UserReviewDto>}
+     * @memberof PageUserReviewDto
      */
-    content?: Array<AdminReportDto>;
+    content?: Array<UserReviewDto>;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     number?: number;
     /**
      * 
      * @type {SortObject}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     sort?: SortObject;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     numberOfElements?: number;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     first?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     last?: boolean;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     pageable?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminReportDto
+     * @memberof PageUserReviewDto
      */
     empty?: boolean;
 }
 
 /**
- * Check if a given object implements the PageAdminReportDto interface.
+ * Check if a given object implements the PageUserReviewDto interface.
  */
-export function instanceOfPageAdminReportDto(value: object): value is PageAdminReportDto {
+export function instanceOfPageUserReviewDto(value: object): value is PageUserReviewDto {
     return true;
 }
 
-export function PageAdminReportDtoFromJSON(json: any): PageAdminReportDto {
-    return PageAdminReportDtoFromJSONTyped(json, false);
+export function PageUserReviewDtoFromJSON(json: any): PageUserReviewDto {
+    return PageUserReviewDtoFromJSONTyped(json, false);
 }
 
-export function PageAdminReportDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageAdminReportDto {
+export function PageUserReviewDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageUserReviewDto {
     if (json == null) {
         return json;
     }
@@ -129,7 +129,7 @@ export function PageAdminReportDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
         'size': json['size'] == null ? undefined : json['size'],
-        'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminReportDtoFromJSON)),
+        'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(UserReviewDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
         'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
         'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
@@ -140,11 +140,11 @@ export function PageAdminReportDtoFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function PageAdminReportDtoToJSON(json: any): PageAdminReportDto {
-    return PageAdminReportDtoToJSONTyped(json, false);
+export function PageUserReviewDtoToJSON(json: any): PageUserReviewDto {
+    return PageUserReviewDtoToJSONTyped(json, false);
 }
 
-export function PageAdminReportDtoToJSONTyped(value?: PageAdminReportDto | null, ignoreDiscriminator: boolean = false): any {
+export function PageUserReviewDtoToJSONTyped(value?: PageUserReviewDto | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -154,7 +154,7 @@ export function PageAdminReportDtoToJSONTyped(value?: PageAdminReportDto | null,
         'totalElements': value['totalElements'],
         'totalPages': value['totalPages'],
         'size': value['size'],
-        'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminReportDtoToJSON)),
+        'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(UserReviewDtoToJSON)),
         'number': value['number'],
         'sort': SortObjectToJSON(value['sort']),
         'numberOfElements': value['numberOfElements'],

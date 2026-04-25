@@ -41,6 +41,7 @@ docs/OfferControllerApi.md
 docs/OfferResponse.md
 docs/PageAdminReportDto.md
 docs/PageAdminUserDto.md
+docs/PageUserReviewDto.md
 docs/Pageable.md
 docs/PageableObject.md
 docs/Permissions.md
@@ -65,6 +66,7 @@ docs/UpdateMeRequest.md
 docs/UpdateReportStatusRequest.md
 docs/UpdateTaskRequest.md
 docs/UserControllerApi.md
+docs/UserReviewDto.md
 docs/UserSummary.md
 docs/VerifyOtpRequest.md
 index.ts
@@ -88,6 +90,7 @@ models/MyOfferResponse.ts
 models/OfferResponse.ts
 models/PageAdminReportDto.ts
 models/PageAdminUserDto.ts
+models/PageUserReviewDto.ts
 models/Pageable.ts
 models/PageableObject.ts
 models/Permissions.ts
@@ -106,6 +109,7 @@ models/TaskSummary.ts
 models/UpdateMeRequest.ts
 models/UpdateReportStatusRequest.ts
 models/UpdateTaskRequest.ts
+models/UserReviewDto.ts
 models/UserSummary.ts
 models/VerifyOtpRequest.ts
 models/index.ts

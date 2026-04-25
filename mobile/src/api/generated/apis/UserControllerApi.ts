@@ -17,6 +17,8 @@ import * as runtime from '../runtime';
 import type {
   ChangePasswordRequest,
   MeUserDto,
+  PageUserReviewDto,
+  Pageable,
   PublicUserDto,
   UpdateMeRequest,
 } from '../models/index';
@@ -25,6 +27,10 @@ import {
     ChangePasswordRequestToJSON,
     MeUserDtoFromJSON,
     MeUserDtoToJSON,
+    PageUserReviewDtoFromJSON,
+    PageUserReviewDtoToJSON,
+    PageableFromJSON,
+    PageableToJSON,
     PublicUserDtoFromJSON,
     PublicUserDtoToJSON,
     UpdateMeRequestFromJSON,
@@ -37,6 +43,11 @@ export interface ChangePasswordOperationRequest {
 
 export interface GetPublicUserRequest {
     id: string;
+}
+
+export interface GetUserReviewsRequest {
+    id: string;
+    pageable: Pageable;
 }
 
 export interface UpdateMeOperationRequest {
@@ -238,6 +249,68 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async getPublicUser(requestParameters: GetPublicUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PublicUserDto> {
         const response = await this.getPublicUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getUserReviews without sending the request
+     */
+    async getUserReviewsRequestOpts(requestParameters: GetUserReviewsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getUserReviews().'
+            );
+        }
+
+        if (requestParameters['pageable'] == null) {
+            throw new runtime.RequiredError(
+                'pageable',
+                'Required parameter "pageable" was null or undefined when calling getUserReviews().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['pageable'] != null) {
+            queryParameters['pageable'] = requestParameters['pageable'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/users/{id}/reviews`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async getUserReviewsRaw(requestParameters: GetUserReviewsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageUserReviewDto>> {
+        const requestOptions = await this.getUserReviewsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PageUserReviewDtoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUserReviews(requestParameters: GetUserReviewsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageUserReviewDto> {
+        const response = await this.getUserReviewsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

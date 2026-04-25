@@ -8,6 +8,7 @@ All URIs are relative to *http://localhost:8080*
 | [**deleteProfileImage**](UserControllerApi.md#deleteprofileimage) | **DELETE** /users/me/profile-image |  |
 | [**getMe**](UserControllerApi.md#getme) | **GET** /users/me |  |
 | [**getPublicUser**](UserControllerApi.md#getpublicuser) | **GET** /users/{id} |  |
+| [**getUserReviews**](UserControllerApi.md#getuserreviews) | **GET** /users/{id}/reviews |  |
 | [**removeMe**](UserControllerApi.md#removeme) | **DELETE** /users/me |  |
 | [**updateMe**](UserControllerApi.md#updatemeoperation) | **PATCH** /users/me |  |
 | [**uploadProfileImage**](UserControllerApi.md#uploadprofileimage) | **POST** /users/me/profile-image |  |
@@ -255,6 +256,78 @@ example().catch(console.error);
 ### Return type
 
 [**PublicUserDto**](PublicUserDto.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getUserReviews
+
+> PageUserReviewDto getUserReviews(id, pageable)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UserControllerApi,
+} from '';
+import type { GetUserReviewsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new UserControllerApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+    // Pageable
+    pageable: ...,
+  } satisfies GetUserReviewsRequest;
+
+  try {
+    const data = await api.getUserReviews(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+| **pageable** | [](.md) |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**PageUserReviewDto**](PageUserReviewDto.md)
 
 ### Authorization
 

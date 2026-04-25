@@ -20,6 +20,7 @@ import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatMessagesSkeleton } from "@/src/components/Skeleton";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
+import { UserActionSheet } from "@/src/components/UserActionSheet";
 
 type ListItem =
   | { type: "date"; key: string; label: string }
@@ -83,6 +84,7 @@ export default function ChatConversationScreen() {
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [showActions, setShowActions] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -287,8 +289,30 @@ export default function ChatConversationScreen() {
             <Text style={styles.headerTask} numberOfLines={1}>{taskTitle}</Text>
           )}
         </Pressable>
-        <Text style={styles.headerChevron}>›</Text>
+        {otherUserId ? (
+          <Pressable
+            onPress={() => setShowActions(true)}
+            style={({ pressed }) => [styles.headerMenu, pressed && { opacity: 0.5 }]}
+            hitSlop={12}
+          >
+            <Text style={styles.headerMenuText}>⋯</Text>
+          </Pressable>
+        ) : (
+          <Text style={styles.headerChevron}>›</Text>
+        )}
       </View>
+
+      {otherUserId && (
+        <UserActionSheet
+          visible={showActions}
+          onClose={() => setShowActions(false)}
+          userId={otherUserId}
+          userName={name}
+          contextTaskId={taskId}
+          contextChatId={chatId}
+          onBlocked={() => router.replace("/(tabs)/chat" as any)}
+        />
+      )}
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -419,6 +443,19 @@ function createStyles(colors: ThemeColors) {
       color: colors.textMuted,
       marginLeft: 8,
       marginRight: 4,
+    },
+    headerMenu: {
+      width: 36,
+      height: 36,
+      alignItems: "center",
+      justifyContent: "center",
+      marginLeft: 4,
+    },
+    headerMenuText: {
+      fontSize: 24,
+      color: colors.textPrimary,
+      fontWeight: "700",
+      marginTop: -10,
     },
     messageList: {
       paddingHorizontal: 16,

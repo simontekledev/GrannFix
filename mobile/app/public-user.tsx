@@ -14,16 +14,23 @@ import { userApi } from "@/src/api/client";
 import type { PublicUserDto } from "@/src/api/generated/models/PublicUserDto";
 import { StarRating } from "@/src/components/StarRating";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
+import { useUser } from "@/src/context/UserContext";
 import { resolveImageUrl } from "@/src/helpers/images";
+import { UserActionSheet } from "@/src/components/UserActionSheet";
 
 export default function PublicUserScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { user: currentUser, loggedIn } = useUser();
   const [user, setUser] = useState<PublicUserDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [showVerifiedTooltip, setShowVerifiedTooltip] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+
+  const isOwnProfile = !!currentUser?.id && currentUser.id === id;
+  const canModerate = loggedIn && !isOwnProfile && !!id;
 
   useEffect(() => {
     if (!id) return;
@@ -73,6 +80,15 @@ export default function PublicUserScreen() {
         >
           <Text style={styles.backText}>← Tillbaka</Text>
         </Pressable>
+        {canModerate && (
+          <Pressable
+            onPress={() => setShowActions(true)}
+            style={({ pressed }) => [styles.menuButton, pressed && { opacity: 0.5 }]}
+            hitSlop={12}
+          >
+            <Text style={styles.menuButtonText}>⋯</Text>
+          </Pressable>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.profileScroll}>
@@ -117,7 +133,7 @@ export default function PublicUserScreen() {
           {user.bio ? (
             <Text style={styles.bioText}>{user.bio}</Text>
           ) : null}
-        </View>
+        </View> 
 
         <Text style={styles.sectionTitle}>Plats</Text>
         <View style={styles.detailCard}>
@@ -146,6 +162,16 @@ export default function PublicUserScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {canModerate && id && (
+        <UserActionSheet
+          visible={showActions}
+          onClose={() => setShowActions(false)}
+          userId={id}
+          userName={user.name ?? undefined}
+          onBlocked={() => router.replace("/(tabs)" as any)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -175,9 +201,24 @@ function createStyles(colors: ThemeColors) {
       fontWeight: "600",
     },
     header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: 24,
       paddingTop: 8,
       paddingBottom: 12,
+    },
+    menuButton: {
+      width: 32,
+      height: 32,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    menuButtonText: {
+      fontSize: 26,
+      color: colors.textPrimary,
+      fontWeight: "700",
+      marginTop: -10,
     },
     backText: {
       fontSize: 15,

@@ -1,5 +1,5 @@
 
-# PageAdminUserDto
+# PageAdminReportDto
 
 
 ## Properties
@@ -9,7 +9,7 @@ Name | Type
 `totalElements` | number
 `totalPages` | number
 `size` | number
-`content` | [Array&lt;AdminUserDto&gt;](AdminUserDto.md)
+`content` | [Array&lt;AdminReportDto&gt;](AdminReportDto.md)
 `number` | number
 `sort` | [SortObject](SortObject.md)
 `first` | boolean
@@ -21,7 +21,7 @@ Name | Type
 ## Example
 
 ```typescript
-import type { PageAdminUserDto } from ''
+import type { PageAdminReportDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
@@ -36,7 +36,7 @@ const example = {
   "numberOfElements": null,
   "pageable": null,
   "empty": null,
-} satisfies PageAdminUserDto
+} satisfies PageAdminReportDto
 
 console.log(example)
 
@@ -45,7 +45,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageAdminUserDto
+const exampleParsed = JSON.parse(exampleJSON) as PageAdminReportDto
 console.log(exampleParsed)
 ```
 

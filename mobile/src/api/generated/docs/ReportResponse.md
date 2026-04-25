@@ -1,32 +1,32 @@
 
-# PageableObject
+# ReportResponse
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`offset` | number
-`sort` | [SortObject](SortObject.md)
-`paged` | boolean
-`pageSize` | number
-`pageNumber` | number
-`unpaged` | boolean
+`id` | string
+`reportedUserId` | string
+`reason` | string
+`description` | string
+`status` | string
+`createdAt` | Date
 
 ## Example
 
 ```typescript
-import type { PageableObject } from ''
+import type { ReportResponse } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "offset": null,
-  "sort": null,
-  "paged": null,
-  "pageSize": null,
-  "pageNumber": null,
-  "unpaged": null,
-} satisfies PageableObject
+  "id": null,
+  "reportedUserId": null,
+  "reason": null,
+  "description": null,
+  "status": null,
+  "createdAt": null,
+} satisfies ReportResponse
 
 console.log(example)
 
@@ -35,7 +35,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageableObject
+const exampleParsed = JSON.parse(exampleJSON) as ReportResponse
 console.log(exampleParsed)
 ```
 

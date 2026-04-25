@@ -27,100 +27,100 @@ import {
     SortObjectToJSON,
     SortObjectToJSONTyped,
 } from './SortObject';
-import type { AdminUserDto } from './AdminUserDto';
+import type { AdminReportDto } from './AdminReportDto';
 import {
-    AdminUserDtoFromJSON,
-    AdminUserDtoFromJSONTyped,
-    AdminUserDtoToJSON,
-    AdminUserDtoToJSONTyped,
-} from './AdminUserDto';
+    AdminReportDtoFromJSON,
+    AdminReportDtoFromJSONTyped,
+    AdminReportDtoToJSON,
+    AdminReportDtoToJSONTyped,
+} from './AdminReportDto';
 
 /**
  * 
  * @export
- * @interface PageAdminUserDto
+ * @interface PageAdminReportDto
  */
-export interface PageAdminUserDto {
+export interface PageAdminReportDto {
     /**
      * 
      * @type {number}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     totalElements?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     totalPages?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     size?: number;
     /**
      * 
-     * @type {Array<AdminUserDto>}
-     * @memberof PageAdminUserDto
+     * @type {Array<AdminReportDto>}
+     * @memberof PageAdminReportDto
      */
-    content?: Array<AdminUserDto>;
+    content?: Array<AdminReportDto>;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     number?: number;
     /**
      * 
      * @type {SortObject}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     sort?: SortObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     first?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     last?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     numberOfElements?: number;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     pageable?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAdminUserDto
+     * @memberof PageAdminReportDto
      */
     empty?: boolean;
 }
 
 /**
- * Check if a given object implements the PageAdminUserDto interface.
+ * Check if a given object implements the PageAdminReportDto interface.
  */
-export function instanceOfPageAdminUserDto(value: object): value is PageAdminUserDto {
+export function instanceOfPageAdminReportDto(value: object): value is PageAdminReportDto {
     return true;
 }
 
-export function PageAdminUserDtoFromJSON(json: any): PageAdminUserDto {
-    return PageAdminUserDtoFromJSONTyped(json, false);
+export function PageAdminReportDtoFromJSON(json: any): PageAdminReportDto {
+    return PageAdminReportDtoFromJSONTyped(json, false);
 }
 
-export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageAdminUserDto {
+export function PageAdminReportDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): PageAdminReportDto {
     if (json == null) {
         return json;
     }
@@ -129,7 +129,7 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'totalElements': json['totalElements'] == null ? undefined : json['totalElements'],
         'totalPages': json['totalPages'] == null ? undefined : json['totalPages'],
         'size': json['size'] == null ? undefined : json['size'],
-        'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminUserDtoFromJSON)),
+        'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminReportDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
         'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
         'first': json['first'] == null ? undefined : json['first'],
@@ -140,11 +140,11 @@ export function PageAdminUserDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function PageAdminUserDtoToJSON(json: any): PageAdminUserDto {
-    return PageAdminUserDtoToJSONTyped(json, false);
+export function PageAdminReportDtoToJSON(json: any): PageAdminReportDto {
+    return PageAdminReportDtoToJSONTyped(json, false);
 }
 
-export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ignoreDiscriminator: boolean = false): any {
+export function PageAdminReportDtoToJSONTyped(value?: PageAdminReportDto | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -154,7 +154,7 @@ export function PageAdminUserDtoToJSONTyped(value?: PageAdminUserDto | null, ign
         'totalElements': value['totalElements'],
         'totalPages': value['totalPages'],
         'size': value['size'],
-        'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminUserDtoToJSON)),
+        'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminReportDtoToJSON)),
         'number': value['number'],
         'sort': SortObjectToJSON(value['sort']),
         'first': value['first'],

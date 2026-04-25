@@ -1,32 +1,28 @@
 
-# PageableObject
+# BlockedUserDto
 
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`offset` | number
-`sort` | [SortObject](SortObject.md)
-`paged` | boolean
-`pageSize` | number
-`pageNumber` | number
-`unpaged` | boolean
+`userId` | string
+`name` | string
+`profileImageUrl` | string
+`blockedAt` | Date
 
 ## Example
 
 ```typescript
-import type { PageableObject } from ''
+import type { BlockedUserDto } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "offset": null,
-  "sort": null,
-  "paged": null,
-  "pageSize": null,
-  "pageNumber": null,
-  "unpaged": null,
-} satisfies PageableObject
+  "userId": null,
+  "name": null,
+  "profileImageUrl": null,
+  "blockedAt": null,
+} satisfies BlockedUserDto
 
 console.log(example)
 
@@ -35,7 +31,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as PageableObject
+const exampleParsed = JSON.parse(exampleJSON) as BlockedUserDto
 console.log(exampleParsed)
 ```
 

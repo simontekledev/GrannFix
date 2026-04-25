@@ -5,12 +5,16 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.common.file.FileStorageService;
 import com.example.grannfix.user.application.port.out.TaskAdminPort;
+import com.example.grannfix.user.application.port.out.UserReviewQueryPort;
 import com.example.grannfix.user.mapper.UserMapper;
 import com.example.grannfix.user.persistence.UserRepository;
 import com.example.grannfix.user.api.dto.MeUserDto;
 import com.example.grannfix.user.api.dto.PublicUserDto;
 import com.example.grannfix.user.api.dto.ChangePasswordRequest;
 import com.example.grannfix.user.api.dto.UpdateMeRequest;
+import com.example.grannfix.user.api.dto.UserReviewDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.example.grannfix.user.domain.User;
 import com.example.grannfix.common.errors.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +34,8 @@ public class UserService {
     private final TaskAdminPort taskAdminPort;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
+    private final UserReviewQueryPort userReviewQueryPort;
+    
     @Transactional(readOnly = true)
     public MeUserDto getMe(UUID userId) {
         return UserMapper.toMeDto(getActiveUserOrThrow(userId));
@@ -108,6 +114,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public PublicUserDto getPublicUser(UUID userId) {
         return UserMapper.toPublicDto(getActiveUserOrThrow(userId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserReviewDto> getReviews(UUID userId, Pageable pageable) {
+        getActiveUserOrThrow(userId);
+        return userReviewQueryPort.findReviewsForHelper(userId, pageable);
     }
 
     private User getActiveUserOrThrow(UUID userId) {

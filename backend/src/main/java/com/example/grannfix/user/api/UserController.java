@@ -5,8 +5,11 @@ import com.example.grannfix.user.api.dto.MeUserDto;
 import com.example.grannfix.user.api.dto.PublicUserDto;
 import com.example.grannfix.user.api.dto.ChangePasswordRequest;
 import com.example.grannfix.user.api.dto.UpdateMeRequest;
+import com.example.grannfix.user.api.dto.UserReviewDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +62,10 @@ public class UserController {
     @GetMapping("/{id}")
     public PublicUserDto getPublicUser(@PathVariable UUID id) {
         return userService.getPublicUser(id);
+    }
+
+    @GetMapping("/{id}/reviews")
+    public Page<UserReviewDto> getUserReviews(@PathVariable UUID id, Pageable pageable) {
+        return userService.getReviews(id, pageable);
     }
 }

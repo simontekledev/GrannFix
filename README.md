@@ -1,6 +1,6 @@
 # GrannFix 🏠
 
-**Quick help from your neighbors.** GrannFix connects people who need help with everyday tasks — carrying, mounting, moving — with reliable helpers nearby.
+**Quick help from your neighbors.** GrannFix connects people who need help with everyday tasks like carrying, mounting and moving with reliable helpers nearby.
 
 > 📱 React Native (Expo) · ☕ Spring Boot · 🐘 PostgreSQL
 

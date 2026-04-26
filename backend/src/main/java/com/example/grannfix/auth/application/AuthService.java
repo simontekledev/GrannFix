@@ -152,7 +152,7 @@ public class AuthService {
             String body = """
                     Hej %s!
 
-                    Du har begärt att återställa ditt lösenord på GrannFix.
+                    Du har begärt att återställa ditt lösenord på Grannfix.
 
                     Din kod: %s
 
@@ -161,10 +161,10 @@ public class AuthService {
 
                     Om du inte begärde detta kan du ignorera det här mailet.
 
-                    / GrannFix
+                    / Grannfix
                     """.formatted(user.name(), token);
 
-            emailSender.send(user.email(), "Din återställningskod – GrannFix", body);
+            emailSender.send(user.email(), "Din återställningskod – Grannfix", body);
         });
     }
 

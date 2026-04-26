@@ -8,12 +8,15 @@
 
 ## Screenshots
 
-<!-- Add screenshots here -->
-<!-- | Discover | Tasks | Chat | Profile |
-|----------|-------|------|---------|
-| ![](docs/screenshots/discover.png) | ![](docs/screenshots/tasks.png) | ![](docs/screenshots/chat.png) | ![](docs/screenshots/profile.png) | -->
+| Onboarding | Explore | Tasks | Chat | Profile |
+|------------|---------|-------|------|---------|
+| ![Onboarding](docs/screenshots/onboarding.png) | ![Explore](docs/screenshots/explore.png) | ![Tasks](docs/screenshots/tasks.png) | ![Chat](docs/screenshots/chat.png) | ![Profile](docs/screenshots/profile.png) |
 
-*Screenshots coming soon*
+### 🌙 Dark mode
+
+| Explore | Tasks |
+|---------|-------|
+| ![Explore – dark](docs/screenshots/explore-dark.png) | ![Tasks – dark](docs/screenshots/tasks-dark.png) |
 
 ---
 

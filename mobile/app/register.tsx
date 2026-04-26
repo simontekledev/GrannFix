@@ -16,6 +16,7 @@ import {
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { authApi } from "@/src/api/client";
 import { validatePassword } from "@/src/helpers/password";
 import { STOCKHOLM_AREAS } from "@/src/helpers/areas";
@@ -30,17 +31,16 @@ export default function RegisterScreen() {
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const confirmPasswordRef = useRef<TextInput>(null);
   const phoneRef = useRef<TextInput>(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [phoneLocal, setPhoneLocal] = useState("");
   const [area, setArea] = useState("");
   const [areaModalVisible, setAreaModalVisible] = useState(false);
   const [areaSearch, setAreaSearch] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
     a.toLowerCase().includes(areaSearch.toLowerCase())
@@ -48,7 +48,6 @@ export default function RegisterScreen() {
 
   const [submitting, setSubmitting] = useState(false);
 
-  const passwordsMatch = password === confirmPassword;
   const passwordError = password.length > 0 ? validatePassword(password) : null;
 
   const phoneDigits = phoneLocal.replace(/\D/g, "");
@@ -79,14 +78,12 @@ export default function RegisterScreen() {
       email.trim().length > 0 &&
       password.length >= 8 &&
       passwordError === null &&
-      confirmPassword.length > 0 &&
-      passwordsMatch &&
       name.trim().length > 0 &&
       phoneDigits.length >= 7 &&
       phoneDigits.length <= 10 &&
       area.trim().length > 0
     );
-  }, [email, password, passwordError, confirmPassword, passwordsMatch, name, phoneDigits, area, submitting]);
+  }, [email, password, passwordError, name, phoneDigits, area, submitting]);
 
   async function handleRegister() {
     if (!canSubmit) return;
@@ -181,44 +178,37 @@ export default function RegisterScreen() {
           />
 
           <Text style={styles.label}>Lösenord</Text>
-          <TextInput
-            ref={passwordRef}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="Minst 8 tecken"
-            placeholderTextColor={colors.textMuted}
-            style={styles.input}
-            editable={!submitting}
-            maxLength={64}
-            returnKeyType="next"
-            onSubmitEditing={() => confirmPasswordRef.current?.focus()}
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              ref={passwordRef}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              placeholder="Minst 8 tecken"
+              placeholderTextColor={colors.textMuted}
+              style={styles.passwordInput}
+              editable={!submitting}
+              maxLength={64}
+              returnKeyType="next"
+              onSubmitEditing={() => phoneRef.current?.focus()}
+            />
+            <Pressable
+              onPress={() => setShowPassword((s) => !s)}
+              hitSlop={8}
+              style={styles.eyeButton}
+              accessibilityRole="button"
+              accessibilityLabel={showPassword ? "Dölj lösenord" : "Visa lösenord"}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color={colors.textMuted}
+              />
+            </Pressable>
+          </View>
           {passwordError && (
             <Text style={styles.errorText}>{passwordError}</Text>
           )}
-
-          <Text style={styles.label}>Bekräfta lösenord</Text>
-          <TextInput
-            ref={confirmPasswordRef}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            placeholder="Skriv lösenordet igen"
-            placeholderTextColor={colors.textMuted}
-            style={styles.input}
-            editable={!submitting}
-            returnKeyType="next"
-            onSubmitEditing={() => phoneRef.current?.focus()}
-          />
-
-          {confirmPassword.length > 0 ? (
-            passwordsMatch ? (
-              <Text style={styles.successText}>Lösenorden matchar</Text>
-            ) : (
-              <Text style={styles.errorText}>Lösenorden matchar inte</Text>
-            )
-          ) : null}
 
           <Text style={styles.label}>Telefonnummer</Text>
           <View style={styles.phoneRow}>
@@ -237,11 +227,6 @@ export default function RegisterScreen() {
               maxLength={12}
               returnKeyType="done"
             />
-          </View>
-
-          <Text style={styles.label}>Stad</Text>
-          <View style={[styles.input, styles.disabledInput]}>
-            <Text style={styles.disabledText}>Stockholm</Text>
           </View>
 
           <Text style={styles.label}>Område</Text>
@@ -368,13 +353,24 @@ function createStyles(colors: ThemeColors) {
       borderWidth: 1,
       borderColor: colors.border,
     },
-    disabledInput: {
-      backgroundColor: colors.divider,
+    passwordRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingRight: 8,
     },
-    disabledText: {
+    passwordInput: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
       fontSize: 16,
-      fontWeight: "600",
-      color: colors.textMuted,
+      color: colors.textPrimary,
+    },
+    eyeButton: {
+      padding: 8,
     },
     phoneRow: {
       flexDirection: "row",
@@ -426,11 +422,6 @@ function createStyles(colors: ThemeColors) {
     },
     errorText: {
       color: colors.danger,
-      fontSize: 13,
-      marginTop: 4,
-    },
-    successText: {
-      color: colors.accent,
       fontSize: 13,
       marginTop: 4,
     },

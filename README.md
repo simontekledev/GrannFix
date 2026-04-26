@@ -9,14 +9,14 @@
 ## Screenshots
 
 | Onboarding | Explore | Tasks | Chat | Profile |
-|------------|---------|-------|------|---------|
-| ![Onboarding](docs/screenshots/onboarding.png) | ![Explore](docs/screenshots/explore.png) | ![Tasks](docs/screenshots/tasks.png) | ![Chat](docs/screenshots/chat.png) | ![Profile](docs/screenshots/profile.png) |
+|:----------:|:-------:|:-----:|:----:|:-------:|
+| <img src="docs/screenshots/onboarding.png" width="180"> | <img src="docs/screenshots/explore.png" width="180"> | <img src="docs/screenshots/tasks.png" width="180"> | <img src="docs/screenshots/chat.png" width="180"> | <img src="docs/screenshots/profile.png" width="180"> |
 
 ### 🌙 Dark mode
 
 | Explore | Tasks |
-|---------|-------|
-| ![Explore – dark](docs/screenshots/explore-dark.png) | ![Tasks – dark](docs/screenshots/tasks-dark.png) |
+|:-------:|:-----:|
+| <img src="docs/screenshots/explore-dark.png" width="220"> | <img src="docs/screenshots/tasks-dark.png" width="220"> |
 
 ---
 

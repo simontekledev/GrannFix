@@ -14,7 +14,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { chatApi } from "@/src/api/client";
+import { chatApi, userApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatMessagesSkeleton } from "@/src/components/Skeleton";
@@ -85,6 +85,25 @@ export default function ChatConversationScreen() {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [fetchedImage, setFetchedImage] = useState<string | null>(null);
+
+  const displayImage = otherUserImage || fetchedImage;
+
+  useEffect(() => {
+    if (otherUserImage || !otherUserId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await userApi.getPublicUser({ id: otherUserId });
+        if (!cancelled && res?.profileImageUrl) {
+          setFetchedImage(res.profileImageUrl);
+        }
+      } catch (e) {
+        console.log("Failed to fetch chat partner profile:", e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [otherUserId, otherUserImage]);
   const flatListRef = useRef<FlatList>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -237,7 +256,7 @@ export default function ChatConversationScreen() {
             borderTopLeftRadius: isFirstInGroup ? 18 : 6,
             borderBottomLeftRadius: isLastInGroup ? 18 : 6,
           },
-      { marginTop: isFirstInGroup ? 6 : 2 },
+      { marginTop: isFirstInGroup ? 12 : 2 },
     ];
 
     return (
@@ -265,9 +284,9 @@ export default function ChatConversationScreen() {
         >
           <Text style={styles.backArrow}>←</Text>
         </Pressable>
-        {otherUserImage ? (
+        {displayImage ? (
           <Image
-            source={{ uri: resolveImageUrl(otherUserImage)! }}
+            source={{ uri: resolveImageUrl(displayImage)! }}
             style={styles.headerAvatarImage}
           />
         ) : (

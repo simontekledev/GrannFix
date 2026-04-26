@@ -339,7 +339,7 @@ export default function TaskDetailScreen() {
       const chat = await chatApi.getOrCreateChat({ taskId: id });
       const helperName = task?.assignedTo?.name ?? "";
       const taskTitle = task?.title ?? "";
-      router.push(`/chat-conversation?chatId=${chat.id}&taskId=${id}&name=${encodeURIComponent(helperName)}&taskTitle=${encodeURIComponent(taskTitle)}&otherUserId=${task?.assignedTo?.id ?? ""}` as any);
+      router.push(`/chat-conversation?chatId=${chat.id}&taskId=${id}&name=${encodeURIComponent(helperName)}&taskTitle=${encodeURIComponent(taskTitle)}&otherUserId=${task?.assignedTo?.id ?? ""}&otherUserImage=${encodeURIComponent(task?.assignedTo?.profileImageUrl ?? "")}` as any);
     } catch (e) {
       console.log("Chat error:", e);
     }

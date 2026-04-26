@@ -333,7 +333,7 @@ export default function TasksScreen() {
           style={[styles.segmentButton, activeTab === "offers" && styles.segmentButtonActive]}
         >
           <Text style={[styles.segmentText, activeTab === "offers" && styles.segmentTextActive]}>
-            Mina erbjudanden
+            Skickade erbjudanden
           </Text>
         </Pressable>
       </View>
@@ -372,7 +372,7 @@ export default function TasksScreen() {
               style={styles.loginIcon}
               resizeMode="contain"
             />
-            <Text style={styles.loginTitle}>Inga erbjudanden</Text>
+            <Text style={styles.loginTitle}>Inga skickade erbjudanden</Text>
             <Text style={styles.loginSubtitle}>Hjälp till med uppdrag på Upptäck-sidan</Text>
           </View>
         ) : (

@@ -59,10 +59,13 @@ export default function UpptäckScreen() {
 
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") return;
         const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         setUserLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      } catch (e) {
+        console.log("Location unavailable, continuing without distance sorting:", e);
       }
     })();
   }, []);

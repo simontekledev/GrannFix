@@ -27,8 +27,17 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       AND (:area IS NULL OR t.area = :area)
       AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
       AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
-      AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
-      AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+      AND (
+            (
+              (:minPrice IS NULL OR CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC) = 0)
+              AND t.offered_price IS NULL
+            )
+            OR (
+              t.offered_price IS NOT NULL
+              AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
+              AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+            )
+      )
       AND (CAST(:createdAfter AS TIMESTAMP) IS NULL OR t.created_at >= CAST(:createdAfter AS TIMESTAMP))
     ORDER BY t.created_at DESC, t.id DESC
 """, nativeQuery = true)
@@ -52,8 +61,17 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       AND (:area IS NULL OR t.area = :area)
       AND (:category IS NULL OR t.category = CAST(:category AS VARCHAR))
       AND (:search IS NULL OR to_tsvector('swedish', t.title || ' ' || t.description) @@ to_tsquery('swedish', regexp_replace(trim(:search), '\\s+', ':* & ', 'g') || ':*'))
-      AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
-      AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+      AND (
+            (
+              (:minPrice IS NULL OR CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC) = 0)
+              AND t.offered_price IS NULL
+            )
+            OR (
+              t.offered_price IS NOT NULL
+              AND (:minPrice IS NULL OR t.offered_price >= CAST(CAST(:minPrice AS VARCHAR) AS NUMERIC))
+              AND (:maxPrice IS NULL OR t.offered_price <= CAST(CAST(:maxPrice AS VARCHAR) AS NUMERIC))
+            )
+      )
       AND (CAST(:createdAfter AS TIMESTAMP) IS NULL OR t.created_at >= CAST(:createdAfter AS TIMESTAMP))
       AND (
             t.created_at < :cursorCreatedAt

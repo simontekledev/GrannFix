@@ -90,11 +90,10 @@ public class UserService {
     public MeUserDto updateProfileImage(UUID userId, MultipartFile file) {
         User u = getActiveUserOrThrow(userId);
         String oldImage = u.getProfileImageUrl();
-        String filename = fileStorageService.store(file);
-        u.setProfileImageUrl("/files/" + filename);
+        String url = fileStorageService.store(file);
+        u.setProfileImageUrl(url);
         if (oldImage != null) {
-            String oldFilename = oldImage.replace("/files/", "");
-            fileStorageService.delete(oldFilename);
+            fileStorageService.delete(oldImage);
         }
         return UserMapper.toMeDto(u);
     }
@@ -104,8 +103,7 @@ public class UserService {
         User u = getActiveUserOrThrow(userId);
         String oldImage = u.getProfileImageUrl();
         if (oldImage != null) {
-            String oldFilename = oldImage.replace("/files/", "");
-            fileStorageService.delete(oldFilename);
+            fileStorageService.delete(oldImage);
         }
         u.setProfileImageUrl(null);
         return UserMapper.toMeDto(u);

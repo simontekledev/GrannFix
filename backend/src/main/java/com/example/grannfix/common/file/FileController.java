@@ -29,8 +29,8 @@ public class FileController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, String> upload(@AuthenticationPrincipal UUID userId,
                                       @RequestPart("file") MultipartFile file) {
-        String filename = fileStorageService.store(file);
-        return Map.of("url", "/files/" + filename);
+        String url = fileStorageService.store(file);
+        return Map.of("url", url);
     }
 
     @GetMapping("/{filename}")

@@ -40,7 +40,7 @@ public class OfferService {
     @Transactional
     public OfferResponse createOffer(UUID taskId, UUID helperId, CreateOfferRequest req) {
         if (!userLookupPort.isVerified(helperId)) {
-            throw new ForbiddenException("Phone number must be verified (OTP) before creating offers.");
+            throw new ForbiddenException("BankID verification required before creating offers.");
         }
         TaskOfferView task = taskOfferPort.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task not found: " + taskId));

@@ -22,7 +22,6 @@ public class RateLimitConfig extends OncePerRequestFilter {
             "/auth/login",           new RateConfig(5, 60_000),
             "/auth/register",        new RateConfig(3, 60_000),
             "/auth/forgot-password", new RateConfig(3, 300_000),
-            "/auth/send-otp",        new RateConfig(3, 300_000),
             "/auth/refresh",         new RateConfig(10, 60_000)
     );
 

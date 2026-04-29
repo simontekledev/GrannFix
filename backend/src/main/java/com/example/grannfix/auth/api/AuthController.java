@@ -14,21 +14,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/send-otp")
-    public ResponseEntity<String> sendOtp(@RequestParam String phoneNumber) {
-        authService.sendOtp(phoneNumber);
-        return ResponseEntity.ok("OTP sent successfully to " + phoneNumber);
-    }
-
-    @PostMapping("/verify-otp")
-    public ResponseEntity<AuthResponse> verifyOtp(
-            @RequestBody @Valid VerifyOtpRequest request) {
-
-        AuthResponse response =
-                authService.verifyOtp(request.phoneNumber(), request.code());
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
             @RequestBody @Valid RegisterRequest request) {

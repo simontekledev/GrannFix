@@ -38,7 +38,7 @@ public class TaskService {
         }
 
         if (!userLookupPort.isVerified(createdById)) {
-            throw new ForbiddenException("Phone number must be verified (OTP) before creating tasks.");
+            throw new ForbiddenException("BankID verification required before creating tasks.");
         }
 
         BigDecimal price = req.offeredPrice();

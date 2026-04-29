@@ -6,7 +6,6 @@ import com.example.grannfix.auth.application.ports.out.UserAuthPort;
 import com.example.grannfix.auth.application.ports.out.UserAuthView;
 import com.example.grannfix.auth.domain.PasswordResetToken;
 import com.example.grannfix.auth.infrastructure.messaging.email.EmailSender;
-import com.example.grannfix.auth.infrastructure.messaging.sms.SmsSender;
 import com.example.grannfix.auth.infrastructure.security.JwtService;
 import com.example.grannfix.auth.persistence.PasswordResetTokenRepository;
 import com.example.grannfix.common.errors.BadRequestException;
@@ -31,48 +30,8 @@ public class AuthService {
     private final UserAuthPort userAuthPort;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final OtpService otpService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailSender emailSender;
-    private final SmsSender smsSender;
-
-    public void sendOtp(String phoneNumber) {
-        phoneNumber = normalizePhone(phoneNumber);
-        validatePhone(phoneNumber);
-        userAuthPort.findByPhone(phoneNumber).ifPresent(user -> {
-            if (!user.active()) {
-                throw new ForbiddenException("User is disabled");
-            }
-            if (user.verified()) {
-                throw new ConflictException("User is already verified");
-            }
-        });
-        String code = otpService.generateAndStore(phoneNumber);
-        System.out.println("Your GrannFix verification code is: " + code + " (valid for 5 minutes)");
-        // smsSender.send(phoneNumber, "Your GrannFix verification code is: " + code);
-    }
-
-    @Transactional
-    public AuthResponse verifyOtp(String phoneNumber, String code) {
-        String normalizedPhone = normalizePhone(phoneNumber);
-        validatePhone(normalizedPhone);
-
-        boolean ok = otpService.verify(normalizedPhone, code);
-        if (!ok) {
-            throw new UnauthorizedException("Invalid or expired OTP");
-        }
-
-        UserAuthView user = userAuthPort.findByPhone(normalizedPhone)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        if (!user.active()) {
-            throw new ForbiddenException("User is disabled");
-        }
-        if (!user.verified()) {
-            userAuthPort.markVerified(user.id());
-        }
-        return buildAuthResponse(user);
-    }
 
     @Transactional
     public AuthResponse register(RegisterRequest req) {
@@ -109,11 +68,6 @@ public class AuthService {
         }
         if (!user.active()) {
             throw new ForbiddenException("User is disabled");
-        }
-        if (!user.verified()) {
-            userAuthPort.markVerified(user.id());
-            user = userAuthPort.findById(user.id())
-                    .orElseThrow(() -> new NotFoundException("User not found"));
         }
         return buildAuthResponse(user);
     }

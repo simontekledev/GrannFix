@@ -6,6 +6,7 @@ target/
 backend/.env
 backend/src/main/resources/application-local.properties
 backend/src/main/resources/firebase-service-account.json
+backend/uploads/
 mobile/google-services.json
 
 ############################

@@ -47,6 +47,7 @@
 | **Database** | PostgreSQL |
 | **Push** | Firebase Cloud Messaging (FCM) |
 | **Email** | Resend SMTP |
+| **Image storage** | Cloudinary (auto-format, auto-quality, on-the-fly transforms) |
 | **Auth** | JWT (access 15 min + refresh 30 days) |
 | **API** | REST, OpenAPI 3.0, auto-generated TypeScript client |
 
@@ -55,7 +56,7 @@
 ```
 GrannFix/
 ├── backend/          # Modular monolith (Spring Boot)
-│   ├── auth/         # JWT, OTP, password reset
+│   ├── auth/         # JWT, password reset
 │   ├── user/         # Profiles, admin
 │   ├── task/         # Tasks, categories, search
 │   ├── offer/        # Offers, ratings
@@ -80,11 +81,14 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-Create `backend/src/main/resources/application-local.properties`:
+Create `backend/.env` (loaded automatically via `spring-dotenv`):
 
 ```properties
-spring.datasource.password=your_db_password
-spring.mail.password=your_resend_api_key
+DB_PASSWORD=your_db_password
+MAIL_PASSWORD=your_resend_api_key
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ### Mobile

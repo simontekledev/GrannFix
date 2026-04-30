@@ -2,7 +2,7 @@ import { Tabs, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect } from 'react';
 import { Image } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
+import { HapticTab } from '@/src/components/HapticTab';
 import { useTheme } from '@/src/context/ThemeContext';
 import { useUnreadChat } from '@/src/context/UnreadChatContext';
 import { useUser } from '@/src/context/UserContext';

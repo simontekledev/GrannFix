@@ -3,12 +3,11 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, useColorScheme as useSystemColorScheme } from 'react-native';
+import { Image, StyleSheet, useColorScheme } from 'react-native';
 import { Asset } from 'expo-asset';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { UserProvider } from '@/src/context/UserContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
@@ -29,7 +28,6 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const systemScheme = useSystemColorScheme();
   const [appReady, setAppReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   usePushNotifications();
@@ -104,7 +102,6 @@ export default function RootLayout() {
             <Stack.Screen name="user-reviews" options={{ headerShown: false }} />
             <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
             <Stack.Screen name="reset-password" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
           <ThemedStatusBar />
         </>
@@ -113,7 +110,7 @@ export default function RootLayout() {
         <Animated.View
           style={[
             styles.splash,
-            { backgroundColor: systemScheme === 'dark' ? '#0f1411' : '#f5faf2' },
+            { backgroundColor: colorScheme === 'dark' ? '#0f1411' : '#f5faf2' },
           ]}
           exiting={FadeOut.duration(400)}
         >

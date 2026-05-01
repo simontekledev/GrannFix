@@ -166,7 +166,25 @@ export default function ProfilScreen() {
             </View>
             <Text style={styles.profileName}>{user?.name ?? "—"}</Text>
 
-            <StarRating rating={user?.ratingAverage ?? 0} color="green" />
+            {(user?.ratingCount ?? 0) > 0 && user?.id ? (
+              <Pressable
+                onPress={() =>
+                  router.push(
+                    `/user-reviews?id=${user.id}&name=${encodeURIComponent(user.name ?? "")}` as any
+                  )
+                }
+                style={({ pressed }) => [styles.ratingPressable, pressed && { opacity: 0.6 }]}
+              >
+                <StarRating rating={user.ratingAverage ?? 0} color="green" />
+                <Text style={styles.reviewsLink}>
+                  {user.ratingCount === 1
+                    ? "1 recension ›"
+                    : `${user.ratingCount} recensioner ›`}
+                </Text>
+              </Pressable>
+            ) : (
+              <StarRating rating={user?.ratingAverage ?? 0} color="green" />
+            )}
 
             {user?.bio ? (
               <Text style={styles.bioText}>{user.bio}</Text>

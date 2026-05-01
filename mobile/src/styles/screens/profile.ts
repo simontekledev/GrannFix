@@ -88,6 +88,17 @@ export function createProfileStyles(colors: ThemeColors) {
       color: colors.textPrimary,
       marginBottom: 6,
     },
+    ratingPressable: {
+      alignItems: "center",
+      paddingVertical: 4,
+      marginBottom: 6,
+    },
+    reviewsLink: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.accent,
+      marginTop: -4,
+    },
     bioText: {
       fontSize: 15,
       color: colors.textSecondary,

@@ -21,7 +21,6 @@ import type {
   RefreshRequest,
   RegisterRequest,
   ResetPasswordRequest,
-  VerifyOtpRequest,
 } from '../models/index';
 import {
     AuthResponseFromJSON,
@@ -36,8 +35,6 @@ import {
     RegisterRequestToJSON,
     ResetPasswordRequestFromJSON,
     ResetPasswordRequestToJSON,
-    VerifyOtpRequestFromJSON,
-    VerifyOtpRequestToJSON,
 } from '../models/index';
 
 export interface ForgotPasswordOperationRequest {
@@ -58,14 +55,6 @@ export interface RegisterOperationRequest {
 
 export interface ResetPasswordOperationRequest {
     resetPasswordRequest: ResetPasswordRequest;
-}
-
-export interface SendOtpRequest {
-    phoneNumber: string;
-}
-
-export interface VerifyOtpOperationRequest {
-    verifyOtpRequest: VerifyOtpRequest;
 }
 
 /**
@@ -334,117 +323,6 @@ export class AuthControllerApi extends runtime.BaseAPI {
      */
     async resetPassword(requestParameters: ResetPasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.resetPasswordRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * Creates request options for sendOtp without sending the request
-     */
-    async sendOtpRequestOpts(requestParameters: SendOtpRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['phoneNumber'] == null) {
-            throw new runtime.RequiredError(
-                'phoneNumber',
-                'Required parameter "phoneNumber" was null or undefined when calling sendOtp().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['phoneNumber'] != null) {
-            queryParameters['phoneNumber'] = requestParameters['phoneNumber'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/auth/send-otp`;
-
-        return {
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        };
-    }
-
-    /**
-     */
-    async sendOtpRaw(requestParameters: SendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
-        const requestOptions = await this.sendOtpRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
-    }
-
-    /**
-     */
-    async sendOtp(requestParameters: SendOtpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.sendOtpRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Creates request options for verifyOtp without sending the request
-     */
-    async verifyOtpRequestOpts(requestParameters: VerifyOtpOperationRequest): Promise<runtime.RequestOpts> {
-        if (requestParameters['verifyOtpRequest'] == null) {
-            throw new runtime.RequiredError(
-                'verifyOtpRequest',
-                'Required parameter "verifyOtpRequest" was null or undefined when calling verifyOtp().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/auth/verify-otp`;
-
-        return {
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: VerifyOtpRequestToJSON(requestParameters['verifyOtpRequest']),
-        };
-    }
-
-    /**
-     */
-    async verifyOtpRaw(requestParameters: VerifyOtpOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponse>> {
-        const requestOptions = await this.verifyOtpRequestOpts(requestParameters);
-        const response = await this.request(requestOptions, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async verifyOtp(requestParameters: VerifyOtpOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponse> {
-        const response = await this.verifyOtpRaw(requestParameters, initOverrides);
-        return await response.value();
     }
 
 }

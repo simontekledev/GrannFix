@@ -10,6 +10,8 @@ Name | Type
 `helperId` | string
 `helperName` | string
 `helperProfileImageUrl` | string
+`helperRatingAverage` | number
+`helperRatingCount` | number
 `proposedPrice` | number
 `message` | string
 `status` | string
@@ -29,6 +31,8 @@ const example = {
   "helperId": null,
   "helperName": null,
   "helperProfileImageUrl": null,
+  "helperRatingAverage": null,
+  "helperRatingCount": null,
   "proposedPrice": null,
   "message": null,
   "status": null,

@@ -48,6 +48,18 @@ export interface OfferResponse {
      * @type {number}
      * @memberof OfferResponse
      */
+    helperRatingAverage?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferResponse
+     */
+    helperRatingCount?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OfferResponse
+     */
     proposedPrice?: number;
     /**
      * 
@@ -123,6 +135,8 @@ export function OfferResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'helperId': json['helperId'] == null ? undefined : json['helperId'],
         'helperName': json['helperName'] == null ? undefined : json['helperName'],
         'helperProfileImageUrl': json['helperProfileImageUrl'] == null ? undefined : json['helperProfileImageUrl'],
+        'helperRatingAverage': json['helperRatingAverage'] == null ? undefined : json['helperRatingAverage'],
+        'helperRatingCount': json['helperRatingCount'] == null ? undefined : json['helperRatingCount'],
         'proposedPrice': json['proposedPrice'] == null ? undefined : json['proposedPrice'],
         'message': json['message'] == null ? undefined : json['message'],
         'status': json['status'] == null ? undefined : json['status'],
@@ -148,6 +162,8 @@ export function OfferResponseToJSONTyped(value?: OfferResponse | null, ignoreDis
         'helperId': value['helperId'],
         'helperName': value['helperName'],
         'helperProfileImageUrl': value['helperProfileImageUrl'],
+        'helperRatingAverage': value['helperRatingAverage'],
+        'helperRatingCount': value['helperRatingCount'],
         'proposedPrice': value['proposedPrice'],
         'message': value['message'],
         'status': value['status'],

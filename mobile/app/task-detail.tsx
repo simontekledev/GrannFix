@@ -469,6 +469,14 @@ export default function TaskDetailScreen() {
                         <Text style={styles.userName} numberOfLines={1}>
                           {offer.helperName ?? "Hjälpare"}
                         </Text>
+                        {offer.helperRatingCount != null && offer.helperRatingCount > 0 ? (
+                          <Text style={styles.offerRating}>
+                            ★ {offer.helperRatingAverage?.toFixed(1)} · {offer.helperRatingCount}{" "}
+                            {offer.helperRatingCount === 1 ? "omdöme" : "omdömen"}
+                          </Text>
+                        ) : (
+                          <Text style={styles.offerRatingEmpty}>Ny hjälpare</Text>
+                        )}
                         {offer.proposedPrice != null && (
                           <Text style={styles.offerPrice}>{offer.proposedPrice} kr</Text>
                         )}

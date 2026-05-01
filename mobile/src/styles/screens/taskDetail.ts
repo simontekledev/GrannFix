@@ -322,6 +322,16 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       fontWeight: "700",
       color: colors.accent,
     },
+    offerRating: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: "500",
+    },
+    offerRatingEmpty: {
+      fontSize: 12,
+      color: colors.textMuted,
+      fontStyle: "italic",
+    },
     offerMessage: {
       fontSize: 13,
       color: colors.textSecondary,

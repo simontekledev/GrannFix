@@ -68,7 +68,6 @@ docs/UpdateTaskRequest.md
 docs/UserControllerApi.md
 docs/UserReviewDto.md
 docs/UserSummary.md
-docs/VerifyOtpRequest.md
 index.ts
 models/AdminReportDto.ts
 models/AdminUserDto.ts
@@ -111,6 +110,5 @@ models/UpdateReportStatusRequest.ts
 models/UpdateTaskRequest.ts
 models/UserReviewDto.ts
 models/UserSummary.ts
-models/VerifyOtpRequest.ts
 models/index.ts
 runtime.ts

@@ -41,4 +41,3 @@ export * from './UpdateReportStatusRequest';
 export * from './UpdateTaskRequest';
 export * from './UserReviewDto';
 export * from './UserSummary';
-export * from './VerifyOtpRequest';

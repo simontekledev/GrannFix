@@ -12,9 +12,9 @@ Name | Type
 `content` | [Array&lt;AdminReportDto&gt;](AdminReportDto.md)
 `number` | number
 `sort` | [SortObject](SortObject.md)
-`numberOfElements` | number
 `first` | boolean
 `last` | boolean
+`numberOfElements` | number
 `pageable` | [PageableObject](PageableObject.md)
 `empty` | boolean
 
@@ -31,9 +31,9 @@ const example = {
   "content": null,
   "number": null,
   "sort": null,
-  "numberOfElements": null,
   "first": null,
   "last": null,
+  "numberOfElements": null,
   "pageable": null,
   "empty": null,
 } satisfies PageAdminReportDto

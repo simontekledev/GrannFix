@@ -20,16 +20,25 @@ import { timeAgo } from "@/src/helpers/time";
 
 export default function UserReviewsScreen() {
   const router = useRouter();
-  const { id, name } = useLocalSearchParams<{ id: string; name?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [reviews, setReviews] = useState<UserReviewDto[]>([]);
+  const [stats, setStats] = useState<{ average: number; count: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    userApi
+      .getPublicUser({ id })
+      .then((u) => setStats({ average: u.ratingAverage ?? 0, count: u.ratingCount ?? 0 }))
+      .catch(() => {});
+  }, [id]);
 
   const loadReviews = useCallback(
     async (targetPage = 0) => {
@@ -74,7 +83,7 @@ export default function UserReviewsScreen() {
   function renderReview({ item }: { item: UserReviewDto }) {
     return (
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
+        <View style={styles.row}>
           {item.reviewerImageUrl ? (
             <Image
               source={{ uri: resolveImageUrl(item.reviewerImageUrl)! }}
@@ -87,31 +96,31 @@ export default function UserReviewsScreen() {
               </Text>
             </View>
           )}
-          <View style={styles.cardHeaderInfo}>
-            <Text style={styles.reviewerName} numberOfLines={1}>
-              {item.reviewerName ?? "Borttagen användare"}
-            </Text>
-            {item.completedAt && (
-              <Text style={styles.timeText}>{timeAgo(new Date(item.completedAt))}</Text>
+          <View style={styles.rowInfo}>
+            <View style={styles.topRow}>
+              <Text style={styles.reviewerName} numberOfLines={1}>
+                {item.reviewerName ?? "Borttagen användare"}
+              </Text>
+              {item.completedAt && (
+                <Text style={styles.timeText}>{timeAgo(new Date(item.completedAt))}</Text>
+              )}
+            </View>
+            {item.rating != null && (
+              <StarRating rating={item.rating} showValue color="green" />
             )}
           </View>
         </View>
 
-        {item.rating != null && (
-          <StarRating rating={item.rating} showValue={false} color="green" />
-        )}
-
         {item.comment ? (
-          <Text style={styles.comment}>{item.comment}</Text>
+          <Text style={styles.comment} numberOfLines={3}>
+            {item.comment}
+          </Text>
         ) : null}
 
         {item.taskTitle && (
-          <View style={styles.taskTag}>
-            <Text style={styles.taskTagIcon}>🔗</Text>
-            <Text style={styles.taskTagText} numberOfLines={1}>
-              {item.taskTitle}
-            </Text>
-          </View>
+          <Text style={styles.taskTagText} numberOfLines={1}>
+            {item.taskTitle}
+          </Text>
         )}
       </View>
     );
@@ -126,7 +135,7 @@ export default function UserReviewsScreen() {
         >
           <Text style={styles.backText}>← Tillbaka</Text>
         </Pressable>
-        <Text style={styles.title}>{name ? `Recensioner – ${name}` : "Recensioner"}</Text>
+        <Text style={styles.title}>Omdömen</Text>
       </View>
 
       {loading ? (
@@ -144,14 +153,25 @@ export default function UserReviewsScreen() {
           }
           onEndReached={onEndReached}
           onEndReachedThreshold={0.3}
+          ListHeaderComponent={
+            stats && stats.count > 0 ? (
+              <View style={styles.summary}>
+                <Text style={styles.summaryRating}>{stats.average.toFixed(1)}</Text>
+                <StarRating rating={stats.average} showValue={false} color="green" />
+                <Text style={styles.summaryCount}>
+                  {stats.count === 1 ? "1 omdöme" : `baserat på ${stats.count} omdömen`}
+                </Text>
+              </View>
+            ) : null
+          }
           ListFooterComponent={
             loadingMore ? <ActivityIndicator style={{ paddingVertical: 16 }} color={colors.accent} /> : null
           }
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Inga recensioner ännu</Text>
+              <Text style={styles.emptyTitle}>Inga omdömen ännu</Text>
               <Text style={styles.emptySubtitle}>
-                Recensioner visas när användaren har slutfört uppdrag
+                Omdömen visas när uppdrag har slutförts
               </Text>
             </View>
           }
@@ -196,6 +216,32 @@ function createStyles(colors: ThemeColors) {
       paddingBottom: 48,
       gap: 12,
     },
+    summary: {
+      alignItems: "center",
+      paddingVertical: 28,
+      paddingHorizontal: 16,
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+      gap: 6,
+    },
+    summaryRating: {
+      fontSize: 56,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      letterSpacing: -1.5,
+      lineHeight: 60,
+    },
+    summaryCount: {
+      fontSize: 13,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
     emptyContainer: {
       flexGrow: 1,
     },
@@ -209,64 +255,61 @@ function createStyles(colors: ThemeColors) {
       shadowRadius: 8,
       elevation: 3,
     },
-    cardHeader: {
+    row: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      marginBottom: 8,
+    },
+    rowInfo: {
+      flex: 1,
+    },
+    topRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 8,
+      marginTop: 4,
     },
     avatar: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
     },
     avatarFallback: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: colors.accent,
       alignItems: "center",
       justifyContent: "center",
     },
     avatarFallbackText: {
-      fontSize: 15,
+      fontSize: 17,
       fontWeight: "700",
       color: "#fff",
-    },
-    cardHeaderInfo: {
-      flex: 1,
     },
     reviewerName: {
       fontSize: 15,
       fontWeight: "600",
       color: colors.textPrimary,
+      flexShrink: 1,
+      lineHeight: 16,
     },
     timeText: {
       fontSize: 12,
       color: colors.textMuted,
-      marginTop: 2,
     },
     comment: {
       fontSize: 14,
       color: colors.textSecondary,
       lineHeight: 20,
-      marginTop: 4,
-    },
-    taskTag: {
-      flexDirection: "row",
-      alignItems: "center",
       marginTop: 10,
-      gap: 4,
-    },
-    taskTagIcon: {
-      fontSize: 11,
-      opacity: 0.6,
     },
     taskTagText: {
       fontSize: 12,
       color: colors.textMuted,
-      flex: 1,
-      opacity: 0.8,
+      marginTop: 8,
+      fontStyle: "italic",
     },
     emptyState: {
       flex: 1,

@@ -12,5 +12,10 @@ export function timeAgo(date: Date): string {
   if (diffD < 7) return `${diffD} dagar sedan`;
   if (diffD < 14) return "1 vecka sedan";
   if (diffD < 30) return `${Math.floor(diffD / 7)} veckor sedan`;
-  return date.toLocaleDateString("sv-SE");
+  if (diffD < 365) {
+    const months = Math.floor(diffD / 30);
+    return months === 1 ? "1 månad sedan" : `${months} månader sedan`;
+  }
+  const years = Math.floor(diffD / 365);
+  return years === 1 ? "1 år sedan" : `${years} år sedan`;
 }

@@ -10,6 +10,8 @@ public record OfferResponse(
         UUID helperId,
         String helperName,
         String helperProfileImageUrl,
+        Double helperRatingAverage,
+        Integer helperRatingCount,
         BigDecimal proposedPrice,
         String message,
         OfferStatus status,

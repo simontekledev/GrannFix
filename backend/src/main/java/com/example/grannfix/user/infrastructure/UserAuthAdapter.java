@@ -133,6 +133,23 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
                 .filter(u -> u.getProfileImageUrl() != null)
                 .collect(Collectors.toMap(User::getId, User::getProfileImageUrl));
     }
+
+    @Override
+    public Map<UUID, Double> ratingAverages(Collection<UUID> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        return userRepository.findAllById(userIds).stream()
+                .filter(u -> u.getRatingAverage() != null)
+                .collect(Collectors.toMap(User::getId, User::getRatingAverage));
+    }
+
+    @Override
+    public Map<UUID, Integer> ratingCounts(Collection<UUID> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        return userRepository.findAllById(userIds).stream()
+                .filter(u -> u.getRatingCount() != null)
+                .collect(Collectors.toMap(User::getId, User::getRatingCount));
+    }
+
     private UserAuthView toView(User u) {
         return new UserAuthView(
                 u.getId(),

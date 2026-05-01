@@ -95,8 +95,15 @@ public class OfferService {
         var helperIds = offers.stream().map(Offer::getHelperId).collect(java.util.stream.Collectors.toSet());
         var names = userLookupPort.displayNames(helperIds);
         var images = userLookupPort.profileImageUrls(helperIds);
+        var ratingAverages = userLookupPort.ratingAverages(helperIds);
+        var ratingCounts = userLookupPort.ratingCounts(helperIds);
         return offers.stream()
-                .map(o -> OfferMapper.toResponse(o, names.get(o.getHelperId()), images.get(o.getHelperId())))
+                .map(o -> OfferMapper.toResponse(
+                        o,
+                        names.get(o.getHelperId()),
+                        images.get(o.getHelperId()),
+                        ratingAverages.get(o.getHelperId()),
+                        ratingCounts.get(o.getHelperId())))
                 .toList();
     }
 

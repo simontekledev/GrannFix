@@ -10,4 +10,6 @@ public interface UserLookupPort {
     String profileImageUrl(UUID userId);
     Map<UUID, String> displayNames(Collection<UUID> userIds);
     Map<UUID, String> profileImageUrls(Collection<UUID> userIds);
+    Map<UUID, Double> ratingAverages(Collection<UUID> userIds);
+    Map<UUID, Integer> ratingCounts(Collection<UUID> userIds);
 }

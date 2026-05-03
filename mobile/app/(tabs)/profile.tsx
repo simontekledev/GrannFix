@@ -170,7 +170,7 @@ export default function ProfilScreen() {
               <Pressable
                 onPress={() =>
                   router.push(
-                    `/user-reviews?id=${user.id}&name=${encodeURIComponent(user.name ?? "")}` as any
+                    `/user-reviews?id=${user.id}` as any
                   )
                 }
                 style={({ pressed }) => [styles.ratingPressable, pressed && { opacity: 0.6 }]}

@@ -130,7 +130,7 @@ export default function PublicUserScreen() {
 
           {(user.ratingCount ?? 0) > 0 ? (
             <Pressable
-              onPress={() => router.push(`/user-reviews?id=${id}&name=${encodeURIComponent(user.name ?? "")}` as any)}
+              onPress={() => router.push(`/user-reviews?id=${id}` as any)}
               style={({ pressed }) => [styles.ratingPressable, pressed && { opacity: 0.6 }]}
             >
               <StarRating rating={user.ratingAverage ?? 0} color="green" />

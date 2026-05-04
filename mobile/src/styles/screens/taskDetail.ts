@@ -306,53 +306,6 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       marginTop: 8,
       gap: 8,
     },
-    offerItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.background,
-      borderRadius: 10,
-      padding: 12,
-    },
-    offerInfo: {
-      flex: 1,
-      gap: 2,
-    },
-    offerPrice: {
-      fontSize: 15,
-      fontWeight: "700",
-      color: colors.accent,
-    },
-    offerRating: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      fontWeight: "500",
-    },
-    offerRatingEmpty: {
-      fontSize: 12,
-      color: colors.textMuted,
-      fontStyle: "italic",
-    },
-    offerMessage: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      lineHeight: 18,
-    },
-    offerDate: {
-      fontSize: 11,
-      color: colors.textMuted,
-    },
-    acceptButton: {
-      backgroundColor: colors.accent,
-      borderRadius: 8,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      marginLeft: 10,
-    },
-    acceptButtonText: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: "#fff",
-    },
     saveButton: {
       marginTop: 24,
       backgroundColor: colors.accent,
@@ -368,26 +321,6 @@ export function createTaskDetailStyles(colors: ThemeColors) {
       fontSize: 16,
       fontWeight: "600",
       color: "#fff",
-    },
-    ratingStars: {
-      flexDirection: "row",
-      justifyContent: "center",
-      gap: 8,
-      marginTop: 4,
-    },
-    ratingStar: {
-      fontSize: 32,
-      color: colors.border,
-    },
-    ratingStarFilled: {
-      color: "#F59E0B",
-    },
-    ratingThanks: {
-      fontSize: 14,
-      color: colors.accent,
-      fontWeight: "500",
-      textAlign: "center",
-      marginTop: 8,
     },
     taskImage: {
       width: 200,

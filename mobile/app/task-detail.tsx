@@ -21,6 +21,8 @@ import { useUser } from "@/src/context/UserContext";
 import { useTheme } from "@/src/context/ThemeContext";
 import { createTaskDetailStyles } from "@/src/styles/screens/taskDetail";
 import { TaskDetailSkeleton } from "@/src/components/Skeleton";
+import { OfferCard } from "@/src/components/OfferCard";
+import { RateHelperSection } from "@/src/components/RateHelperSection";
 import { timeAgo } from "@/src/helpers/time";
 import { createModalStyles } from "@/src/styles/modal";
 import { createFormStyles } from "@/src/styles/form";
@@ -450,58 +452,19 @@ export default function TaskDetailScreen() {
                 {offers.length === 0 ? (
                   <ActivityIndicator color={colors.accent} style={{ paddingVertical: 12 }} />
                 ) : (
-                  offers.filter((o) => o.status === "PENDING").map((offer) => (
-                    <Pressable
-                      key={offer.id}
-                      style={styles.offerItem}
-                      onPress={() => offer.helperId && router.push(`/public-user?id=${offer.helperId}` as any)}
-                    >
-                      {offer.helperProfileImageUrl ? (
-                        <Image source={{ uri: resolveImageUrl(offer.helperProfileImageUrl)! }} style={[styles.userAvatarImage, { marginRight: 10 }]} />
-                      ) : (
-                        <View style={[styles.userAvatar, { marginRight: 10 }]}>
-                          <Text style={styles.userAvatarText}>
-                            {(offer.helperName ?? "?").charAt(0).toUpperCase()}
-                          </Text>
-                        </View>
-                      )}
-                      <View style={styles.offerInfo}>
-                        <Text style={styles.userName} numberOfLines={1}>
-                          {offer.helperName ?? "Hjälpare"}
-                        </Text>
-                        {offer.helperRatingCount != null && offer.helperRatingCount > 0 ? (
-                          <Text style={styles.offerRating}>
-                            ★ {offer.helperRatingAverage?.toFixed(1)} · {offer.helperRatingCount}{" "}
-                            {offer.helperRatingCount === 1 ? "omdöme" : "omdömen"}
-                          </Text>
-                        ) : (
-                          <Text style={styles.offerRatingEmpty}>Ny hjälpare</Text>
-                        )}
-                        {offer.proposedPrice != null && (
-                          <Text style={styles.offerPrice}>{offer.proposedPrice} kr</Text>
-                        )}
-                        {offer.message && (
-                          <Text style={styles.offerMessage} numberOfLines={2}>{offer.message}</Text>
-                        )}
-                        {offer.createdAt && (
-                          <Text style={styles.offerDate}>{timeAgo(offer.createdAt)}</Text>
-                        )}
-                      </View>
-                      <Pressable
-                        onPress={() => handleAcceptOffer(offer.id!)}
-                        disabled={acceptingId === offer.id}
-                        style={({ pressed }) => [
-                          styles.acceptButton,
-                          pressed && { opacity: 0.7 },
-                          acceptingId === offer.id && { opacity: 0.4 },
-                        ]}
-                      >
-                        <Text style={styles.acceptButtonText}>
-                          {acceptingId === offer.id ? "..." : "Acceptera"}
-                        </Text>
-                      </Pressable>
-                    </Pressable>
-                  ))
+                  offers
+                    .filter((o) => o.status === "PENDING")
+                    .map((offer) => (
+                      <OfferCard
+                        key={offer.id}
+                        offer={offer}
+                        isAccepting={acceptingId === offer.id}
+                        onAccept={(id) => handleAcceptOffer(id)}
+                        onPressHelper={(helperId) =>
+                          router.push(`/public-user?id=${helperId}` as any)
+                        }
+                      />
+                    ))
                 )}
               </View>
             )}
@@ -621,61 +584,20 @@ export default function TaskDetailScreen() {
 
         {status === "COMPLETED" && task.createdBy?.id === user?.id && (() => {
           const completedOffer = offers.find((o) => (o as any).status === "COMPLETED");
-          const alreadyRated = ratingSubmitted || (completedOffer && (completedOffer as any).rating != null);
-
           if (!completedOffer) return null;
-
-          if (alreadyRated) {
-            const r = (completedOffer as any).rating ?? ratingValue;
-            return (
-              <View style={styles.card}>
-                <Text style={styles.sectionTitle}>DITT BETYG</Text>
-                <View style={styles.ratingStars}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Text key={star} style={[styles.ratingStar, star <= r && styles.ratingStarFilled]}>★</Text>
-                  ))}
-                </View>
-                <Text style={styles.ratingThanks}>Tack för ditt betyg!</Text>
-              </View>
-            );
-          }
-
+          const savedRating = (completedOffer as any).rating as number | undefined;
+          const submittedRating =
+            ratingSubmitted ? ratingValue : (savedRating ?? null);
           return (
-            <View style={styles.card}>
-              <Text style={styles.sectionTitle}>BETYGSÄTT HJÄLPAREN</Text>
-              <View style={styles.ratingStars}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Pressable key={star} onPress={() => setRatingValue(star)}>
-                    <Text style={[styles.ratingStar, star <= ratingValue && styles.ratingStarFilled]}>★</Text>
-                  </Pressable>
-                ))}
-              </View>
-              <TextInput
-                value={ratingComment}
-                onChangeText={setRatingComment}
-                placeholder="Valfri kommentar..."
-                placeholderTextColor={colors.textMuted}
-                style={[formStyles.input, { marginTop: 12 }]}
-                multiline
-                maxLength={500}
-              />
-              <Pressable
-                onPress={handleSubmitRating}
-                disabled={ratingValue === 0 || submittingRating}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  { marginTop: 16 },
-                  (ratingValue === 0 || submittingRating) && { opacity: 0.35 },
-                  pressed && ratingValue > 0 && !submittingRating && styles.primaryButtonPressed,
-                ]}
-              >
-                {submittingRating ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Skicka betyg</Text>
-                )}
-              </Pressable>
-            </View>
+            <RateHelperSection
+              submittedRating={submittedRating}
+              ratingValue={ratingValue}
+              onChangeRating={setRatingValue}
+              comment={ratingComment}
+              onChangeComment={setRatingComment}
+              submitting={submittingRating}
+              onSubmit={handleSubmitRating}
+            />
           );
         })()}
 

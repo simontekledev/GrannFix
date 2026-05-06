@@ -93,17 +93,17 @@ public class OfferService {
         }
 
         var helperIds = offers.stream().map(Offer::getHelperId).collect(java.util.stream.Collectors.toSet());
-        var names = userLookupPort.displayNames(helperIds);
-        var images = userLookupPort.profileImageUrls(helperIds);
-        var ratingAverages = userLookupPort.ratingAverages(helperIds);
-        var ratingCounts = userLookupPort.ratingCounts(helperIds);
+        var summaries = userLookupPort.summaries(helperIds);
         return offers.stream()
-                .map(o -> OfferMapper.toResponse(
-                        o,
-                        names.get(o.getHelperId()),
-                        images.get(o.getHelperId()),
-                        ratingAverages.get(o.getHelperId()),
-                        ratingCounts.get(o.getHelperId())))
+                .map(o -> {
+                    var s = summaries.get(o.getHelperId());
+                    return OfferMapper.toResponse(
+                            o,
+                            s != null ? s.name() : null,
+                            s != null ? s.profileImageUrl() : null,
+                            s != null ? s.ratingAverage() : null,
+                            s != null ? s.ratingCount() : null);
+                })
                 .toList();
     }
 
@@ -213,13 +213,13 @@ public class OfferService {
         var taskIds = offers.stream().map(Offer::getTaskId).collect(java.util.stream.Collectors.toSet());
         var tasks = taskOfferPort.findTaskSummaries(taskIds);
         var ownerIds = tasks.values().stream().map(TaskAssignmentPort.TaskOfferSummary::createdById).collect(java.util.stream.Collectors.toSet());
-        var names = userLookupPort.displayNames(ownerIds);
-        var images = userLookupPort.profileImageUrls(ownerIds);
+        var summaries = userLookupPort.summaries(ownerIds);
 
         return offers.stream().map(o -> {
             var task = tasks.get(o.getTaskId());
             if (task == null) return null;
             UUID ownerId = task.createdById();
+            var s = summaries.get(ownerId);
             return new MyOfferResponse(
                     o.getId(),
                     o.getStatus(),
@@ -231,8 +231,8 @@ public class OfferService {
                             task.category(),
                             task.area(),
                             task.status(),
-                            names.get(ownerId),
-                            images.get(ownerId)
+                            s != null ? s.name() : null,
+                            s != null ? s.profileImageUrl() : null
                     )
             );
         }).filter(java.util.Objects::nonNull).toList();

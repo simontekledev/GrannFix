@@ -40,19 +40,19 @@ public class OfferUserReviewAdapter implements UserReviewQueryPort {
         Map<UUID, TaskAssignmentPort.TaskOfferSummary> tasks = taskAssignmentPort.findTaskSummaries(taskIds);
         for (var summary : tasks.values()) reviewerIds.add(summary.createdById());
 
-        Map<UUID, String> names = userLookupPort.displayNames(reviewerIds);
-        Map<UUID, String> images = userLookupPort.profileImageUrls(reviewerIds);
+        var summaries = userLookupPort.summaries(reviewerIds);
 
         return offers.map(o -> {
             var task = tasks.get(o.getTaskId());
             UUID reviewerId = task != null ? task.createdById() : null;
+            var s = reviewerId != null ? summaries.get(reviewerId) : null;
             return new UserReviewDto(
                     o.getId(),
                     o.getRating(),
                     o.getRatingComment(),
                     reviewerId,
-                    reviewerId != null ? names.get(reviewerId) : null,
-                    reviewerId != null ? images.get(reviewerId) : null,
+                    s != null ? s.name() : null,
+                    s != null ? s.profileImageUrl() : null,
                     o.getTaskId(),
                     task != null ? task.title() : null,
                     o.getCompletedAt()

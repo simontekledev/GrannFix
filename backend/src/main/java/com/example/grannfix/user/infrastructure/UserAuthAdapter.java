@@ -4,6 +4,7 @@ import com.example.grannfix.auth.application.ports.out.CreateUserCommand;
 import com.example.grannfix.auth.application.ports.out.UserAuthPort;
 import com.example.grannfix.auth.application.ports.out.UserAuthView;
 import com.example.grannfix.common.contracts.UserLookupPort;
+import com.example.grannfix.common.contracts.UserLookupView;
 import com.example.grannfix.offer.application.port.out.UserRatingPort;
 import com.example.grannfix.user.domain.User;
 import com.example.grannfix.user.persistence.UserRepository;
@@ -120,34 +121,18 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
     }
 
     @Override
-    public Map<UUID, String> displayNames(Collection<UUID> userIds) {
+    public Map<UUID, UserLookupView> summaries(Collection<UUID> userIds) {
         if (userIds.isEmpty()) return Map.of();
         return userRepository.findAllById(userIds).stream()
-                .collect(Collectors.toMap(User::getId, User::getName));
-    }
-
-    @Override
-    public Map<UUID, String> profileImageUrls(Collection<UUID> userIds) {
-        if (userIds.isEmpty()) return Map.of();
-        return userRepository.findAllById(userIds).stream()
-                .filter(u -> u.getProfileImageUrl() != null)
-                .collect(Collectors.toMap(User::getId, User::getProfileImageUrl));
-    }
-
-    @Override
-    public Map<UUID, Double> ratingAverages(Collection<UUID> userIds) {
-        if (userIds.isEmpty()) return Map.of();
-        return userRepository.findAllById(userIds).stream()
-                .filter(u -> u.getRatingAverage() != null)
-                .collect(Collectors.toMap(User::getId, User::getRatingAverage));
-    }
-
-    @Override
-    public Map<UUID, Integer> ratingCounts(Collection<UUID> userIds) {
-        if (userIds.isEmpty()) return Map.of();
-        return userRepository.findAllById(userIds).stream()
-                .filter(u -> u.getRatingCount() != null)
-                .collect(Collectors.toMap(User::getId, User::getRatingCount));
+                .collect(Collectors.toMap(
+                        User::getId,
+                        u -> new UserLookupView(
+                                u.getName(),
+                                u.getProfileImageUrl(),
+                                u.getRatingAverage(),
+                                u.getRatingCount()
+                        )
+                ));
     }
 
     private UserAuthView toView(User u) {

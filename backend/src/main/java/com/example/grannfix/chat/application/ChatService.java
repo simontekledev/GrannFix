@@ -54,21 +54,21 @@ public class ChatService {
         }
 
         Map<UUID, String> titles = taskChatPort.taskTitles(taskIds);
-        Map<UUID, String> names = userLookupPort.displayNames(userIds);
-        Map<UUID, String> images = userLookupPort.profileImageUrls(userIds);
+        var summaries = userLookupPort.summaries(userIds);
         Map<UUID, ChatMessage> lastMessages = messageRepository.findLastMessagesByChatIds(chatIds).stream()
                 .collect(Collectors.toMap(ChatMessage::getChatId, m -> m));
 
         return chats.stream().map(chat -> {
             UUID otherPartyId = chat.getOwnerId().equals(userId) ? chat.getHelperId() : chat.getOwnerId();
             ChatMessage lastMsg = lastMessages.get(chat.getId());
+            var s = summaries.get(otherPartyId);
             return new ChatSummaryResponse(
                     chat.getId(),
                     chat.getTaskId(),
                     titles.getOrDefault(chat.getTaskId(), "Uppdrag"),
                     otherPartyId,
-                    names.get(otherPartyId),
-                    images.get(otherPartyId),
+                    s != null ? s.name() : null,
+                    s != null ? s.profileImageUrl() : null,
                     lastMsg != null ? lastMsg.getContent() : null,
                     lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt(),
                     lastMsg != null ? lastMsg.getSenderId() : null

@@ -18,6 +18,8 @@ import { chatApi, userApi } from "@/src/api/client";
 import { useUser } from "@/src/context/UserContext";
 import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 import { ChatMessagesSkeleton } from "@/src/components/Skeleton";
+import { MessageBubble } from "@/src/components/MessageBubble";
+import { DateSeparator } from "@/src/components/DateSeparator";
 import type { ChatMessageResponse } from "@/src/api/generated/models/ChatMessageResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
 import { UserActionSheet } from "@/src/components/UserActionSheet";
@@ -235,43 +237,18 @@ export default function ChatConversationScreen() {
 
   function renderItem({ item }: { item: ListItem }) {
     if (item.type === "date") {
-      return (
-        <View style={styles.dateSeparator}>
-          <Text style={styles.dateSeparatorText}>{item.label}</Text>
-        </View>
-      );
+      return <DateSeparator label={item.label} />;
     }
 
     const { message, isMe, isFirstInGroup, isLastInGroup, showTime } = item;
-
-    const bubbleStyle = [
-      styles.bubble,
-      isMe ? styles.bubbleMe : styles.bubbleThem,
-      isMe
-        ? {
-            borderTopRightRadius: isFirstInGroup ? 18 : 6,
-            borderBottomRightRadius: isLastInGroup ? 18 : 6,
-          }
-        : {
-            borderTopLeftRadius: isFirstInGroup ? 18 : 6,
-            borderBottomLeftRadius: isLastInGroup ? 18 : 6,
-          },
-      { marginTop: isFirstInGroup ? 12 : 2 },
-    ];
-
     return (
-      <View style={isMe ? styles.rowMe : styles.rowThem}>
-        <View style={bubbleStyle}>
-          <Text style={[styles.bubbleText, isMe ? styles.bubbleTextMe : styles.bubbleTextThem]}>
-            {message.content}
-          </Text>
-        </View>
-        {showTime && message.createdAt && (
-          <Text style={[styles.timeBelow, isMe ? styles.timeBelowMe : styles.timeBelowThem]}>
-            {timeLabel(message.createdAt)}
-          </Text>
-        )}
-      </View>
+      <MessageBubble
+        content={message.content ?? ""}
+        isMe={isMe}
+        isFirstInGroup={isFirstInGroup}
+        isLastInGroup={isLastInGroup}
+        timeLabel={showTime && message.createdAt ? timeLabel(message.createdAt) : null}
+      />
     );
   }
 
@@ -480,66 +457,6 @@ function createStyles(colors: ThemeColors) {
       paddingHorizontal: 16,
       paddingVertical: 12,
       flexGrow: 1,
-    },
-    dateSeparator: {
-      alignItems: "center",
-      marginVertical: 12,
-    },
-    dateSeparatorText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.textMuted,
-      backgroundColor: colors.cardElevated,
-      paddingHorizontal: 12,
-      paddingVertical: 4,
-      borderRadius: 10,
-      overflow: "hidden",
-      textTransform: "capitalize",
-    },
-    rowMe: {
-      alignItems: "flex-end",
-    },
-    rowThem: {
-      alignItems: "flex-start",
-    },
-    bubble: {
-      maxWidth: "78%",
-      paddingHorizontal: 14,
-      paddingVertical: 9,
-      borderRadius: 18,
-    },
-    bubbleMe: {
-      backgroundColor: colors.accent,
-    },
-    bubbleThem: {
-      backgroundColor: colors.card,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    bubbleText: {
-      fontSize: 15,
-      lineHeight: 21,
-    },
-    bubbleTextMe: {
-      color: "#fff",
-    },
-    bubbleTextThem: {
-      color: colors.textPrimary,
-    },
-    timeBelow: {
-      fontSize: 10,
-      color: colors.textMuted,
-      marginTop: 3,
-      marginBottom: 4,
-    },
-    timeBelowMe: {
-      marginRight: 4,
-    },
-    timeBelowThem: {
-      marginLeft: 4,
     },
     emptyText: {
       fontSize: 16,

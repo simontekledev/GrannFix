@@ -23,6 +23,7 @@ import { createTaskDetailStyles } from "@/src/styles/screens/taskDetail";
 import { TaskDetailSkeleton } from "@/src/components/Skeleton";
 import { OfferCard } from "@/src/components/OfferCard";
 import { RateHelperSection } from "@/src/components/RateHelperSection";
+import { CreateOfferModal } from "@/src/components/CreateOfferModal";
 import { timeAgo } from "@/src/helpers/time";
 import { createModalStyles } from "@/src/styles/modal";
 import { createFormStyles } from "@/src/styles/form";
@@ -181,24 +182,19 @@ export default function TaskDetailScreen() {
 
   // Offer modal
   const [showOfferModal, setShowOfferModal] = useState(false);
-  const [offerPrice, setOfferPrice] = useState("");
-  const [offerMessage, setOfferMessage] = useState("");
   const [sendingOffer, setSendingOffer] = useState(false);
 
-  async function handleSendOffer() {
+  async function handleSendOffer(payload: { price?: number; message?: string }) {
     if (!id) return;
     setSendingOffer(true);
     try {
       await taskOfferApi.createOffer({
         taskId: id,
         createOfferRequest: {
-          proposedPrice: offerPrice ? Number(offerPrice.replace(/[^0-9]/g, "")) || undefined : undefined,
-          message: offerMessage.trim() || undefined,
+          proposedPrice: payload.price,
+          message: payload.message,
         },
       });
-      setShowOfferModal(false);
-      setOfferPrice("");
-      setOfferMessage("");
       const updated = await taskApi.getTask({ id });
       setTask(updated);
       if (Platform.OS === "web") window.alert("Erbjudande skickat!");
@@ -208,6 +204,7 @@ export default function TaskDetailScreen() {
       const msg = "Kunde inte skicka erbjudandet";
       if (Platform.OS === "web") window.alert(msg);
       else Alert.alert("Fel", msg);
+      throw e;
     } finally {
       setSendingOffer(false);
     }
@@ -700,67 +697,13 @@ export default function TaskDetailScreen() {
         </View>
       </ScrollView>
 
-      <Modal
+      <CreateOfferModal
         visible={showOfferModal}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowOfferModal(false)}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <View style={modalStyles.overlay}>
-            <Pressable
-              style={modalStyles.overlayTouchable}
-              onPress={() => setShowOfferModal(false)}
-            />
-            <View style={modalStyles.content}>
-              <View style={modalStyles.handle} />
-              <Text style={modalStyles.title}>Skicka erbjudande</Text>
-
-              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                <Text style={formStyles.label}>Pris <Text style={formStyles.optional}>(valfritt)</Text></Text>
-                <TextInput
-                  value={offerPrice}
-                  onChangeText={setOfferPrice}
-                  placeholder={task?.offeredPrice ? `Föreslaget: ${task.offeredPrice} kr` : "Ditt pris i kr"}
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="number-pad"
-                  style={formStyles.input}
-                />
-
-                <Text style={formStyles.label}>Meddelande <Text style={formStyles.optional}>(valfritt)</Text></Text>
-                <TextInput
-                  value={offerMessage}
-                  onChangeText={setOfferMessage}
-                  placeholder="Berätta varför du kan hjälpa..."
-                  placeholderTextColor={colors.textMuted}
-                  style={[formStyles.input, formStyles.textArea]}
-                  multiline
-                />
-
-                <Pressable
-                  onPress={handleSendOffer}
-                  disabled={sendingOffer}
-                  style={({ pressed }) => [
-                    styles.primaryButton,
-                    { marginTop: 24 },
-                    sendingOffer && { opacity: 0.35 },
-                    pressed && !sendingOffer && styles.primaryButtonPressed,
-                  ]}
-                >
-                  {sendingOffer ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.primaryButtonText}>Skicka erbjudande</Text>
-                  )}
-                </Pressable>
-              </ScrollView>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        onClose={() => setShowOfferModal(false)}
+        onSubmit={handleSendOffer}
+        submitting={sendingOffer}
+        suggestedPrice={task?.offeredPrice ? Number(task.offeredPrice) : null}
+      />
 
       <Modal
         visible={showEditModal}

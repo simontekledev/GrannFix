@@ -98,10 +98,16 @@ public class TaskService {
         if (!isOwner && !isHelper && task.getStatus() != TaskStatus.OPEN) {
             throw new ForbiddenException("Forbidden");
         }
-        String ownerName = userLookupPort.displayName(task.getCreatedById());
-        String ownerImage = userLookupPort.profileImageUrl(task.getCreatedById());
-        String helperName = task.getAssignedToId() != null ? userLookupPort.displayName(task.getAssignedToId()) : null;
-        String helperImage = task.getAssignedToId() != null ? userLookupPort.profileImageUrl(task.getAssignedToId()) : null;
+        var userIds = task.getAssignedToId() != null
+                ? java.util.Set.of(task.getCreatedById(), task.getAssignedToId())
+                : java.util.Set.of(task.getCreatedById());
+        var summaries = userLookupPort.summaries(userIds);
+        var owner = summaries.get(task.getCreatedById());
+        var helper = task.getAssignedToId() != null ? summaries.get(task.getAssignedToId()) : null;
+        String ownerName = owner != null ? owner.name() : null;
+        String ownerImage = owner != null ? owner.profileImageUrl() : null;
+        String helperName = helper != null ? helper.name() : null;
+        String helperImage = helper != null ? helper.profileImageUrl() : null;
         int pendingOffers = isOwner ? offerTaskPort.countPendingOffers(taskId) : 0;
         boolean viewerHasOffer = !isOwner && userId != null && offerTaskPort.hasOffer(taskId, userId);
         return TaskMapper.toDetailResponse(task, userId, ownerName, ownerImage, helperName, helperImage, pendingOffers, viewerHasOffer);

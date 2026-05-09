@@ -3,6 +3,7 @@ package com.example.grannfix.chat.api;
 import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
 import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
+import com.example.grannfix.chat.api.dto.ChatUnreadStatusResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
 import com.example.grannfix.chat.application.ChatService;
 import jakarta.validation.Valid;
@@ -23,6 +24,11 @@ public class ChatController {
     @GetMapping("/chats")
     public List<ChatSummaryResponse> getMyChats(@AuthenticationPrincipal UUID userId) {
         return chatService.getMyChats(userId);
+    }
+
+    @GetMapping("/chats/unread-status")
+    public List<ChatUnreadStatusResponse> getUnreadStatus(@AuthenticationPrincipal UUID userId) {
+        return chatService.getUnreadStatus(userId);
     }
 
     @GetMapping("/tasks/{taskId}/chat")

@@ -3,6 +3,7 @@ package com.example.grannfix.chat.application;
 import com.example.grannfix.chat.api.dto.ChatMessageResponse;
 import com.example.grannfix.chat.api.dto.ChatResponse;
 import com.example.grannfix.chat.api.dto.ChatSummaryResponse;
+import com.example.grannfix.chat.api.dto.ChatUnreadStatusResponse;
 import com.example.grannfix.chat.api.dto.SendMessageRequest;
 import com.example.grannfix.common.contracts.BlockLookupPort;
 import com.example.grannfix.common.contracts.PushPort;
@@ -71,6 +72,25 @@ public class ChatService {
                     s != null ? s.profileImageUrl() : null,
                     lastMsg != null ? lastMsg.getContent() : null,
                     lastMsg != null ? lastMsg.getCreatedAt() : chat.getCreatedAt(),
+                    lastMsg != null ? lastMsg.getSenderId() : null
+            );
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatUnreadStatusResponse> getUnreadStatus(UUID userId) {
+        var chats = chatRepository.findByOwnerIdOrHelperIdOrderByCreatedAtDesc(userId, userId);
+        if (chats.isEmpty()) return List.of();
+
+        Set<UUID> chatIds = chats.stream().map(Chat::getId).collect(Collectors.toSet());
+        Map<UUID, ChatMessage> lastMessages = messageRepository.findLastMessagesByChatIds(chatIds).stream()
+                .collect(Collectors.toMap(ChatMessage::getChatId, m -> m));
+
+        return chats.stream().map(chat -> {
+            ChatMessage lastMsg = lastMessages.get(chat.getId());
+            return new ChatUnreadStatusResponse(
+                    chat.getId(),
+                    lastMsg != null ? lastMsg.getCreatedAt() : null,
                     lastMsg != null ? lastMsg.getSenderId() : null
             );
         }).toList();

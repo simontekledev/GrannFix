@@ -39,14 +39,14 @@ export function UnreadChatProvider({ children }: { children: React.ReactNode }) 
       const map: Record<string, string> = stored ? JSON.parse(stored) : {};
       lastReadMapRef.current = map;
 
-      const chats = await chatApi.getMyChats();
+      const statuses = await chatApi.getUnreadStatus();
       const userId = userIdRef.current;
       let count = 0;
-      for (const chat of chats) {
-        if (!chat.id || !chat.lastMessageAt) continue;
-        if (chat.lastMessageSenderId === userId) continue;
-        const lastRead = map[chat.id];
-        if (!lastRead || new Date(chat.lastMessageAt).getTime() > new Date(lastRead).getTime()) {
+      for (const s of statuses) {
+        if (!s.chatId || !s.lastMessageAt) continue;
+        if (s.lastMessageSenderId === userId) continue;
+        const lastRead = map[s.chatId];
+        if (!lastRead || new Date(s.lastMessageAt).getTime() > new Date(lastRead).getTime()) {
           count++;
         }
       }

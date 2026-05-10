@@ -9,6 +9,7 @@ export * from './ChangePasswordRequest';
 export * from './ChatMessageResponse';
 export * from './ChatResponse';
 export * from './ChatSummaryResponse';
+export * from './ChatUnreadStatusResponse';
 export * from './CreateOfferRequest';
 export * from './CreateReportRequest';
 export * from './CreateTaskRequest';

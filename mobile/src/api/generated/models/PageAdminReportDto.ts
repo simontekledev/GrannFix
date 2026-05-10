@@ -79,6 +79,12 @@ export interface PageAdminReportDto {
     sort?: SortObject;
     /**
      * 
+     * @type {number}
+     * @memberof PageAdminReportDto
+     */
+    numberOfElements?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof PageAdminReportDto
      */
@@ -89,12 +95,6 @@ export interface PageAdminReportDto {
      * @memberof PageAdminReportDto
      */
     last?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAdminReportDto
-     */
-    numberOfElements?: number;
     /**
      * 
      * @type {PageableObject}
@@ -132,9 +132,9 @@ export function PageAdminReportDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         'content': json['content'] == null ? undefined : ((json['content'] as Array<any>).map(AdminReportDtoFromJSON)),
         'number': json['number'] == null ? undefined : json['number'],
         'sort': json['sort'] == null ? undefined : SortObjectFromJSON(json['sort']),
+        'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
         'first': json['first'] == null ? undefined : json['first'],
         'last': json['last'] == null ? undefined : json['last'],
-        'numberOfElements': json['numberOfElements'] == null ? undefined : json['numberOfElements'],
         'pageable': json['pageable'] == null ? undefined : PageableObjectFromJSON(json['pageable']),
         'empty': json['empty'] == null ? undefined : json['empty'],
     };
@@ -157,9 +157,9 @@ export function PageAdminReportDtoToJSONTyped(value?: PageAdminReportDto | null,
         'content': value['content'] == null ? undefined : ((value['content'] as Array<any>).map(AdminReportDtoToJSON)),
         'number': value['number'],
         'sort': SortObjectToJSON(value['sort']),
+        'numberOfElements': value['numberOfElements'],
         'first': value['first'],
         'last': value['last'],
-        'numberOfElements': value['numberOfElements'],
         'pageable': PageableObjectToJSON(value['pageable']),
         'empty': value['empty'],
     };

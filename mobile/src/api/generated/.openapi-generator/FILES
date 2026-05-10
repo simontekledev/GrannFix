@@ -27,6 +27,7 @@ docs/ChatControllerApi.md
 docs/ChatMessageResponse.md
 docs/ChatResponse.md
 docs/ChatSummaryResponse.md
+docs/ChatUnreadStatusResponse.md
 docs/CreateOfferRequest.md
 docs/CreateReportRequest.md
 docs/CreateTaskRequest.md
@@ -78,6 +79,7 @@ models/ChangePasswordRequest.ts
 models/ChatMessageResponse.ts
 models/ChatResponse.ts
 models/ChatSummaryResponse.ts
+models/ChatUnreadStatusResponse.ts
 models/CreateOfferRequest.ts
 models/CreateReportRequest.ts
 models/CreateTaskRequest.ts

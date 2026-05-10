@@ -18,6 +18,7 @@ import type {
   ChatMessageResponse,
   ChatResponse,
   ChatSummaryResponse,
+  ChatUnreadStatusResponse,
   SendMessageRequest,
 } from '../models/index';
 import {
@@ -27,6 +28,8 @@ import {
     ChatResponseToJSON,
     ChatSummaryResponseFromJSON,
     ChatSummaryResponseToJSON,
+    ChatUnreadStatusResponseFromJSON,
+    ChatUnreadStatusResponseToJSON,
     SendMessageRequestFromJSON,
     SendMessageRequestToJSON,
 } from '../models/index';
@@ -196,6 +199,49 @@ export class ChatControllerApi extends runtime.BaseAPI {
      */
     async getOrCreateChat(requestParameters: GetOrCreateChatRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ChatResponse> {
         const response = await this.getOrCreateChatRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getUnreadStatus without sending the request
+     */
+    async getUnreadStatusRequestOpts(): Promise<runtime.RequestOpts> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/chats/unread-status`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async getUnreadStatusRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ChatUnreadStatusResponse>>> {
+        const requestOptions = await this.getUnreadStatusRequestOpts();
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ChatUnreadStatusResponseFromJSON));
+    }
+
+    /**
+     */
+    async getUnreadStatus(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ChatUnreadStatusResponse>> {
+        const response = await this.getUnreadStatusRaw(initOverrides);
         return await response.value();
     }
 

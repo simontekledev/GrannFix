@@ -60,6 +60,7 @@ docs/SortObject.md
 docs/TaskControllerApi.md
 docs/TaskDetailResponse.md
 docs/TaskOfferControllerApi.md
+docs/TaskPaymentInfoResponse.md
 docs/TaskQueryControllerApi.md
 docs/TaskResponse.md
 docs/TaskSummary.md
@@ -105,6 +106,7 @@ models/ResetPasswordRequest.ts
 models/SendMessageRequest.ts
 models/SortObject.ts
 models/TaskDetailResponse.ts
+models/TaskPaymentInfoResponse.ts
 models/TaskResponse.ts
 models/TaskSummary.ts
 models/UpdateMeRequest.ts

@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   CreateTaskRequest,
   TaskDetailResponse,
+  TaskPaymentInfoResponse,
   TaskResponse,
   UpdateTaskRequest,
 } from '../models/index';
@@ -25,6 +26,8 @@ import {
     CreateTaskRequestToJSON,
     TaskDetailResponseFromJSON,
     TaskDetailResponseToJSON,
+    TaskPaymentInfoResponseFromJSON,
+    TaskPaymentInfoResponseToJSON,
     TaskResponseFromJSON,
     TaskResponseToJSON,
     UpdateTaskRequestFromJSON,
@@ -40,6 +43,10 @@ export interface CreateTaskOperationRequest {
 }
 
 export interface DeleteTaskRequest {
+    id: string;
+}
+
+export interface GetPaymentInfoRequest {
     id: string;
 }
 
@@ -250,6 +257,57 @@ export class TaskControllerApi extends runtime.BaseAPI {
      */
     async getMyTasks(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskResponse>> {
         const response = await this.getMyTasksRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getPaymentInfo without sending the request
+     */
+    async getPaymentInfoRequestOpts(requestParameters: GetPaymentInfoRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getPaymentInfo().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/tasks/{id}/payment-info`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     */
+    async getPaymentInfoRaw(requestParameters: GetPaymentInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskPaymentInfoResponse>> {
+        const requestOptions = await this.getPaymentInfoRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskPaymentInfoResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getPaymentInfo(requestParameters: GetPaymentInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskPaymentInfoResponse> {
+        const response = await this.getPaymentInfoRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

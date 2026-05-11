@@ -8,6 +8,7 @@ All URIs are relative to *http://localhost:8080*
 | [**createTask**](TaskControllerApi.md#createtaskoperation) | **POST** /tasks |  |
 | [**deleteTask**](TaskControllerApi.md#deletetask) | **DELETE** /tasks/{id} |  |
 | [**getMyTasks**](TaskControllerApi.md#getmytasks) | **GET** /tasks/me |  |
+| [**getPaymentInfo**](TaskControllerApi.md#getpaymentinfo) | **GET** /tasks/{id}/payment-info |  |
 | [**getTask**](TaskControllerApi.md#gettask) | **GET** /tasks/{id} |  |
 | [**updateMyTask**](TaskControllerApi.md#updatemytask) | **PATCH** /tasks/{id} |  |
 
@@ -262,6 +263,75 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**Array&lt;TaskResponse&gt;**](TaskResponse.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `*/*`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getPaymentInfo
+
+> TaskPaymentInfoResponse getPaymentInfo(id)
+
+
+
+### Example
+
+```ts
+import {
+  Configuration,
+  TaskControllerApi,
+} from '';
+import type { GetPaymentInfoRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // Configure HTTP bearer authorization: bearerAuth
+    accessToken: "YOUR BEARER TOKEN",
+  });
+  const api = new TaskControllerApi(config);
+
+  const body = {
+    // string
+    id: 38400000-8cf0-11bd-b23e-10b96e4ef00d,
+  } satisfies GetPaymentInfoRequest;
+
+  try {
+    const data = await api.getPaymentInfo(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `string` |  | [Defaults to `undefined`] |
+
+### Return type
+
+[**TaskPaymentInfoResponse**](TaskPaymentInfoResponse.md)
 
 ### Authorization
 

@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -64,6 +65,38 @@ export default function TaskDetailScreen() {
 
   // Mark done / confirm done
   const [markingDone, setMarkingDone] = useState(false);
+  const [openingSwish, setOpeningSwish] = useState(false);
+
+  async function handleSwish() {
+    if (!id) return;
+    setOpeningSwish(true);
+    try {
+      const info = await taskApi.getPaymentInfo({ id });
+      const phone = (info.helperPhoneNumber ?? "").replace(/[^0-9]/g, "");
+      const swishPhone = phone.startsWith("46") ? "0" + phone.slice(2) : phone;
+      const data = {
+        payee: swishPhone,
+        amount: info.amount?.toString() ?? "",
+        message: info.taskReference ?? "GrannFix",
+      };
+      const url = `swish://payment?data=${encodeURIComponent(JSON.stringify(data))}`;
+      const canOpen = await Linking.canOpenURL(url);
+      if (!canOpen) {
+        const msg = "Swish-appen kunde inte öppnas. Är den installerad?";
+        if (Platform.OS === "web") window.alert(msg);
+        else Alert.alert("Swish saknas", msg);
+        return;
+      }
+      await Linking.openURL(url);
+    } catch (e: any) {
+      console.log("Swish error:", e);
+      const msg = "Kunde inte hämta betalningsinfo.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setOpeningSwish(false);
+    }
+  }
   const [confirmingDone, setConfirmingDone] = useState(false);
 
   // Rating
@@ -669,6 +702,27 @@ export default function TaskDetailScreen() {
             }
             return null;
           })()}
+
+          {task.createdBy?.id === user?.id &&
+            task.assignedTo &&
+            (status === "ASSIGNED" || status === "COMPLETED") && (
+              <Pressable
+                onPress={handleSwish}
+                disabled={openingSwish}
+                style={({ pressed, hovered }: any) => [
+                  styles.primaryButton,
+                  hovered && styles.primaryButtonHovered,
+                  pressed && styles.primaryButtonPressed,
+                  openingSwish && { opacity: 0.35 },
+                ]}
+              >
+                {openingSwish ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.primaryButtonText}>Swisha hjälpare</Text>
+                )}
+              </Pressable>
+            )}
 
           {perms?.canEdit && (
             <Pressable

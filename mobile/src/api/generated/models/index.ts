@@ -35,6 +35,7 @@ export * from './ResetPasswordRequest';
 export * from './SendMessageRequest';
 export * from './SortObject';
 export * from './TaskDetailResponse';
+export * from './TaskPaymentInfoResponse';
 export * from './TaskResponse';
 export * from './TaskSummary';
 export * from './UpdateMeRequest';

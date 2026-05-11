@@ -8,5 +8,6 @@ public interface UserLookupPort {
     boolean isVerified(UUID userId);
     String displayName(UUID userId);
     String profileImageUrl(UUID userId);
+    String phoneNumber(UUID userId);
     Map<UUID, UserLookupView> summaries(Collection<UUID> userIds);
 }

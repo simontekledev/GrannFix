@@ -9,9 +9,17 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 public interface OfferRepository extends JpaRepository<Offer, UUID> {
+
+    @Query("SELECT o FROM Offer o WHERE o.taskId = :taskId AND o.status IN :statuses")
+    Optional<Offer> findByTaskIdAndStatusIn(
+            @Param("taskId") UUID taskId,
+            @Param("statuses") Collection<OfferStatus> statuses);
+
 
     Page<Offer> findByHelperIdAndStatusAndRatingIsNotNull(
             UUID helperId, OfferStatus status, Pageable pageable);

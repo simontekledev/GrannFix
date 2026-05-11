@@ -6,6 +6,7 @@ import com.example.grannfix.common.errors.ForbiddenException;
 import com.example.grannfix.common.errors.NotFoundException;
 import com.example.grannfix.task.api.dto.CreateTaskRequest;
 import com.example.grannfix.task.api.dto.TaskDetailResponse;
+import com.example.grannfix.task.api.dto.TaskPaymentInfoResponse;
 import com.example.grannfix.task.api.dto.TaskResponse;
 import com.example.grannfix.task.api.dto.UpdateTaskRequest;
 import com.example.grannfix.task.application.port.out.OfferTaskPort;
@@ -111,6 +112,27 @@ public class TaskService {
         int pendingOffers = isOwner ? offerTaskPort.countPendingOffers(taskId) : 0;
         boolean viewerHasOffer = !isOwner && userId != null && offerTaskPort.hasOffer(taskId, userId);
         return TaskMapper.toDetailResponse(task, userId, ownerName, ownerImage, helperName, helperImage, pendingOffers, viewerHasOffer);
+    }
+
+    @Transactional(readOnly = true)
+    public TaskPaymentInfoResponse getPaymentInfo(UUID userId, UUID taskId) {
+        Task task = taskRepository.findByIdAndActiveTrue(taskId)
+                .orElseThrow(() -> new NotFoundException("Task not found"));
+
+        if (!task.getCreatedById().equals(userId)) {
+            throw new ForbiddenException("Only the task poster can view payment info");
+        }
+        if (task.getAssignedToId() == null) {
+            throw new BadRequestException("Task has no assigned helper");
+        }
+
+        BigDecimal amount = offerTaskPort.getAcceptedOfferPrice(taskId)
+                .orElse(task.getOfferedPrice());
+        String helperName = userLookupPort.displayName(task.getAssignedToId());
+        String helperPhone = userLookupPort.phoneNumber(task.getAssignedToId());
+        String taskReference = "GrannFix #" + taskId.toString().substring(0, 8);
+
+        return new TaskPaymentInfoResponse(helperPhone, helperName, amount, taskReference);
     }
 
     @Transactional

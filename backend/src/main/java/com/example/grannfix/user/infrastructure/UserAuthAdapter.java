@@ -102,6 +102,13 @@ public class UserAuthAdapter implements UserAuthPort, UserLookupPort, UserRating
     }
 
     @Override
+    public String phoneNumber(UUID userId) {
+        return userRepository.findById(userId)
+                .map(User::getPhoneNumber)
+                .orElse(null);
+    }
+
+    @Override
     public void updateRating(UUID userId, int newRating) {
         userRepository.findById(userId).ifPresent(user -> {
             int count = user.getRatingCount() != null ? user.getRatingCount() : 0;

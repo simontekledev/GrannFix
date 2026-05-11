@@ -2,6 +2,7 @@ package com.example.grannfix.task.api;
 
 import com.example.grannfix.task.api.dto.CreateTaskRequest;
 import com.example.grannfix.task.api.dto.TaskDetailResponse;
+import com.example.grannfix.task.api.dto.TaskPaymentInfoResponse;
 import com.example.grannfix.task.api.dto.TaskResponse;
 import com.example.grannfix.task.api.dto.UpdateTaskRequest;
 import com.example.grannfix.task.application.TaskService;
@@ -44,6 +45,14 @@ public class TaskController {
             @PathVariable UUID id
     ) {
         return taskService.getTaskById(userId, id);
+    }
+
+    @GetMapping("/{id}/payment-info")
+    public TaskPaymentInfoResponse getPaymentInfo(
+            @AuthenticationPrincipal UUID userId,
+            @PathVariable UUID id
+    ) {
+        return taskService.getPaymentInfo(userId, id);
     }
 
     @PatchMapping("/{id}")

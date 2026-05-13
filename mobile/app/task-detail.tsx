@@ -4,14 +4,11 @@ import {
   Alert,
   FlatList,
   Image,
-  KeyboardAvoidingView,
   Linking,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,9 +22,8 @@ import { TaskDetailSkeleton } from "@/src/components/Skeleton";
 import { OfferCard } from "@/src/components/OfferCard";
 import { RateHelperSection } from "@/src/components/RateHelperSection";
 import { CreateOfferModal } from "@/src/components/CreateOfferModal";
+import { EditTaskModal } from "@/src/components/EditTaskModal";
 import { timeAgo } from "@/src/helpers/time";
-import { createModalStyles } from "@/src/styles/modal";
-import { createFormStyles } from "@/src/styles/form";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
 
@@ -52,8 +48,6 @@ export default function TaskDetailScreen() {
   const { user } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => createTaskDetailStyles(colors), [colors]);
-  const modalStyles = useMemo(() => createModalStyles(colors), [colors]);
-  const formStyles = useMemo(() => createFormStyles(colors), [colors]);
   const [task, setTask] = useState<TaskDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
@@ -80,16 +74,15 @@ export default function TaskDetailScreen() {
         message: info.taskReference ?? "GrannFix",
       };
       const url = `swish://payment?data=${encodeURIComponent(JSON.stringify(data))}`;
-      const canOpen = await Linking.canOpenURL(url);
-      if (!canOpen) {
+      try {
+        await Linking.openURL(url);
+      } catch {
         const msg = "Swish-appen kunde inte öppnas. Är den installerad?";
         if (Platform.OS === "web") window.alert(msg);
         else Alert.alert("Swish saknas", msg);
-        return;
       }
-      await Linking.openURL(url);
     } catch (e: any) {
-      console.log("Swish error:", e);
+      console.log("Swish payment-info error:", e);
       const msg = "Kunde inte hämta betalningsinfo.";
       if (Platform.OS === "web") window.alert(msg);
       else Alert.alert("Fel", msg);
@@ -245,42 +238,34 @@ export default function TaskDetailScreen() {
 
   // Edit modal
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editPrice, setEditPrice] = useState("");
-  const [editStreet, setEditStreet] = useState("");
   const [saving, setSaving] = useState(false);
 
   function openEditModal() {
     if (!task) return;
-    setEditTitle(task.title ?? "");
-    setEditDescription(task.description ?? "");
-    setEditPrice(task.offeredPrice != null ? String(task.offeredPrice) : "");
-    setEditStreet(task.street ?? "");
     setShowEditModal(true);
   }
 
-  async function handleSaveEdit() {
-    if (!id || !editTitle.trim() || !editDescription.trim()) return;
+  async function handleSaveEdit(payload: { title: string; description: string; price: number; street: string }) {
+    if (!id) return;
     setSaving(true);
     try {
       await taskApi.updateMyTask({
         id,
         updateTaskRequest: {
-          title: editTitle.trim(),
-          description: editDescription.trim(),
-          offeredPrice: editPrice ? Number(editPrice) : 0,
-          street: editStreet.trim() || "",
+          title: payload.title,
+          description: payload.description,
+          offeredPrice: payload.price,
+          street: payload.street,
         },
       });
       const updated = await taskApi.getTask({ id });
       setTask(updated);
-      setShowEditModal(false);
     } catch (e: any) {
       console.log("Edit task error:", e);
       const msg = "Kunde inte uppdatera uppdraget";
       if (Platform.OS === "web") window.alert(msg);
       else Alert.alert("Fel", msg);
+      throw e;
     } finally {
       setSaving(false);
     }
@@ -759,84 +744,18 @@ export default function TaskDetailScreen() {
         suggestedPrice={task?.offeredPrice ? Number(task.offeredPrice) : null}
       />
 
-      <Modal
+      <EditTaskModal
         visible={showEditModal}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowEditModal(false)}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <View style={modalStyles.overlay}>
-            <Pressable
-              style={modalStyles.overlayTouchable}
-              onPress={() => setShowEditModal(false)}
-            />
-            <View style={modalStyles.content}>
-              <View style={modalStyles.handle} />
-              <Text style={modalStyles.title}>Redigera uppdrag</Text>
-
-              <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                <Text style={formStyles.label}>Titel <Text style={formStyles.required}>*</Text></Text>
-                <TextInput
-                  value={editTitle}
-                  onChangeText={setEditTitle}
-                  placeholder="Titel"
-                  placeholderTextColor={colors.textMuted}
-                  style={formStyles.input}
-                />
-
-                <Text style={formStyles.label}>Beskrivning <Text style={formStyles.required}>*</Text></Text>
-                <TextInput
-                  value={editDescription}
-                  onChangeText={setEditDescription}
-                  placeholder="Beskrivning"
-                  placeholderTextColor={colors.textMuted}
-                  style={[formStyles.input, formStyles.textArea]}
-                  multiline
-                />
-
-                <Text style={formStyles.label}>Pris <Text style={formStyles.optional}>(valfritt)</Text></Text>
-                <TextInput
-                  value={editPrice}
-                  onChangeText={setEditPrice}
-                  placeholder="Ersättning i kr"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="number-pad"
-                  style={formStyles.input}
-                />
-
-                <Text style={formStyles.label}>Adress <Text style={formStyles.optional}>(valfritt)</Text></Text>
-                <TextInput
-                  value={editStreet}
-                  onChangeText={setEditStreet}
-                  placeholder="Gatuadress"
-                  placeholderTextColor={colors.textMuted}
-                  style={formStyles.input}
-                />
-
-                <Pressable
-                  onPress={handleSaveEdit}
-                  disabled={saving || !editTitle.trim() || !editDescription.trim()}
-                  style={({ pressed }) => [
-                    styles.saveButton,
-                    (saving || !editTitle.trim() || !editDescription.trim()) && styles.saveButtonDisabled,
-                    pressed && { opacity: 0.85 },
-                  ]}
-                >
-                  {saving ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={styles.saveButtonText}>Spara ändringar</Text>
-                  )}
-                </Pressable>
-              </ScrollView>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        onClose={() => setShowEditModal(false)}
+        onSave={handleSaveEdit}
+        saving={saving}
+        initialValues={{
+          title: task?.title,
+          description: task?.description,
+          price: task?.offeredPrice,
+          street: task?.street,
+        }}
+      />
     </SafeAreaView>
   );
 }

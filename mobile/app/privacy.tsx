@@ -12,28 +12,48 @@ import { useTheme, ThemeColors } from "@/src/context/ThemeContext";
 
 const SECTIONS = [
   {
-    title: "Vilken data samlar vi in?",
-    body: "När du skapar ett konto samlar vi in: namn, e-postadress, telefonnummer, stad och område. Vi sparar även uppgifter om uppdrag du skapar eller hjälper till med.",
+    title: "Personuppgiftsansvarig",
+    body: "Grannfix är personuppgiftsansvarig för behandlingen av dina personuppgifter enligt denna policy. Kontaktuppgifter: support@grannfix.se.",
   },
   {
-    title: "Varför samlar vi in data?",
-    body: "Vi använder din data för att:\n\n• Skapa och hantera ditt konto\n• Matcha dig med uppdrag i ditt närområde\n• Möjliggöra kontakt mellan användare\n• Förbättra appen och användarupplevelsen",
+    title: "Vilken data vi samlar in",
+    body: "Identitetsuppgifter: namn, e-postadress, telefonnummer.\n\nProfildata: profilbild, kort beskrivning (bio), stad och område.\n\nIdentitetsverifiering: när du verifierar dig via BankID bekräftar vi ditt namn och att din identitet är verifierad. Vi lagrar inte ditt personnummer.\n\nAnvändargenererat innehåll: uppdrag du skapar (titel, beskrivning, bilder, plats), erbjudanden du skickar, chattmeddelanden, recensioner och betyg.\n\nTeknisk data: enhets-token för push-notifikationer, IP-adress vid inloggning (för bedrägeriskydd) och loggar.",
   },
   {
-    title: "Hur länge sparar vi data?",
-    body: "Vi sparar din data så länge du har ett aktivt konto. Om du raderar ditt konto tar vi bort all personlig data inom 30 dagar.",
+    title: "Varför vi behandlar din data (rättslig grund)",
+    body: "Avtal (GDPR art. 6.1.b): för att leverera tjänsten — skapa konto, matcha uppdrag, möjliggöra chat och betalning mellan användare.\n\nBerättigat intresse (art. 6.1.f): för bedrägeriskydd, moderation, säkerhetsloggar och att förbättra appen.\n\nRättslig förpliktelse (art. 6.1.c): för bokföringskrav om transaktioner hanteras via plattformen, samt vid förfrågan från myndighet.\n\nSamtycke (art. 6.1.a): för push-notifikationer och frivilliga funktioner. Du kan när som helst återkalla samtycke i Inställningar.",
+  },
+  {
+    title: "Vem vi delar din data med",
+    body: "Vi säljer aldrig din data. Vi använder följande personuppgiftsbiträden för att driva tjänsten:\n\n• Microsoft Azure (Sverige) — hosting av backend och databas\n• Cloudinary (EU) — bildlagring och leverans\n• Google Firebase Cloud Messaging — push-notifikationer\n• Resend — utskick av transaktionella mejl\n• Criipto — identitetsverifiering via BankID\n\nNamn och profilbild på dig syns för andra användare när du skapar uppdrag, skickar erbjudanden eller får recensioner. Telefonnummer delas endast med uppdragsskaparen när du accepterat ett erbjudande, för att möjliggöra betalning via Swish.\n\nVi lämnar ut data till myndighet om vi är rättsligt skyldiga.",
+  },
+  {
+    title: "Var din data lagras",
+    body: "Din data lagras primärt inom EU/EES. För push-notifikationer används Google Firebase, som kan innebära överföring till USA — Google har Standard Contractual Clauses (SCC) på plats för detta enligt GDPR.",
+  },
+  {
+    title: "Hur länge vi sparar din data",
+    body: "Aktivt konto: så länge du använder tjänsten.\n\nVid radering: personuppgifter raderas inom 30 dagar. Namn och profil i recensioner du skrivit pseudonymiseras (visas som \"Borttagen användare\") för att bevara andra användares omdömeshistorik.\n\nChattmeddelanden: raderas när båda parter har raderat sina konton, eller efter 24 månaders inaktivitet.\n\nSäkerhets- och inloggningsloggar: 90 dagar.\n\nBokföringsuppgifter (om transaktioner förmedlats via oss): 7 år enligt bokföringslagen.",
   },
   {
     title: "Dina rättigheter",
-    body: "Enligt GDPR har du rätt att:\n\n• Begära tillgång till din data\n• Korrigera felaktig data\n• Radera ditt konto och all tillhörande data\n• Exportera din data\n\nDu kan radera ditt konto direkt i appen via Inställningar.",
-  },
-  {
-    title: "Delning med tredje part",
-    body: "Vi säljer aldrig din data. Din information delas inte med tredje part förutom:\n\n• Tekniska tjänsteleverantörer som behövs för att driva appen (hosting, push-notifikationer)\n• Om det krävs enligt lag",
+    body: "Enligt GDPR har du rätt att:\n\n• Få tillgång till dina personuppgifter (registerutdrag)\n• Rätta felaktiga uppgifter — gör det direkt under Redigera profil\n• Radera ditt konto och tillhörande data — gör det under Inställningar\n• Exportera din data i maskinläsbart format\n• Invända mot behandling som sker på berättigat intresse\n• Begära begränsning av behandling\n• Återkalla samtycke för push-notifikationer och liknande\n\nKontakta support@grannfix.se för att utöva rättigheter som inte kan hanteras direkt i appen.",
   },
   {
     title: "Säkerhet",
-    body: "Vi skyddar din data med kryptering och säkra servrar. Lösenord lagras aldrig i klartext.",
+    body: "Vi skyddar din data med kryptering vid överföring (HTTPS/TLS) och vid lagring där det är tillämpligt. Lösenord lagras endast som bcrypt-hashar. All åtkomst till produktionsdata är loggat och begränsat till personal som behöver det.\n\nVid en personuppgiftsincident som riskerar dina rättigheter informerar vi dig och Integritetsskyddsmyndigheten enligt GDPR.",
+  },
+  {
+    title: "Åldersgräns",
+    body: "Grannfix riktar sig till personer som har fyllt 18 år. Vi samlar inte medvetet in data från barn. Om du tror att ett konto tillhör någon under 18 år, kontakta oss på support@grannfix.se så raderar vi kontot.",
+  },
+  {
+    title: "Ändringar av policyn",
+    body: "Vi kan uppdatera denna policy. Vid väsentliga ändringar meddelas du via appen eller mejl innan de träder i kraft. Datumet längst upp visar när policyn senast uppdaterades.",
+  },
+  {
+    title: "Klagomål till tillsynsmyndighet",
+    body: "Om du anser att vi hanterar dina personuppgifter felaktigt har du rätt att lämna in klagomål till Integritetsskyddsmyndigheten (IMY), Box 8114, 104 20 Stockholm, imy@imy.se. Vi uppskattar dock om du först kontaktar oss så vi får möjlighet att rätta till saken.",
   },
   {
     title: "Kontakt",
@@ -56,7 +76,7 @@ export default function PrivacyScreen() {
           <Text style={styles.backText}>← Om Grannfix</Text>
         </Pressable>
         <Text style={styles.title}>Integritetspolicy</Text>
-        <Text style={styles.updated}>Senast uppdaterad: april 2026</Text>
+        <Text style={styles.updated}>Senast uppdaterad: maj 2026</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll}>

@@ -17,31 +17,31 @@ const SECTIONS = [
   },
   {
     title: "Vilken data vi samlar in",
-    body: "Identitetsuppgifter: namn, e-postadress, telefonnummer.\n\nProfildata: profilbild, kort beskrivning (bio), stad och område.\n\nIdentitetsverifiering: när du verifierar dig via BankID bekräftar vi ditt namn och att din identitet är verifierad. Vi lagrar inte ditt personnummer.\n\nAnvändargenererat innehåll: uppdrag du skapar (titel, beskrivning, bilder, plats), erbjudanden du skickar, chattmeddelanden, recensioner och betyg.\n\nTeknisk data: enhets-token för push-notifikationer, IP-adress vid inloggning (för bedrägeriskydd) och loggar.",
+    body: "Identitetsuppgifter: namn, mejladress, telefonnummer.\n\nProfildata: profilbild, kort beskrivning (bio), stad och område.\n\nIdentitetsverifiering: när du verifierar dig via BankID bekräftar vi ditt namn och att din identitet är verifierad. Vi lagrar inte ditt personnummer.\n\nAnvändargenererat innehåll: uppdrag du skapar (titel, beskrivning, bilder, plats), erbjudanden du skickar, chattmeddelanden, recensioner och betyg.\n\nTeknisk data: enhetstoken för aviseringar, nätverksadress (IP) vid inloggning för bedrägeriskydd, samt loggar.",
   },
   {
     title: "Varför vi behandlar din data (rättslig grund)",
-    body: "Avtal (GDPR art. 6.1.b): för att leverera tjänsten — skapa konto, matcha uppdrag, möjliggöra chat och betalning mellan användare.\n\nBerättigat intresse (art. 6.1.f): för bedrägeriskydd, moderation, säkerhetsloggar och att förbättra appen.\n\nRättslig förpliktelse (art. 6.1.c): för bokföringskrav om transaktioner hanteras via plattformen, samt vid förfrågan från myndighet.\n\nSamtycke (art. 6.1.a): för push-notifikationer och frivilliga funktioner. Du kan när som helst återkalla samtycke i Inställningar.",
+    body: "Avtal (GDPR art. 6.1.b): för att leverera tjänsten, det vill säga skapa konto, matcha uppdrag och möjliggöra chat och betalning mellan användare.\n\nBerättigat intresse (art. 6.1.f): för bedrägeriskydd, moderation, säkerhetsloggar och att förbättra appen.\n\nRättslig förpliktelse (art. 6.1.c): för bokföringskrav om transaktioner hanteras via plattformen, samt vid förfrågan från myndighet.\n\nSamtycke (art. 6.1.a): för aviseringar och frivilliga funktioner. Du kan när som helst återkalla samtycke i Inställningar.",
   },
   {
     title: "Vem vi delar din data med",
-    body: "Vi säljer aldrig din data. Vi använder följande personuppgiftsbiträden för att driva tjänsten:\n\n• Microsoft Azure (Sverige) — hosting av backend och databas\n• Cloudinary (EU) — bildlagring och leverans\n• Google Firebase Cloud Messaging — push-notifikationer\n• Resend — utskick av transaktionella mejl\n• Criipto — identitetsverifiering via BankID\n\nNamn och profilbild på dig syns för andra användare när du skapar uppdrag, skickar erbjudanden eller får recensioner. Telefonnummer delas endast med uppdragsskaparen när du accepterat ett erbjudande, för att möjliggöra betalning via Swish.\n\nVi lämnar ut data till myndighet om vi är rättsligt skyldiga.",
+    body: "Vi säljer aldrig din data. Vi använder följande personuppgiftsbiträden för att driva tjänsten:\n\n• Microsoft Azure (Sverige): hosting av backend och databas\n• Cloudinary (EU): bildlagring och leverans\n• Google Firebase Cloud Messaging: aviseringar\n• Resend: utskick av transaktionella mejl\n• Criipto: identitetsverifiering via BankID\n\nNamn och profilbild på dig syns för andra användare när du skapar uppdrag, skickar erbjudanden eller får recensioner. Telefonnummer delas endast med uppdragsskaparen när du accepterat ett erbjudande, för att möjliggöra betalning via Swish.\n\nVi lämnar ut data till myndighet om vi är rättsligt skyldiga.",
   },
   {
     title: "Var din data lagras",
-    body: "Din data lagras primärt inom EU/EES. För push-notifikationer används Google Firebase, som kan innebära överföring till USA — Google har Standard Contractual Clauses (SCC) på plats för detta enligt GDPR.",
+    body: "Din data lagras primärt inom EU och EES. För aviseringar används Google Firebase, som kan innebära överföring till USA. Google har Standard Contractual Clauses (SCC) på plats för detta enligt GDPR.",
   },
   {
     title: "Hur länge vi sparar din data",
-    body: "Aktivt konto: så länge du använder tjänsten.\n\nVid radering: personuppgifter raderas inom 30 dagar. Namn och profil i recensioner du skrivit pseudonymiseras (visas som \"Borttagen användare\") för att bevara andra användares omdömeshistorik.\n\nChattmeddelanden: raderas när båda parter har raderat sina konton, eller efter 24 månaders inaktivitet.\n\nSäkerhets- och inloggningsloggar: 90 dagar.\n\nBokföringsuppgifter (om transaktioner förmedlats via oss): 7 år enligt bokföringslagen.",
+    body: "Aktivt konto: så länge du använder tjänsten.\n\nVid radering: personuppgifter raderas inom 30 dagar. Namn och profil i recensioner du skrivit pseudonymiseras (visas som \"Borttagen användare\") för att bevara andra användares omdömeshistorik.\n\nChattmeddelanden: raderas när båda parter har raderat sina konton, eller efter 24 månaders inaktivitet.\n\nLoggar för säkerhet och inloggning: 90 dagar.\n\nBokföringsuppgifter (om transaktioner förmedlats via oss): 7 år enligt bokföringslagen.",
   },
   {
     title: "Dina rättigheter",
-    body: "Enligt GDPR har du rätt att:\n\n• Få tillgång till dina personuppgifter (registerutdrag)\n• Rätta felaktiga uppgifter — gör det direkt under Redigera profil\n• Radera ditt konto och tillhörande data — gör det under Inställningar\n• Exportera din data i maskinläsbart format\n• Invända mot behandling som sker på berättigat intresse\n• Begära begränsning av behandling\n• Återkalla samtycke för push-notifikationer och liknande\n\nKontakta support@grannfix.se för att utöva rättigheter som inte kan hanteras direkt i appen.",
+    body: "Enligt GDPR har du rätt att:\n\n• Få tillgång till dina personuppgifter (registerutdrag)\n• Rätta felaktiga uppgifter, vilket du gör direkt under Redigera profil\n• Radera ditt konto och tillhörande data, vilket du gör under Inställningar\n• Exportera din data i maskinläsbart format\n• Invända mot behandling som sker på berättigat intresse\n• Begära begränsning av behandling\n• Återkalla samtycke för aviseringar och liknande\n\nKontakta support@grannfix.se för att utöva rättigheter som inte kan hanteras direkt i appen.",
   },
   {
     title: "Säkerhet",
-    body: "Vi skyddar din data med kryptering vid överföring (HTTPS/TLS) och vid lagring där det är tillämpligt. Lösenord lagras endast som bcrypt-hashar. All åtkomst till produktionsdata är loggat och begränsat till personal som behöver det.\n\nVid en personuppgiftsincident som riskerar dina rättigheter informerar vi dig och Integritetsskyddsmyndigheten enligt GDPR.",
+    body: "Vi skyddar din data med kryptering vid överföring (HTTPS och TLS) och vid lagring där det är tillämpligt. Lösenord lagras aldrig i klartext, utan endast hashade med bcrypt. All åtkomst till produktionsdata är loggad och begränsad till personal som behöver den.\n\nVid en personuppgiftsincident som riskerar dina rättigheter informerar vi dig och Integritetsskyddsmyndigheten enligt GDPR.",
   },
   {
     title: "Åldersgräns",

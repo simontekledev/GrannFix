@@ -14,7 +14,7 @@ import Constants from "expo-constants";
 
 const BASE_URL = Constants.expoConfig?.extra?.apiUrl ?? "http://localhost:8080";
 
-let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
 
 async function getToken() {
   return (await AsyncStorage.getItem("access_token")) ?? "";
@@ -23,9 +23,7 @@ async function getToken() {
 const bareConfig = new Configuration({ basePath: BASE_URL });
 const bareAuthApi = new AuthControllerApi(bareConfig);
 
-async function tryRefreshToken(): Promise<boolean> {
-  if (isRefreshing) return false;
-  isRefreshing = true;
+async function doRefresh(): Promise<boolean> {
   try {
     const refreshToken = await AsyncStorage.getItem("refresh_token");
     if (!refreshToken) return false;
@@ -41,9 +39,21 @@ async function tryRefreshToken(): Promise<boolean> {
     return true;
   } catch {
     return false;
-  } finally {
-    isRefreshing = false;
   }
+}
+
+/**
+ * Refreshes the access token. Concurrent callers share a single in-flight
+ * refresh and all receive its result, so parallel 401s retry correctly
+ * instead of all but one failing.
+ */
+function tryRefreshToken(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = doRefresh().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
 }
 
 const refreshMiddleware: Middleware = {

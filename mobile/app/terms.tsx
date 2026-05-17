@@ -65,7 +65,7 @@ const SECTIONS = [
   },
   {
     title: "Ändringar av villkoren",
-    body: "Vi kan uppdatera dessa villkor. Vid väsentliga ändringar meddelar vi dig i appen eller via mejl innan de träder i kraft. Fortsatt användning efter att ändringarna trätt i kraft innebär att du godkänner dem.",
+    body: "Vi kan uppdatera dessa villkor. Vid väsentliga ändringar meddelar vi dig i appen eller via e-post innan de träder i kraft. Fortsatt användning efter att ändringarna trätt i kraft innebär att du godkänner dem.",
   },
   {
     title: "Kontakt",

@@ -27,7 +27,6 @@ public class TaskMapper {
                 t.getArea(),
                 t.getStreet(),
                 t.getOfferedPrice(),
-                t.getImageUrls() != null ? t.getImageUrls() : List.of(),
                 t.getStatus(),
                 t.getCreatedById(),
                 t.isActive(),

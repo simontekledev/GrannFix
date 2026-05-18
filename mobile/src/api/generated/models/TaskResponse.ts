@@ -75,12 +75,6 @@ export interface TaskResponse {
     offeredPrice?: number;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof TaskResponse
-     */
-    imageUrls?: Array<string>;
-    /**
-     * 
      * @type {TaskResponseStatusEnum}
      * @memberof TaskResponse
      */
@@ -162,7 +156,6 @@ export function TaskResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'area': json['area'] == null ? undefined : json['area'],
         'street': json['street'] == null ? undefined : json['street'],
         'offeredPrice': json['offeredPrice'] == null ? undefined : json['offeredPrice'],
-        'imageUrls': json['imageUrls'] == null ? undefined : json['imageUrls'],
         'status': json['status'] == null ? undefined : json['status'],
         'createdById': json['createdById'] == null ? undefined : json['createdById'],
         'active': json['active'] == null ? undefined : json['active'],
@@ -193,7 +186,6 @@ export function TaskResponseToJSONTyped(value?: TaskResponse | null, ignoreDiscr
         'area': value['area'],
         'street': value['street'],
         'offeredPrice': value['offeredPrice'],
-        'imageUrls': value['imageUrls'],
         'status': value['status'],
         'createdById': value['createdById'],
         'active': value['active'],

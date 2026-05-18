@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Image,
   Linking,
   Platform,
@@ -23,7 +22,6 @@ import { OfferCard } from "@/src/components/OfferCard";
 import { RateHelperSection } from "@/src/components/RateHelperSection";
 import { CreateOfferModal } from "@/src/components/CreateOfferModal";
 import { EditTaskModal } from "@/src/components/EditTaskModal";
-import { timeAgo } from "@/src/helpers/time";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
 
@@ -109,7 +107,7 @@ export default function TaskDetailScreen() {
   }
 
   async function handleMarkDone() {
-    const acceptedOffer = offers.find((o) => (o as any).status === "ACCEPTED");
+    const acceptedOffer = offers.find((o) => o.status === "ACCEPTED");
     if (!acceptedOffer?.id) return;
     setMarkingDone(true);
     try {
@@ -130,7 +128,7 @@ export default function TaskDetailScreen() {
   }
 
   async function handleConfirmDone() {
-    const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+    const markedOffer = offers.find((o) => o.status === "MARKED_DONE");
     if (!markedOffer?.id) return;
 
     const doConfirm = async () => {
@@ -163,7 +161,7 @@ export default function TaskDetailScreen() {
   }
 
   async function handleSubmitRating() {
-    const completedOffer = offers.find((o) => (o as any).status === "COMPLETED");
+    const completedOffer = offers.find((o) => o.status === "COMPLETED");
     if (!completedOffer?.id || ratingValue === 0) return;
     setSubmittingRating(true);
     try {
@@ -598,9 +596,9 @@ export default function TaskDetailScreen() {
         )}
 
         {status === "COMPLETED" && task.createdBy?.id === user?.id && (() => {
-          const completedOffer = offers.find((o) => (o as any).status === "COMPLETED");
+          const completedOffer = offers.find((o) => o.status === "COMPLETED");
           if (!completedOffer) return null;
-          const savedRating = (completedOffer as any).rating as number | undefined;
+          const savedRating = completedOffer.rating;
           const submittedRating =
             ratingSubmitted ? ratingValue : (savedRating ?? null);
           return (
@@ -631,8 +629,8 @@ export default function TaskDetailScreen() {
           )}
 
           {status === "ASSIGNED" && task.assignedTo?.id === user?.id && (() => {
-            const acceptedOffer = offers.find((o) => (o as any).status === "ACCEPTED");
-            const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+            const acceptedOffer = offers.find((o) => o.status === "ACCEPTED");
+            const markedOffer = offers.find((o) => o.status === "MARKED_DONE");
             if (markedOffer) {
               return (
                 <View style={styles.infoBanner}>
@@ -664,7 +662,7 @@ export default function TaskDetailScreen() {
           })()}
 
           {status === "ASSIGNED" && task.createdBy?.id === user?.id && (() => {
-            const markedOffer = offers.find((o) => (o as any).status === "MARKED_DONE");
+            const markedOffer = offers.find((o) => o.status === "MARKED_DONE");
             if (markedOffer) {
               return (
                 <Pressable

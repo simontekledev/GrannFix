@@ -31,6 +31,10 @@ import { useTheme } from "@/src/context/ThemeContext";
 import { createTasksStyles } from "@/src/styles/screens/tasks";
 import { pickTaskImages, uploadImage } from "@/src/helpers/images";
 import { timeAgo } from "@/src/helpers/time";
+import {
+  alertTitleForApiError,
+  messageForCreateTaskError,
+} from "@/src/helpers/errors";
 import type { MyOfferResponse } from "@/src/api/generated/models/MyOfferResponse";
 
 const STATUS_ORDER: Record<string, number> = {
@@ -120,9 +124,10 @@ export default function TasksScreen() {
       fetchTasks();
     } catch (e: any) {
       console.log("Create task error:", e);
-      const msg = "Kunde inte skapa uppdraget. Försök igen.";
+      const msg = messageForCreateTaskError(e);
+      const title = alertTitleForApiError(e);
       if (Platform.OS === "web") window.alert(msg);
-      else Alert.alert("Fel", msg);
+      else Alert.alert(title, msg);
     } finally {
       setCreating(false);
     }

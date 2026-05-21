@@ -21,6 +21,10 @@ import { TaskDetailSkeleton } from "@/src/components/Skeleton";
 import { OfferCard } from "@/src/components/OfferCard";
 import { RateHelperSection } from "@/src/components/RateHelperSection";
 import { CreateOfferModal } from "@/src/components/CreateOfferModal";
+import {
+  alertTitleForApiError,
+  messageForCreateOfferError,
+} from "@/src/helpers/errors";
 import { EditTaskModal } from "@/src/components/EditTaskModal";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
@@ -225,9 +229,10 @@ export default function TaskDetailScreen() {
       else Alert.alert("Skickat", "Ditt erbjudande har skickats");
     } catch (e: any) {
       console.log("Offer error:", e);
-      const msg = "Kunde inte skicka erbjudandet";
+      const msg = messageForCreateOfferError(e);
+      const title = alertTitleForApiError(e);
       if (Platform.OS === "web") window.alert(msg);
-      else Alert.alert("Fel", msg);
+      else Alert.alert(title, msg);
       throw e;
     } finally {
       setSendingOffer(false);

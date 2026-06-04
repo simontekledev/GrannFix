@@ -70,6 +70,7 @@ export default function TasksScreen() {
   const [areaSearch, setAreaSearch] = useState("");
   const [creating, setCreating] = useState(false);
   const [imageUris, setImageUris] = useState<string[]>([]);
+  const [cancellingOfferId, setCancellingOfferId] = useState<string | null>(null);
 
 
   const filteredAreas = STOCKHOLM_AREAS.filter((a) =>
@@ -180,6 +181,33 @@ export default function TasksScreen() {
     setRefreshing(false);
   }
 
+  function confirmCancelOffer(offerId: string, onConfirm: () => void) {
+    const message = "Vill du dra tillbaka ditt erbjudande?";
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) onConfirm();
+    } else {
+      Alert.alert("Dra tillbaka erbjudande", message, [
+        { text: "Nej", style: "cancel" },
+        { text: "Dra tillbaka", style: "destructive", onPress: onConfirm },
+      ]);
+    }
+  }
+
+  async function handleCancelOffer(offerId: string) {
+    setCancellingOfferId(offerId);
+    try {
+      await offerApi.cancelOffer({ offerId });
+      setMyOffers((prev) => prev.filter((o) => o.id !== offerId));
+    } catch (e) {
+      console.log("Cancel offer error:", e);
+      const msg = "Kunde inte dra tillbaka erbjudandet. Försök igen.";
+      if (Platform.OS === "web") window.alert(msg);
+      else Alert.alert("Fel", msg);
+    } finally {
+      setCancellingOfferId(null);
+    }
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -266,12 +294,20 @@ export default function TasksScreen() {
     CANCELLED: "#EF4444",
   };
 
-  const sortedOffers = [...myOffers].sort((a, b) =>
-    (OFFER_STATUS_ORDER[a.status ?? ""] ?? 99) - (OFFER_STATUS_ORDER[b.status ?? ""] ?? 99)
-  );
+  const sortedOffers = [...myOffers]
+    .filter((o) => o.status !== "CANCELLED")
+    .sort(
+      (a, b) =>
+        (OFFER_STATUS_ORDER[a.status ?? ""] ?? 99) -
+        (OFFER_STATUS_ORDER[b.status ?? ""] ?? 99)
+    );
 
-  const activeOffers = sortedOffers.filter((o) => ["PENDING", "ACCEPTED", "MARKED_DONE"].includes(o.status ?? ""));
-  const pastOffers = sortedOffers.filter((o) => ["COMPLETED", "DECLINED", "CANCELLED"].includes(o.status ?? ""));
+  const activeOffers = sortedOffers.filter((o) =>
+    ["PENDING", "ACCEPTED", "MARKED_DONE"].includes(o.status ?? "")
+  );
+  const pastOffers = sortedOffers.filter((o) =>
+    ["COMPLETED", "DECLINED"].includes(o.status ?? "")
+  );
 
   const offerSections = [
     ...(activeOffers.length > 0 ? [{ title: "Aktiva", data: activeOffers }] : []),
@@ -284,35 +320,57 @@ export default function TasksScreen() {
     const statusColor = OFFER_STATUS_COLORS[item.status ?? ""] ?? "#888";
     const statusLabel = OFFER_STATUS_LABELS[item.status ?? ""] ?? item.status;
 
-    const isDeclined = item.status === "DECLINED" || item.status === "CANCELLED";
+    const isDeclined = item.status === "DECLINED";
+    const isPending = item.status === "PENDING";
+    const isCancelling = cancellingOfferId === item.id;
 
     return (
-      <Pressable
-        onPress={isDeclined ? undefined : () => router.push(`/task-detail?id=${task.id}` as any)}
-        style={({ pressed }) => [styles.offerCard, pressed && !isDeclined && { opacity: 0.7 }, isDeclined && { opacity: 0.5 }]}
-      >
-        <View style={styles.offerCardHeader}>
-          <Text style={styles.offerTaskTitle} numberOfLines={1}>{task.title}</Text>
-          {item.proposedPrice != null && (
-            <Text style={styles.offerPrice}>{item.proposedPrice} kr</Text>
-          )}
-        </View>
-
-        <View style={styles.offerCardMeta}>
-          <View style={[styles.offerStatusBadge, { backgroundColor: statusColor + "18" }]}>
-            <Text style={[styles.offerStatusText, { color: statusColor }]}>{statusLabel}</Text>
+      <View style={[styles.offerCard, isDeclined && { opacity: 0.5 }]}>
+        <Pressable
+          onPress={isDeclined ? undefined : () => router.push(`/task-detail?id=${task.id}` as any)}
+          style={({ pressed }) => [pressed && !isDeclined && { opacity: 0.7 }]}
+        >
+          <View style={styles.offerCardHeader}>
+            <Text style={styles.offerTaskTitle} numberOfLines={1}>{task.title}</Text>
+            {item.proposedPrice != null && (
+              <Text style={styles.offerPrice}>{item.proposedPrice} kr</Text>
+            )}
           </View>
-        </View>
 
-        <View style={styles.offerCardFooter}>
-          {item.createdAt && (
-            <Text style={styles.offerDate}>{timeAgo(item.createdAt)}</Text>
-          )}
-          {!isDeclined && (
-            <Text style={styles.offerDetailLink}>Visa detaljer →</Text>
-          )}
-        </View>
-      </Pressable>
+          <View style={styles.offerCardMeta}>
+            <View style={[styles.offerStatusBadge, { backgroundColor: statusColor + "18" }]}>
+              <Text style={[styles.offerStatusText, { color: statusColor }]}>{statusLabel}</Text>
+            </View>
+          </View>
+
+          <View style={styles.offerCardFooter}>
+            {item.createdAt && (
+              <Text style={styles.offerDate}>{timeAgo(item.createdAt)}</Text>
+            )}
+            {!isDeclined && (
+              <Text style={styles.offerDetailLink}>Visa detaljer →</Text>
+            )}
+          </View>
+        </Pressable>
+
+        {isPending && item.id && (
+          <Pressable
+            onPress={() => confirmCancelOffer(item.id!, () => handleCancelOffer(item.id!))}
+            disabled={isCancelling}
+            style={({ pressed }) => [
+              styles.offerCancelButton,
+              pressed && !isCancelling && { opacity: 0.7 },
+              isCancelling && { opacity: 0.35 },
+            ]}
+          >
+            {isCancelling ? (
+              <ActivityIndicator color={colors.danger} size="small" />
+            ) : (
+              <Text style={styles.offerCancelButtonText}>Dra tillbaka erbjudande</Text>
+            )}
+          </Pressable>
+        )}
+      </View>
     );
   }
 
@@ -370,7 +428,7 @@ export default function TasksScreen() {
           />
         )
       ) : (
-        myOffers.length === 0 ? (
+        myOffers.filter((o) => o.status !== "CANCELLED").length === 0 ? (
           <View style={[styles.centered, { flex: 1, paddingBottom: 140 }]}>
             <Image
               source={require("@/assets/images/activity-icon.png")}

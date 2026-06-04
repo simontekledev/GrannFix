@@ -312,6 +312,20 @@ export function createTasksStyles(colors: ThemeColors) {
       fontWeight: "500",
       color: colors.accent,
     },
+    offerCancelButton: {
+      marginTop: 12,
+      borderWidth: 1,
+      borderColor: colors.danger,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    offerCancelButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.danger,
+    },
     imageThumb: {
       width: 80,
       height: 80,

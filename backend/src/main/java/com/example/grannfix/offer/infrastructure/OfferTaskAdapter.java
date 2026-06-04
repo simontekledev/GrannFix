@@ -30,7 +30,16 @@ public class OfferTaskAdapter implements OfferTaskPort {
 
     @Override
     public boolean hasOffer(UUID taskId, UUID userId) {
-        return offerRepository.existsByTaskIdAndHelperId(taskId, userId);
+        return offerRepository.findByTaskIdAndHelperId(taskId, userId)
+                .map(OfferTaskAdapter::blocksOfferingAgain)
+                .orElse(false);
+    }
+
+    private static boolean blocksOfferingAgain(Offer offer) {
+        return switch (offer.getStatus()) {
+            case PENDING, ACCEPTED, MARKED_DONE, COMPLETED -> true;
+            case DECLINED, CANCELLED -> false;
+        };
     }
 
     @Override

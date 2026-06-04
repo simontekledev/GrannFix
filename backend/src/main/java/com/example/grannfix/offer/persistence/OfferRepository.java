@@ -25,6 +25,7 @@ public interface OfferRepository extends JpaRepository<Offer, UUID> {
             UUID helperId, OfferStatus status, Pageable pageable);
 
     boolean existsByTaskIdAndHelperId(UUID taskId, UUID helperId);
+    Optional<Offer> findByTaskIdAndHelperId(UUID taskId, UUID helperId);
     List<Offer> findByTaskIdOrderByCreatedAtDesc(UUID taskId);
     boolean existsByTaskIdAndStatus(UUID taskId, OfferStatus offerStatus);
     int countByTaskIdAndStatus(UUID taskId, OfferStatus status);

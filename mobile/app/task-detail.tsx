@@ -27,6 +27,7 @@ import {
 } from "@/src/helpers/errors";
 import { EditTaskModal } from "@/src/components/EditTaskModal";
 import type { TaskDetailResponse } from "@/src/api/generated/models/TaskDetailResponse";
+import type { MyOfferResponse } from "@/src/api/generated/models/MyOfferResponse";
 import { resolveImageUrl } from "@/src/helpers/images";
 
 
@@ -211,6 +212,21 @@ export default function TaskDetailScreen() {
   // Offer modal
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [sendingOffer, setSendingOffer] = useState(false);
+  const [myPendingOffer, setMyPendingOffer] = useState<MyOfferResponse | null>(null);
+  const [cancellingOffer, setCancellingOffer] = useState(false);
+
+  const loadMyPendingOffer = useCallback(async (taskId: string) => {
+    try {
+      const mine = await offerApi.getMyOffers();
+      const pending = mine.find(
+        (o) => o.task?.id === taskId && o.status === "PENDING"
+      );
+      setMyPendingOffer(pending ?? null);
+    } catch (e) {
+      console.log("Failed to load my offer:", e);
+      setMyPendingOffer(null);
+    }
+  }, []);
 
   async function handleSendOffer(payload: { price?: number; message?: string }) {
     if (!id) return;
@@ -225,6 +241,7 @@ export default function TaskDetailScreen() {
       });
       const updated = await taskApi.getTask({ id });
       setTask(updated);
+      await loadMyPendingOffer(id);
       if (Platform.OS === "web") window.alert("Erbjudande skickat!");
       else Alert.alert("Skickat", "Ditt erbjudande har skickats");
     } catch (e: any) {
@@ -236,6 +253,39 @@ export default function TaskDetailScreen() {
       throw e;
     } finally {
       setSendingOffer(false);
+    }
+  }
+
+  async function handleCancelMyOffer() {
+    if (!myPendingOffer?.id || !id) return;
+
+    const doCancel = async () => {
+      setCancellingOffer(true);
+      try {
+        await offerApi.cancelOffer({ offerId: myPendingOffer.id! });
+        setMyPendingOffer(null);
+        const updated = await taskApi.getTask({ id });
+        setTask(updated);
+        if (Platform.OS === "web") window.alert("Erbjudandet har dragits tillbaka.");
+        else Alert.alert("Klart", "Erbjudandet har dragits tillbaka.");
+      } catch (e) {
+        console.log("Cancel offer error:", e);
+        const msg = "Kunde inte dra tillbaka erbjudandet. Försök igen.";
+        if (Platform.OS === "web") window.alert(msg);
+        else Alert.alert("Fel", msg);
+      } finally {
+        setCancellingOffer(false);
+      }
+    };
+
+    const message = "Vill du dra tillbaka ditt erbjudande?";
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) doCancel();
+    } else {
+      Alert.alert("Dra tillbaka erbjudande", message, [
+        { text: "Nej", style: "cancel" },
+        { text: "Dra tillbaka", style: "destructive", onPress: doCancel },
+      ]);
     }
   }
 
@@ -279,6 +329,11 @@ export default function TaskDetailScreen() {
     try {
       const res = await taskApi.getTask({ id });
       setTask(res);
+      if (res.createdBy?.id !== user?.id) {
+        await loadMyPendingOffer(id);
+      } else {
+        setMyPendingOffer(null);
+      }
       if (
         (res.status === "ASSIGNED" || res.status === "COMPLETED") &&
         (res.createdBy?.id === user?.id || res.assignedTo?.id === user?.id)
@@ -288,7 +343,7 @@ export default function TaskDetailScreen() {
     } catch (e) {
       console.log("Failed to load task:", e);
     }
-  }, [id, user?.id]);
+  }, [id, user?.id, loadMyPendingOffer]);
 
   useEffect(() => {
     if (!id) return;
@@ -298,6 +353,11 @@ export default function TaskDetailScreen() {
       try {
         const res = await taskApi.getTask({ id });
         setTask(res);
+        if (res.createdBy?.id !== user?.id) {
+          await loadMyPendingOffer(id);
+        } else {
+          setMyPendingOffer(null);
+        }
         if (offer === "true" && res.permissions?.canOffer) {
           setShowOfferModal(true);
         }
@@ -620,6 +680,30 @@ export default function TaskDetailScreen() {
         })()}
 
         <View style={styles.actions}>
+          {myPendingOffer && (
+            <>
+              <View style={styles.infoBanner}>
+                <Text style={styles.infoBannerText}>Ditt erbjudande väntar på svar</Text>
+              </View>
+              <Pressable
+                onPress={handleCancelMyOffer}
+                disabled={cancellingOffer}
+                style={({ pressed, hovered }: any) => [
+                  styles.dangerButton,
+                  hovered && styles.dangerButtonHovered,
+                  pressed && styles.dangerButtonPressed,
+                  cancellingOffer && { opacity: 0.35 },
+                ]}
+              >
+                {cancellingOffer ? (
+                  <ActivityIndicator color={colors.danger} />
+                ) : (
+                  <Text style={styles.dangerButtonText}>Dra tillbaka erbjudande</Text>
+                )}
+              </Pressable>
+            </>
+          )}
+
           {perms?.canOffer && (
             <Pressable
               style={({ pressed, hovered }: any) => [

@@ -54,9 +54,25 @@ public class OfferService {
         if (!task.offerable()) {
             throw new BadRequestException("Task is not open for offers.");
         }
-        if (offerRepository.existsByTaskIdAndHelperId(taskId, helperId)) {
+
+        var existing = offerRepository.findByTaskIdAndHelperId(taskId, helperId);
+        if (existing.isPresent()) {
+            Offer prior = existing.get();
+            if (prior.getStatus() == OfferStatus.CANCELLED || prior.getStatus() == OfferStatus.DECLINED) {
+                prior.setStatus(OfferStatus.PENDING);
+                prior.setProposedPrice(req.proposedPrice());
+                prior.setMessage(req.message());
+                Offer saved = offerRepository.save(prior);
+                String helperName = userLookupPort.displayName(helperId);
+                pushPort.sendToUser(
+                        task.createdById(),
+                        "Nytt erbjudande",
+                        helperName + " vill hjälpa till med ditt uppdrag");
+                return OfferMapper.toResponse(saved);
+            }
             throw new ConflictException("You already have an offer for this task.");
         }
+
         Offer offer = Offer.builder()
                 .taskId(taskId)
                 .helperId(helperId)
